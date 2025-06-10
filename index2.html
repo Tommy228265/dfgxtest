@@ -14,7 +14,8 @@
                         primary: '#165DFF',
                         success: '#00B42A',
                         error: '#F53F3F',
-                        neutral: '#F2F3F5'
+                        neutral: '#F2F3F5',
+                        aiBlue: '#3B82F6',
                     },
                     fontFamily: {
                         inter: ['Inter', 'system-ui', 'sans-serif'],
@@ -34,6 +35,16 @@
             .btn-hover {
                 @apply hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300;
             }
+            .problem-card {
+                @apply bg-white rounded-xl shadow-md p-6 border-l-4 border-primary transition-all duration-300 hover:shadow-lg;
+            }
+            .feedback-appear {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
         }
     </style>
 </head>
@@ -42,38 +53,43 @@
         <!-- 头部区域 -->
         <header class="text-center mb-8">
             <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold text-primary mb-2">
-                <i class="fa fa-graduation-cap mr-2"></i>东方国信AI助教系统
+                <i class="fa fa-robot mr-2 text-aiBlue"></i>东方国信AI助教系统
             </h1>
-            <p class="text-gray-600">智能问答训练平台</p>
+            <p class="text-gray-600">人工智能知识问答训练平台</p>
         </header>
 
         <!-- 主内容区 -->
         <main class="bg-white rounded-xl shadow-md p-6 mb-8 flex-grow">
             <div class="space-y-6">
                 <!-- 问题展示区 -->
-                <div class="bg-neutral rounded-lg p-5 shadow-sm">
-                    <h2 class="text-lg font-semibold text-gray-700 mb-3">当前问题</h2>
-                    <div id="problemContainer" class="text-[clamp(1.2rem,3vw,1.8rem)] font-medium text-gray-800 min-h-[60px] flex items-center justify-center">
+                <div class="problem-card">
+                    <div class="flex items-start mb-3">
+                        <div class="flex-shrink-0 pt-0.5">
+                            <i class="fa fa-question-circle text-xl text-primary"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-700 ml-2">AI知识问题</h2>
+                    </div>
+                    <div id="problemContainer" class="text-[clamp(1.2rem,3vw,1.5rem)] font-medium text-gray-800 min-h-[60px] flex items-center justify-center">
                         <div class="animate-pulse text-gray-400">
-                            <i class="fa fa-spinner fa-spin mr-2"></i>正在加载问题...
+                            <i class="fa fa-spinner fa-spin mr-2"></i>正在加载AI问题...
                         </div>
                     </div>
                 </div>
 
                 <!-- 回答输入区 -->
                 <div class="space-y-3">
-                    <label for="answerInput" class="block text-sm font-medium text-gray-700">您的答案:</label>
+                    <label for="answerInput" class="block text-sm font-medium text-gray-700">您的回答:</label>
                     <div class="flex">
-                        <input type="text" id="answerInput" placeholder="输入答案..." 
-                            class="flex-grow px-4 py-3 rounded-l-lg border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all">
+                        <textarea id="answerInput" rows="3" placeholder="输入您的回答..." 
+                            class="flex-grow px-4 py-3 rounded-l-lg border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all resize-none"></textarea>
                         <button id="checkBtn" onclick="checkAnswer()" 
                             class="bg-primary text-white px-6 py-3 rounded-r-lg btn-hover flex items-center justify-center">
-                            <i class="fa fa-check-circle mr-2"></i>验证
+                            <i class="fa fa-check-circle mr-2"></i>提交回答
                         </button>
                     </div>
                     <button id="newProblemBtn" onclick="generateProblem()" 
                         class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-lg btn-hover flex items-center justify-center">
-                        <i class="fa fa-refresh mr-2"></i>生成新问题
+                        <i class="fa fa-refresh mr-2"></i>获取新问题
                     </button>
                 </div>
 
@@ -89,18 +105,19 @@
 
                     <!-- 记录信息区 -->
                     <div class="bg-neutral rounded-lg p-4 flex flex-col justify-center">
-                        <h3 class="text-sm font-medium text-gray-600 mb-2">记录信息</h3>
+                        <h3 class="text-sm font-medium text-gray-600 mb-2">学习记录</h3>
                         <div class="space-y-2 text-sm text-gray-700">
                             <p>回答ID: <span id="recordId" class="font-mono text-gray-900">--</span></p>
                             <p>时间: <span id="timestamp" class="font-mono text-gray-900">--</span></p>
                             <p>正确率: <span id="accuracyRate" class="font-mono text-gray-900">--</span></p>
+                            <p>已回答: <span id="totalQuestions" class="font-mono text-gray-900">0</span> 问题</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 结果反馈区 -->
                 <div id="feedbackContainer" class="hidden">
-                    <div id="successFeedback" class="hidden bg-success/10 border border-success/30 text-success p-4 rounded-lg">
+                    <div id="successFeedback" class="hidden bg-success/10 border border-success/30 text-success p-4 rounded-lg feedback-appear">
                         <div class="flex items-start">
                             <div class="flex-shrink-0 pt-0.5">
                                 <i class="fa fa-check-circle text-xl"></i>
@@ -108,20 +125,21 @@
                             <div class="ml-3">
                                 <h3 class="text-sm font-medium">回答正确！</h3>
                                 <div class="mt-2 text-sm">
-                                    <p>恭喜您答对了问题，继续保持！</p>
+                                    <p>您的回答与标准答案高度匹配。</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="errorFeedback" class="hidden bg-error/10 border border-error/30 text-error p-4 rounded-lg">
+                    <div id="errorFeedback" class="hidden bg-error/10 border border-error/30 text-error p-4 rounded-lg feedback-appear">
                         <div class="flex items-start">
                             <div class="flex-shrink-0 pt-0.5">
                                 <i class="fa fa-times-circle text-xl"></i>
                             </div>
                             <div class="ml-3">
-                                <h3 class="text-sm font-medium">回答错误</h3>
+                                <h3 class="text-sm font-medium">回答有待完善</h3>
                                 <div class="mt-2 text-sm">
-                                    <p>正确答案是: <span id="correctAnswerDisplay" class="font-mono font-medium"></span></p>
+                                    <p>正确答案参考:</p>
+                                    <div id="correctAnswerDisplay" class="mt-2 p-3 bg-white rounded border border-gray-200 text-gray-800"></div>
                                 </div>
                             </div>
                         </div>
@@ -143,7 +161,7 @@
         // 页面加载时生成问题
         window.onload = generateProblem;
 
-        // 从API获取问题
+        // 从API获取AI相关问题
         async function generateProblem() {
             // 重置UI状态
             document.getElementById('answerInput').value = '';
@@ -160,19 +178,19 @@
             
             // 显示加载状态
             const problemContainer = document.getElementById('problemContainer');
-            problemContainer.innerHTML = '<div class="animate-pulse text-gray-400"><i class="fa fa-spinner fa-spin mr-2"></i>正在获取问题...</div>';
+            problemContainer.innerHTML = '<div class="animate-pulse text-gray-400"><i class="fa fa-spinner fa-spin mr-2"></i>正在获取AI问题...</div>';
             
             try {
-                // 调用API获取问题
+                // 调用API获取AI相关问题
                 const response = await fetch('http://aibot.red/share?apikey=aibot_ee2dd3a99f5f4e0eaf87fc8b9bd18220', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "question_type": "math",
-                        "difficulty": "easy",
-                        "subject": "arithmetic"
+                        "question_type": "ai",
+                        "difficulty": "intermediate",
+                        "topic": ["machine_learning", "deep_learning", "nlp", "computer_vision"]
                     })
                 });
                 
@@ -185,11 +203,11 @@
                 // 处理API响应
                 if (data.question && data.answer) {
                     currentProblem = data;
-                    problemContainer.textContent = data.question;
+                    problemContainer.innerHTML = `<div class="prose max-w-none">${formatQuestion(data.question)}</div>`;
                     document.getElementById('answerInput').focus();
                     
-                    // 更新正确率显示
-                    updateAccuracyRate();
+                    // 更新统计信息
+                    updateStatsDisplay();
                 } else {
                     throw new Error('API返回数据格式不正确');
                 }
@@ -197,6 +215,12 @@
                 console.error('获取问题时出错:', error);
                 problemContainer.innerHTML = `<div class="text-error"><i class="fa fa-exclamation-circle mr-2"></i>获取问题失败: ${error.message}</div>`;
             }
+        }
+
+        // 格式化问题文本
+        function formatQuestion(question) {
+            // 简单的格式化，将换行符转换为<br>
+            return question.replace(/\n/g, '<br>');
         }
 
         // 检查用户答案
@@ -225,24 +249,26 @@
             
             // 禁用按钮防止重复提交
             document.getElementById('checkBtn').disabled = true;
-            document.getElementById('checkBtn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>验证中...';
+            document.getElementById('checkBtn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>正在验证...';
             
             try {
-                // 检查答案是否正确
-                const isCorrect = evaluateAnswer(userAnswer, currentProblem.answer);
+                // 调用API评估用户答案
+                const evaluation = await evaluateAnswerWithAI(userAnswer, currentProblem.question, currentProblem.answer);
                 
                 // 记录用户回答
                 const answerRecord = {
                     problem: currentProblem.question,
                     userAnswer: userAnswer,
                     correctAnswer: currentProblem.answer,
-                    isCorrect: isCorrect,
+                    isCorrect: evaluation.isCorrect,
+                    confidence: evaluation.confidence,
+                    feedback: evaluation.feedback,
                     timestamp: new Date().toISOString()
                 };
                 userAnswers.push(answerRecord);
                 
                 // 更新UI显示
-                if (isCorrect) {
+                if (evaluation.isCorrect) {
                     // 回答正确
                     statusSquare.className = 'w-32 h-32 rounded-lg border-2 border-success bg-success/20 square-transition flex items-center justify-center';
                     statusSquare.innerHTML = '<i class="fa fa-check-circle text-4xl text-success"></i>';
@@ -266,46 +292,138 @@
                     // 显示错误反馈
                     feedbackContainer.classList.remove('hidden');
                     errorFeedback.classList.remove('hidden');
-                    correctAnswerDisplay.textContent = currentProblem.answer;
+                    correctAnswerDisplay.innerHTML = `<div class="prose max-w-none text-sm">${formatAnswer(currentProblem.answer)}</div>`;
+                    
+                    // 如果有AI提供的反馈，显示出来
+                    if (evaluation.feedback) {
+                        correctAnswerDisplay.innerHTML += `<div class="mt-3 p-2 bg-blue-50 border border-blue-100 rounded text-blue-700 text-sm">
+                            <i class="fa fa-lightbulb-o mr-1"></i> <strong>AI提示:</strong> ${evaluation.feedback}
+                        </div>`;
+                    }
                 }
                 
                 // 保存记录到数据库
-                const recordData = await saveAnswerRecord(isCorrect);
+                const recordData = await saveAnswerRecord(answerRecord);
                 
                 // 更新记录信息
                 recordIdElement.textContent = recordData.recordId;
                 timestampElement.textContent = new Date(recordData.timestamp).toLocaleString();
                 
-                // 更新正确率
-                updateAccuracyRate();
+                // 更新统计信息
+                updateStatsDisplay();
                 
             } catch (error) {
                 console.error('验证答案时出错:', error);
                 feedbackContainer.classList.remove('hidden');
                 errorFeedback.classList.remove('hidden');
-                correctAnswerDisplay.textContent = '验证答案时出错，请重试';
+                correctAnswerDisplay.innerHTML = `<div class="text-error">验证答案时出错: ${error.message}</div>`;
             } finally {
                 // 重新启用按钮
                 document.getElementById('checkBtn').disabled = false;
-                document.getElementById('checkBtn').innerHTML = '<i class="fa fa-check-circle mr-2"></i>验证';
+                document.getElementById('checkBtn').innerHTML = '<i class="fa fa-check-circle mr-2"></i>提交回答';
             }
         }
 
-        // 评估用户答案
-        function evaluateAnswer(userAnswer, correctAnswer) {
-            // 简单的字符串比较，可根据需要扩展为更复杂的评估逻辑
-            return userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+        // 使用AI评估用户答案
+        async function evaluateAnswerWithAI(userAnswer, question, correctAnswer) {
+            try {
+                // 实际应用中应该调用API进行答案评估
+                // 这里为演示目的，使用简单的相似度算法模拟评估
+                
+                // 计算答案相似度 (简化版)
+                const similarity = calculateAnswerSimilarity(userAnswer, correctAnswer);
+                
+                // 设定阈值 (实际应用中可能需要调整)
+                const threshold = 0.7;
+                
+                // 模拟AI反馈
+                let feedback = null;
+                if (similarity < threshold) {
+                    feedback = generateSampleFeedback(question, userAnswer, correctAnswer);
+                }
+                
+                return {
+                    isCorrect: similarity >= threshold,
+                    confidence: similarity,
+                    feedback: feedback
+                };
+            } catch (error) {
+                console.error('评估答案时出错:', error);
+                // 出错时返回默认评估结果
+                return {
+                    isCorrect: false,
+                    confidence: 0,
+                    feedback: '评估答案时出现技术问题，请重试'
+                };
+            }
+        }
+
+        // 计算答案相似度 (简化版)
+        function calculateAnswerSimilarity(userAnswer, correctAnswer) {
+            // 实际应用中应使用更复杂的NLP算法
+            // 这里仅做简单的文本相似度计算
+            
+            // 转换为小写并去除多余空格
+            const userAnswerProcessed = userAnswer.toLowerCase().trim();
+            const correctAnswerProcessed = correctAnswer.toLowerCase().trim();
+            
+            // 如果完全匹配，相似度为100%
+            if (userAnswerProcessed === correctAnswerProcessed) {
+                return 1.0;
+            }
+            
+            // 计算词重叠率
+            const userWords = userAnswerProcessed.split(/\s+/);
+            const correctWords = correctAnswerProcessed.split(/\s+/);
+            
+            const commonWords = userWords.filter(word => correctWords.includes(word));
+            
+            // 计算相似度 (简化版)
+            return commonWords.length / Math.max(userWords.length, correctWords.length);
+        }
+
+        // 生成示例反馈
+        function generateSampleFeedback(question, userAnswer, correctAnswer) {
+            // 实际应用中应该由AI生成
+            // 这里为演示目的，生成一些通用反馈
+            
+            if (userAnswer.length < 10) {
+                return "您的回答过于简短，建议提供更多细节和解释。";
+            }
+            
+            if (question.includes("什么是") || question.includes("定义")) {
+                return "您的回答没有完全涵盖概念的关键要素。建议补充" + correctAnswer.substring(0, 20) + "...";
+            }
+            
+            if (question.includes("为什么") || question.includes("原因")) {
+                return "您的回答没有解释根本原因。考虑从" + correctAnswer.substring(0, 15) + "...方面分析。";
+            }
+            
+            return "您的回答方向正确，但需要进一步完善。参考正确答案中的关键点。";
+        }
+
+        // 格式化答案文本
+        function formatAnswer(answer) {
+            // 简单的格式化，将换行符转换为<br>，并添加段落间距
+            return answer.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
         }
 
         // 保存答案记录到数据库
-        async function saveAnswerRecord(isCorrect) {
+        async function saveAnswerRecord(answerRecord) {
             try {
                 const response = await fetch('check.php', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/json'
                     },
-                    body: `isCorrect=${isCorrect ? 1 : 0}`
+                    body: JSON.stringify({
+                        question: answerRecord.problem,
+                        user_answer: answerRecord.userAnswer,
+                        correct_answer: answerRecord.correctAnswer,
+                        is_correct: answerRecord.isCorrect,
+                        confidence: answerRecord.confidence,
+                        feedback: answerRecord.feedback
+                    })
                 });
                 
                 if (!response.ok) {
@@ -330,18 +448,22 @@
             }
         }
 
-        // 更新正确率显示
-        function updateAccuracyRate() {
+        // 更新统计信息显示
+        function updateStatsDisplay() {
             const accuracyRateElement = document.getElementById('accuracyRate');
+            const totalQuestionsElement = document.getElementById('totalQuestions');
             
             if (userAnswers.length === 0) {
                 accuracyRateElement.textContent = '0%';
+                totalQuestionsElement.textContent = '0';
                 return;
             }
             
             const correctCount = userAnswers.filter(answer => answer.isCorrect).length;
             const accuracyRate = ((correctCount / userAnswers.length) * 100).toFixed(1) + '%';
+            
             accuracyRateElement.textContent = accuracyRate;
+            totalQuestionsElement.textContent = userAnswers.length;
         }
     </script>
 </body>
