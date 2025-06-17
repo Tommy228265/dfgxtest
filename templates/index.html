@@ -1,15 +1,15 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>拓扑图生成与展示系统</title>
+    <title>知识图谱生成系统</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vis-network@9.15.0/dist/vis-network.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/vis-network@9.15.0/dist/vis-network.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.1/dist/vis-network.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vis-network@9.1.1/dist/vis-network.min.css" rel="stylesheet">
     
-    <!-- 配置Tailwind CSS -->
     <script>
         tailwind.config = {
             theme: {
@@ -18,8 +18,8 @@
                         primary: '#3B82F6',
                         secondary: '#10B981',
                         accent: '#8B5CF6',
-                        dark: '#1F2937',
-                        light: '#F3F4F6'
+                        neutral: '#1F2937',
+                        "neutral-light": '#F3F4F6'
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -34,560 +34,367 @@
             .content-auto {
                 content-visibility: auto;
             }
-            .shadow-deep {
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
             }
-            .text-balance {
-                text-wrap: balance;
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
             }
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans text-dark min-h-screen flex flex-col">
-    <!-- 顶部导航栏 -->
-    <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fa fa-sitemap text-primary text-2xl"></i>
-                <h1 class="text-xl font-bold text-dark">拓扑图生成系统</h1>
+<body class="bg-gray-50 font-sans">
+    <!-- 顶部导航 -->
+    <header class="bg-gradient-primary text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa fa-sitemap text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-shadow">知识图谱生成系统</h1>
             </div>
-            <div class="hidden md:flex items-center space-x-4">
-                <a href="#upload" class="px-4 py-2 rounded-md hover:bg-gray-100 transition-colors">
-                    <i class="fa fa-upload mr-2"></i>上传文档
-                </a>
-                <a href="#topologies" class="px-4 py-2 rounded-md hover:bg-gray-100 transition-colors">
-                    <i class="fa fa-th-list mr-2"></i>拓扑图列表
-                </a>
-            </div>
-            <button class="md:hidden text-dark focus:outline-none" id="mobile-menu-button">
-                <i class="fa fa-bars text-xl"></i>
-            </button>
-        </div>
-        
-        <!-- 移动端菜单 -->
-        <div class="md:hidden hidden bg-white border-t" id="mobile-menu">
-            <div class="container mx-auto px-4 py-2 flex flex-col space-y-2">
-                <a href="#upload" class="px-4 py-2 rounded-md hover:bg-gray-100 transition-colors">
-                    <i class="fa fa-upload mr-2"></i>上传文档
-                </a>
-                <a href="#topologies" class="px-4 py-2 rounded-md hover:bg-gray-100 transition-colors">
-                    <i class="fa fa-th-list mr-2"></i>拓扑图列表
-                </a>
+            <div class="flex items-center space-x-4">
+                <button id="helpBtn" class="hover:text-gray-200 transition-all-300">
+                    <i class="fa fa-question-circle text-lg"></i>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8">
+    <main class="container mx-auto px-4 py-8">
         <!-- 上传区域 -->
-        <section id="upload" class="mb-12">
-            <div class="bg-white rounded-xl shadow-deep p-6 md:p-8 transform hover:-translate-y-1 transition-all duration-300">
-                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center">
-                    <i class="fa fa-file-text-o text-primary mr-3"></i>上传文档生成拓扑图
+        <section class="bg-white rounded-xl shadow-md p-6 mb-8 transition-all-300 hover:shadow-lg">
+            <h2 class="text-xl font-bold text-neutral mb-4 flex items-center">
+                <i class="fa fa-upload mr-2 text-primary"></i>上传文档
+            </h2>
+            <div id="uploadContainer" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-all-300 hover:border-primary cursor-pointer">
+                <i class="fa fa-file-text-o text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600 mb-4">拖放文档到此处，或<span class="text-primary font-medium">点击上传</span></p>
+                <p class="text-sm text-gray-500">支持 .txt, .pdf, .docx, .html 格式</p>
+                <input type="file" id="fileInput" class="hidden" accept=".txt,.pdf,.docx,.html">
+            </div>
+        </section>
+
+        <!-- 处理进度 -->
+        <section id="progressSection" class="bg-white rounded-xl shadow-md p-6 mb-8 hidden">
+            <h2 class="text-xl font-bold text-neutral mb-4 flex items-center">
+                <i class="fa fa-cog fa-spin mr-2 text-primary"></i>处理中
+            </h2>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+                <div id="progressBar" class="bg-primary h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p id="progressMessage" class="text-gray-600">准备中...</p>
+        </section>
+
+        <!-- 知识图谱结果 -->
+        <section id="resultSection" class="bg-white rounded-xl shadow-md p-6 mb-8 hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-xl font-bold text-neutral flex items-center">
+                    <i class="fa fa-sitemap mr-2 text-primary"></i>知识图谱
                 </h2>
-                
-                <div class="text-center mb-8">
-                    <p class="text-gray-600 max-w-2xl mx-auto text-balance">
-                        上传任意格式的文档（TXT、PDF、Word等），系统将自动分析内容并生成知识拓扑图，支持节点高亮和交互探索。
-                    </p>
+                <div class="flex space-x-3 mt-3 md:mt-0">
+                    <button id="zoomInBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center">
+                        <i class="fa fa-search-plus mr-1"></i> 放大
+                    </button>
+                    <button id="zoomOutBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center">
+                        <i class="fa fa-search-minus mr-1"></i> 缩小
+                    </button>
+                    <button id="resetViewBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center">
+                        <i class="fa fa-refresh mr-1"></i> 重置视图
+                    </button>
                 </div>
-                
-                <div class="flex flex-col items-center">
-                    <div class="w-full max-w-md">
-                        <div class="mb-4">
-                            <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-1">选择文档</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fa fa-file-o text-gray-400"></i>
-                                </div>
-                                <input type="file" id="file-upload" name="file" 
-                                       class="block w-full pl-10 pr-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
-                            </div>
-                        </div>
-                        
-                        <button id="upload-button" 
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200">
-                            <i class="fa fa-paper-plane mr-2"></i>上传并生成拓扑图
-                        </button>
-                    </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg overflow-hidden h-[600px] mb-6">
+                <div id="knowledgeGraph" class="w-full h-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div class="bg-neutral-light p-3 rounded-lg">
+                    <div class="font-medium text-neutral">处理时间</div>
+                    <div id="processingTime" class="text-primary font-semibold">--</div>
                 </div>
-                
-                <div id="upload-status" class="mt-6 hidden">
-                    <div class="bg-blue-50 border-l-4 border-primary p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <i class="fa fa-info-circle text-primary"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-blue-700" id="status-message">
-                                    文档已上传，正在分析生成拓扑图...
-                                </p>
-                                <div class="mt-2">
-                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                        <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="bg-neutral-light p-3 rounded-lg">
+                    <div class="font-medium text-neutral">节点数量</div>
+                    <div id="nodeCount" class="text-primary font-semibold">--</div>
+                </div>
+                <div class="bg-neutral-light p-3 rounded-lg">
+                    <div class="font-medium text-neutral">关系数量</div>
+                    <div id="edgeCount" class="text-primary font-semibold">--</div>
                 </div>
             </div>
         </section>
-        
-        <!-- 拓扑图展示区域 -->
-        <section id="topology-view" class="mb-12 hidden">
-            <div class="bg-white rounded-xl shadow-deep p-6 md:p-8">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                    <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-0">
-                        <i class="fa fa-sitemap text-primary mr-3"></i>拓扑图可视化
-                    </h2>
-                    <div class="flex space-x-3">
-                        <button id="refresh-topology" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center">
-                            <i class="fa fa-refresh mr-2"></i>刷新
-                        </button>
-                        <button id="download-json" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center">
-                            <i class="fa fa-download mr-2"></i>下载JSON
-                        </button>
+
+        <!-- 错误信息 -->
+        <section id="errorSection" class="bg-white rounded-xl shadow-md p-6 mb-8 hidden">
+            <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-exclamation-triangle text-red-500"></i>
                     </div>
-                </div>
-                
-                <div class="mb-6">
-                    <div class="flex items-center mb-3">
-                        <label for="search-node" class="mr-2 text-sm font-medium text-gray-700">搜索节点:</label>
-                        <div class="relative flex-grow max-w-md">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fa fa-search text-gray-400"></i>
-                            </div>
-                            <input type="text" id="search-node" 
-                                   class="block w-full pl-10 pr-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">处理出错</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p id="errorMessage">生成知识图谱时出现错误</p>
                         </div>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <div class="flex items-center">
-                            <label for="node-size" class="mr-2 text-sm font-medium text-gray-700">节点大小:</label>
-                            <input type="range" id="node-size" min="1" max="5" value="3" 
-                                   class="w-32 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <div class="flex items-center">
-                            <label for="edge-width" class="mr-2 text-sm font-medium text-gray-700">边粗细:</label>
-                            <input type="range" id="edge-width" min="1" max="5" value="2" 
-                                   class="w-32 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <div class="flex items-center">
-                            <label for="layout-algorithm" class="mr-2 text-sm font-medium text-gray-700">布局算法:</label>
-                            <select id="layout-algorithm" class="text-sm border border-gray-300 rounded-md px-2 py-1">
-                                <option value="forceAtlas2">Force Atlas 2</option>
-                                <option value="hierarchical">层次布局</option>
-                                <option value="circle">环形布局</option>
-                                <option value="random">随机布局</option>
-                            </select>
-                        </div>
-                        <button id="reset-layout" class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 text-sm transition-colors">
-                            重置布局
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="relative h-[600px] border border-gray-200 rounded-lg overflow-hidden" id="topology-container">
-                    <!-- 拓扑图将在这里渲染 -->
-                    <div class="absolute inset-0 flex items-center justify-center text-gray-400">
-                        <p>加载拓扑图中...</p>
-                    </div>
-                </div>
-                
-                <div id="node-info" class="mt-6 p-4 bg-gray-50 rounded-lg hidden">
-                    <h3 class="font-medium text-gray-800 mb-2">节点信息</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <p class="text-gray-500">节点ID:</p>
-                            <p id="node-id" class="font-medium"></p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">节点标签:</p>
-                            <p id="node-label" class="font-medium"></p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">关联节点数:</p>
-                            <p id="connected-nodes" class="font-medium"></p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">所属分组:</p>
-                            <p id="node-group" class="font-medium"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 拓扑图列表 -->
-        <section id="topologies" class="mb-12">
-            <div class="bg-white rounded-xl shadow-deep p-6 md:p-8">
-                <h2 class="text-2xl md:text-3xl font-bold mb-6">
-                    <i class="fa fa-th-list text-primary mr-3"></i>历史拓扑图列表
-                </h2>
-                
-                <div id="topology-list" class="space-y-4">
-                    <div class="text-center text-gray-500 py-8">
-                        <i class="fa fa-folder-o text-4xl mb-3"></i>
-                        <p>暂无生成的拓扑图，上传文档开始创建</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-dark text-white py-6">
-        <div class="container mx-auto px-4 text-center">
-            <p>拓扑图生成与展示系统 &copy; 2025</p>
-            <p class="text-sm text-gray-400 mt-1">基于自然语言处理和图可视化技术</p>
+    <footer class="bg-neutral text-white py-6">
+        <div class="container mx-auto px-4 text-center text-sm">
+            <p>© 2025 知识图谱生成系统 | 使用 OpenAI API 构建</p>
         </div>
     </footer>
 
     <script>
-        // 移动端菜单切换
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
-        
-        // 上传文档
-        document.getElementById('upload-button').addEventListener('click', function() {
-            const fileInput = document.getElementById('file-upload');
-            const file = fileInput.files[0];
+        document.addEventListener('DOMContentLoaded', function() {
+            // 元素引用
+            const uploadContainer = document.getElementById('uploadContainer');
+            const fileInput = document.getElementById('fileInput');
+            const progressSection = document.getElementById('progressSection');
+            const progressBar = document.getElementById('progressBar');
+            const progressMessage = document.getElementById('progressMessage');
+            const resultSection = document.getElementById('resultSection');
+            const errorSection = document.getElementById('errorSection');
+            const errorMessage = document.getElementById('errorMessage');
+            const processingTime = document.getElementById('processingTime');
+            const nodeCount = document.getElementById('nodeCount');
+            const edgeCount = document.getElementById('edgeCount');
+            const helpBtn = document.getElementById('helpBtn');
             
-            if (!file) {
-                alert('请选择一个文档文件');
-                return;
-            }
+            // 可视化相关元素
+            const knowledgeGraphContainer = document.getElementById('knowledgeGraph');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const resetViewBtn = document.getElementById('resetViewBtn');
             
-            // 显示上传状态
-            const uploadStatus = document.getElementById('upload-status');
-            uploadStatus.classList.remove('hidden');
+            // 知识图谱实例
+            let network = null;
+            let topologyId = null;
             
-            // 模拟进度条动画
-            let progress = 0;
-            const progressBar = document.getElementById('progress-bar');
-            const statusMessage = document.getElementById('status-message');
-            
-            const progressInterval = setInterval(function() {
-                progress += 5;
-                progressBar.style.width = `${progress}%`;
-                
-                if (progress >= 30 && progress < 60) {
-                    statusMessage.textContent = '正在分析文档内容...';
-                } else if (progress >= 60 && progress < 90) {
-                    statusMessage.textContent = '生成拓扑图结构...';
-                } else if (progress >= 90) {
-                    statusMessage.textContent = '准备展示拓扑图...';
-                }
-                
-                if (progress >= 100) {
-                    clearInterval(progressInterval);
-                    processTopology(file);
-                }
-            }, 100);
-        });
-        
-        // 处理拓扑图
-        function processTopology(file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            fetch('http://localhost:5000/api/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const topologyId = data.topology_id;
-                    loadTopology(topologyId);
-                    fetchTopologies();
-                } else {
-                    alert('上传失败: ' + data.message);
-                    document.getElementById('upload-status').classList.add('hidden');
-                }
-            })
-            .catch(error => {
-                console.error('上传错误:', error);
-                alert('上传过程中出现错误，请重试');
-                document.getElementById('upload-status').classList.add('hidden');
+            // 上传区域点击事件
+            uploadContainer.addEventListener('click', () => {
+                fileInput.click();
             });
-        }
-        
-        // 加载拓扑图
-        function loadTopology(topologyId) {
-            const topologyView = document.getElementById('topology-view');
-            const topologyContainer = document.getElementById('topology-container');
-            const nodeInfo = document.getElementById('node-info');
             
-            // 显示加载状态
-            topologyContainer.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-gray-400"><p>加载拓扑图中...</p></div>';
-            topologyView.classList.remove('hidden');
+            // 文件拖放事件
+            uploadContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadContainer.classList.add('border-primary');
+                uploadContainer.classList.add('bg-blue-50');
+            });
             
-            // 定时检查拓扑图生成状态
-            const checkInterval = setInterval(function() {
-                fetch(`http://localhost:5000/api/topology/${topologyId}`)
+            uploadContainer.addEventListener('dragleave', () => {
+                uploadContainer.classList.remove('border-primary');
+                uploadContainer.classList.remove('bg-blue-50');
+            });
+            
+            uploadContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadContainer.classList.remove('border-primary');
+                uploadContainer.classList.remove('bg-blue-50');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    uploadFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 文件选择事件
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    uploadFile(fileInput.files[0]);
+                }
+            });
+            
+            // 上传文件
+            function uploadFile(file) {
+                // 重置状态
+                progressBar.style.width = '0%';
+                progressMessage.textContent = '准备上传...';
+                progressSection.classList.remove('hidden');
+                resultSection.classList.add('hidden');
+                errorSection.classList.add('hidden');
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === 'processing') {
-                        // 继续等待
-                    } else if (data.status === 'success') {
-                        clearInterval(checkInterval);
-                        renderTopology(data.data);
+                    if (data.status === 'success') {
+                        topologyId = data.topology_id;
+                        checkProgress(topologyId);
                     } else {
-                        clearInterval(checkInterval);
-                        topologyContainer.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-red-500"><p>生成拓扑图失败: ${data.message}</p></div>`;
+                        showError(data.message);
                     }
                 })
                 .catch(error => {
-                    console.error('获取拓扑图错误:', error);
+                    showError('上传文件时发生错误: ' + error.message);
                 });
-            }, 1000);
-        }
-        
-        // 渲染拓扑图
-        function renderTopology(data) {
-            const container = document.getElementById('topology-container');
-            const nodes = data.nodes || [];
-            const edges = data.edges || [];
-            
-            // 准备vis.js数据
-            const visNodes = nodes.map(node => ({
-                id: node.id,
-                label: node.label,
-                group: node.group || 'default',
-                size: node.value || 20,
-                shape: 'circle',
-                color: getNodeColor(node.group)
-            }));
-            
-            const visEdges = edges.map(edge => ({
-                from: edge.from,
-                to: edge.to,
-                label: edge.label || '',
-                width: edge.width || 1,
-                color: {
-                    color: '#9CA3AF',
-                    highlight: '#3B82F6'
-                }
-            }));
-            
-            const dataSet = {
-                nodes: new vis.DataSet(visNodes),
-                edges: new vis.DataSet(visEdges)
-            };
-            
-            // 配置选项
-            const options = {
-                nodes: {
-                    size: 20,
-                    shape: 'circle',
-                    font: {
-                        size: 12,
-                        color: '#333'
-                    }
-                },
-                edges: {
-                    width: 1,
-                    color: '#9CA3AF',
-                    arrows: 'none',
-                    smooth: {
-                        type: 'curvedCW'
-                    }
-                },
-                interaction: {
-                    hover: true,
-                    selectable: true,
-                    navigationButtons: true
-                },
-                layout: {
-                    algorithm: 'forceAtlas2',
-                    randomSeed: undefined
-                },
-                physics: {
-                    enabled: true,
-                    forceAtlas2Based: {
-                        gravitationalConstant: -5000,
-                        springLength: 100,
-                        springConstant: 0.04,
-                        avoidOverlap: 0.1
-                    }
-                },
-                groups: {
-                    main: {
-                        color: '#3B82F6',
-                        size: 30
-                    },
-                    secondary: {
-                        color: '#10B981',
-                        size: 25
-                    },
-                    associated: {
-                        color: '#8B5CF6',
-                        size: 20
-                    },
-                    default: {
-                        color: '#6B7280',
-                        size: 15
-                    }
-                }
-            };
-            
-            // 创建网络
-            const network = new vis.Network(container, dataSet, options);
-            
-            // 节点大小调整
-            document.getElementById('node-size').addEventListener('input', function() {
-                const size = parseInt(this.value) * 5;
-                network.setOptions({
-                    nodes: {
-                        size: size
-                    }
-                });
-            });
-            
-            // 边粗细调整
-            document.getElementById('edge-width').addEventListener('input', function() {
-                const width = parseInt(this.value);
-                network.setOptions({
-                    edges: {
-                        width: width
-                    }
-                });
-            });
-            
-            // 布局算法切换
-            document.getElementById('layout-algorithm').addEventListener('change', function() {
-                const algorithm = this.value;
-                network.setOptions({
-                    layout: {
-                        algorithm: algorithm
-                    }
-                });
-                network.layout();
-            });
-            
-            // 重置布局
-            document.getElementById('reset-layout').addEventListener('click', function() {
-                network.layout();
-            });
-            
-            // 节点搜索
-            document.getElementById('search-node').addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                if (searchTerm) {
-                    const foundNodes = visNodes.filter(node => 
-                        node.label.toLowerCase().includes(searchTerm)
-                    );
-                    
-                    if (foundNodes.length > 0) {
-                        network.selectNodes(foundNodes.map(node => node.id));
-                        network.focus(foundNodes[0].id);
-                    }
-                } else {
-                    network.deselectAll();
-                }
-            });
-            
-            // 节点点击事件
-            network.on('click', function(params) {
-                if (params.nodes.length > 0) {
-                    const nodeId = params.nodes[0];
-                    const node = visNodes.find(n => n.id === nodeId);
-                    
-                    if (node) {
-                        // 显示节点信息
-                        document.getElementById('node-id').textContent = node.id;
-                        document.getElementById('node-label').textContent = node.label;
-                        document.getElementById('node-group').textContent = node.group || '默认';
-                        
-                        // 计算关联节点数
-                        const connectedEdges = visEdges.filter(edge => 
-                            edge.from === nodeId || edge.to === nodeId
-                        );
-                        document.getElementById('connected-nodes').textContent = connectedEdges.length;
-                        
-                        nodeInfo.classList.remove('hidden');
-                    }
-                } else {
-                    nodeInfo.classList.add('hidden');
-                }
-            });
-            
-            // 刷新拓扑图
-            document.getElementById('refresh-topology').addEventListener('click', function() {
-                network.layout();
-            });
-            
-            // 下载JSON数据
-            document.getElementById('download-json').addEventListener('click', function() {
-                const jsonData = JSON.stringify(data, null, 2);
-                const blob = new Blob([jsonData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `topology_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
-        }
-        
-        // 获取节点颜色
-        function getNodeColor(group) {
-            switch(group) {
-                case 'main':
-                    return '#3B82F6';
-                case 'secondary':
-                    return '#10B981';
-                case 'associated':
-                    return '#8B5CF6';
-                default:
-                    return '#6B7280';
             }
-        }
-        
-        // 获取所有拓扑图
-        function fetchTopologies() {
-            fetch('http://localhost:5000/api/topologies')
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success' && data.topologies.length > 0) {
-                    const topologyList = document.getElementById('topology-list');
-                    topologyList.innerHTML = '';
-                    
-                    data.topologies.forEach(topology => {
-                        const topologyItem = document.createElement('div');
-                        topologyItem.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow';
-                        topologyItem.innerHTML = `
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-medium text-gray-800">拓扑图 #${topology.id.substring(0, 8)}...</h3>
-                                    <p class="text-sm text-gray-500">创建时间: ${topology.created_at}</p>
-                                    <p class="text-sm text-gray-600 mt-1">节点: ${topology.node_count} | 关系: ${topology.edge_count}</p>
-                                </div>
-                                <div class="flex space-x-2 mt-2 md:mt-0">
-                                    <button class="text-sm px-3 py-1 bg-primary text-white rounded-md hover:bg-primary/90" 
-                                            onclick="loadTopology('${topology.id}')">
-                                        查看
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                        topologyList.appendChild(topologyItem);
-                    });
+            
+            // 检查处理进度
+            function checkProgress(topologyId) {
+                fetch(`/api/topology/${topologyId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'processing') {
+                        progressBar.style.width = `${data.progress}%`;
+                        progressMessage.textContent = data.message;
+                        setTimeout(() => checkProgress(topologyId), 1000);
+                    } else if (data.status === 'success') {
+                        progressSection.classList.add('hidden');
+                        resultSection.classList.remove('hidden');
+                        renderKnowledgeGraph(data.data);
+                        
+                        // 更新统计信息
+                        processingTime.textContent = `${data.processing_time} 秒`;
+                        nodeCount.textContent = data.node_count;
+                        edgeCount.textContent = data.edge_count;
+                    } else {
+                        showError(data.message);
+                    }
+                })
+                .catch(error => {
+                    showError('检查处理进度时发生错误: ' + error.message);
+                });
+            }
+            
+            // 显示错误信息
+            function showError(message) {
+                progressSection.classList.add('hidden');
+                errorSection.classList.remove('hidden');
+                errorMessage.textContent = message;
+            }
+            
+            // 渲染知识图谱
+            function renderKnowledgeGraph(graphData) {
+                // 销毁现有网络（如果存在）
+                if (network !== null) {
+                    network.destroy();
+                    network = null;
                 }
-            })
-            .catch(error => {
-                console.error('获取拓扑图列表错误:', error);
+                
+                // 准备节点和边数据
+                const nodes = new vis.DataSet(graphData.nodes);
+                const edges = new vis.DataSet(graphData.edges);
+                
+                // 设置节点样式
+                const nodeStyle = {
+                    shape: 'ellipse',
+                    color: {
+                        background: '#E0F2FE',
+                        border: '#3B82F6',
+                        highlight: {
+                            background: '#BAE6FD',
+                            border: '#2563EB'
+                        }
+                    },
+                    font: {
+                        color: '#1E40AF',
+                        size: 14,
+                        face: 'Inter'
+                    },
+                    shadow: {
+                        enabled: true,
+                        color: 'rgba(0,0,0,0.1)',
+                        size: 5,
+                        x: 2,
+                        y: 2
+                    }
+                };
+                
+                // 设置边样式
+                const edgeStyle = {
+                    color: {
+                        color: '#94A3B8',
+                        highlight: '#64748B'
+                    },
+                    width: 1.5,
+                    arrows: {
+                        to: {
+                            enabled: true,
+                            type: 'arrow'
+                        }
+                    },
+                    font: {
+                        color: '#64748B',
+                        size: 12,
+                        face: 'Inter',
+                        align: 'middle'
+                    },
+                    smooth: {
+                        enabled: true,
+                        type: 'dynamic'
+                    }
+                };
+                
+                // 设置网络配置
+                const data = {
+                    nodes: nodes,
+                    edges: edges
+                };
+                
+                const options = {
+                    autoResize: true,
+                    height: '100%',
+                    width: '100%',
+                    interaction: {
+                        hover: true,
+                        zoomView: true,
+                        dragNodes: true,
+                        dragView: true
+                    },
+                    layout: {
+                        hierarchical: {
+                            enabled: true,
+                            direction: 'UD',
+                            sortMethod: 'directed',
+                            nodeSpacing: 150,
+                            levelSeparation: 200,
+                            shakeTowards: 'roots'
+                        }
+                    },
+                    nodes: nodeStyle,
+                    edges: edgeStyle,
+                    physics: {
+                        enabled: false
+                    }
+                };
+                
+                // 创建网络
+                network = new vis.Network(knowledgeGraphContainer, data, options);
+                
+                // 设置视图控制
+                zoomInBtn.addEventListener('click', () => {
+                    if (network) network.moveTo({ scale: network.getScale() * 1.2 });
+                });
+                
+                zoomOutBtn.addEventListener('click', () => {
+                    if (network) network.moveTo({ scale: network.getScale() / 1.2 });
+                });
+                
+                resetViewBtn.addEventListener('click', () => {
+                    if (network) network.fit();
+                });
+                
+                // 自动调整视图
+                setTimeout(() => {
+                    if (network) network.fit();
+                }, 500);
+            }
+            
+            // 帮助按钮事件
+            helpBtn.addEventListener('click', () => {
+                alert('知识图谱生成系统帮助:\n\n1. 上传支持的文档格式(.txt, .pdf, .docx, .html)\n2. 系统将自动分析文档内容并提取知识点\n3. 生成的知识图谱将以树形结构展示知识点及其关系\n4. 使用视图控制按钮可以调整图谱显示效果');
             });
-        }
-        
-        // 页面加载完成后获取拓扑图列表
-        window.addEventListener('load', function() {
-            fetchTopologies();
         });
     </script>
 </body>

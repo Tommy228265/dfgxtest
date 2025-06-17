@@ -1,2 +1,2 @@
-import nltk
-nltk.download('punkt_tab')
+import spacy
+print(spacy.__version__)

@@ -1,0 +1,22 @@
+[
+    ["Artificial Intelligence", "包含", "Development History"],
+    ["Development History", "包含", "Early Ideological Sprouts"],
+    ["Development History", "包含", "Birth Stage"],
+    ["Development History", "包含", "Golden Age"],
+    ["Development History", "包含", "The First Trough"],
+    ["Early Ideological Sprouts", "包含", "Talos"],
+    ["Early Ideological Sprouts", "包含", "Pascaline"],
+    ["Early Ideological Sprouts", "包含", "Difference Engine"],
+    ["Early Ideological Sprouts", "包含", "Boolean algebra"],
+    ["Early Ideological Sprouts", "包含", "Turing machine"],
+    ["Birth Stage", "包含", "Turing Test"],
+    ["Birth Stage", "包含", "Dartmouth Conference on Artificial Intelligence"],
+    ["Birth Stage", "包含", "The emergence of core research centers"],
+    ["Birth Stage", "包含", "Logic Theorist"],
+    ["Birth Stage", "包含", "First industrial robot"],
+    ["Golden Age", "包含", "Shakey"],
+    ["Golden Age", "包含", "ELIZA"],
+    ["Golden Age", "包含", "Development of computer mouse and hypertext links"],
+    ["The First Trough", "包含", "Challenges faced in early 1970s"],
+    ["The First Trough", "包含", "Changes in funding for AI research"]
+]

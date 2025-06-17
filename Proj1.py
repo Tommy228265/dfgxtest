@@ -112,4 +112,8 @@ if __name__ == "__main__":
     qa_list = generate_qa_pairs(doc_text, api_key)
     print("生成的问答对:")
     for qa in qa_list:
+<<<<<<< HEAD
         print(f"Q: {qa['question']}\nA: {qa['answer']}\n")
+=======
+        print(f"Q: {qa['question']}\nA: {qa['answer']}\n")
+>>>>>>> d67873e437880a9dd354d59a80a7177e1e531804
