@@ -33,8 +33,8 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# OpenAI API配置
-OPENAI_API_KEY = "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"
+# DeepSeek API配置
+OPENAI_API_KEY = "sk-ba9cc9a26b8c4859ba5c9bad33785093"
 MAX_RETRIES = 3
 BACKOFF_FACTOR = 2
 
@@ -133,12 +133,14 @@ def sanitize_text(text: str) -> str:
     return text
 
 def extract_knowledge_from_text(text: str, max_retries: int = MAX_RETRIES) -> list:
-    """调用OpenAI API提取适合树形结构的知识点层级关系"""
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {OPENAI_API_KEY}"
-    }
+    """调用DeepSeek API提取适合树形结构的知识点层级关系"""
+    from openai import OpenAI
+    
+    # 创建OpenAI客户端
+    client = OpenAI(
+        api_key=OPENAI_API_KEY,
+        base_url="https://api.deepseek.com"
+    )
     
     # 清理文本
     sanitized_text = sanitize_text(text)
@@ -150,16 +152,20 @@ def extract_knowledge_from_text(text: str, max_retries: int = MAX_RETRIES) -> li
 关系应体现层级结构，如"包含"、"属于"、"是子类"等。确保输出格式正确，仅返回JSON数组。"""},
         {"role": "user", "content": f"请从下面文本中提取知识点及其层级关系，输出JSON数组，每个元素格式为 [父知识点, 关系, 子知识点]：\n{sanitized_text}"}
     ]
-    data = {"model": "gpt-3.5-turbo", "messages": messages, "max_tokens": 1500}
     
     backoff = 2
     for attempt in range(1, max_retries + 1):
         try:
-            logger.info(f"第{attempt}次尝试调用OpenAI API...")
-            resp = requests.post(url, headers=headers, json=data, timeout=30)
-            resp.raise_for_status()
+            logger.info(f"第{attempt}次尝试调用DeepSeek API...")
             
-            raw = resp.json()["choices"][0]["message"]["content"]
+            # 使用OpenAI SDK调用API
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=messages,
+                max_tokens=1500
+            )
+            
+            raw = response.choices[0].message.content
             cleaned = clean_json_string(raw)
             logger.info(f"API返回知识关系: {cleaned[:200]}...")
             
@@ -180,26 +186,8 @@ def extract_knowledge_from_text(text: str, max_retries: int = MAX_RETRIES) -> li
             logger.info(f"成功解析知识关系，共{len(knowledge_edges)}条")
             return knowledge_edges
                 
-        except requests.exceptions.RequestException as e:
-            if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code == 429:
-                retry_after = e.response.headers.get("Retry-After", backoff)
-                wait = float(retry_after) if retry_after else backoff
-                logger.warning(f"[限流] 第{attempt}次重试，等待{wait:.1f}s...")
-                time.sleep(wait)
-                backoff *= BACKOFF_FACTOR
-            else:
-                logger.error(f"API请求错误: {str(e)}", exc_info=True)
-                raise
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON解析错误: {e}", exc_info=True)
-            if attempt < max_retries:
-                logger.info(f"准备第{attempt+1}次重试...")
-                time.sleep(backoff)
-                backoff *= BACKOFF_FACTOR
-            else:
-                raise
         except Exception as e:
-            logger.error(f"处理知识关系时出错: {str(e)}", exc_info=True)
+            logger.error(f"API请求错误: {str(e)}", exc_info=True)
             if attempt < max_retries:
                 logger.info(f"准备第{attempt+1}次重试...")
                 time.sleep(backoff)
@@ -341,7 +329,6 @@ def process_document(file_path, topology_id):
     }
     
     try:
-        # 1. 解析文档
         update_progress(topology_id, 10, "解析文档内容...")
         text = parse_document(file_path)
         if not text:
@@ -351,8 +338,6 @@ def process_document(file_path, topology_id):
             }
             logger.error(f"文档解析失败: {file_path}")
             return
-        
-        # 2. 检测文本长度
         update_progress(topology_id, 20, "准备提取知识层级...")
         text_length = len(text)
         if text_length < 100:
@@ -362,28 +347,24 @@ def process_document(file_path, topology_id):
             }
             logger.warning(f"文档内容过短: {file_path}, 长度: {text_length}")
             return
-        
-        # 3. 截取文本（限制长度避免API调用超时）
+
         MAX_TEXT_LENGTH = 8000
         if text_length > MAX_TEXT_LENGTH:
             logger.info(f"文档内容过长，截取前{MAX_TEXT_LENGTH}字符")
             text = text[:MAX_TEXT_LENGTH]
         
-        # 4. 调用OpenAI提取知识层级关系
-        update_progress(topology_id, 60, "调用OpenAI API提取知识层级...")
+        update_progress(topology_id, 60, "调用DeepSeek API提取知识层级...")
         knowledge_edges = extract_knowledge_from_text(text)
         logger.info(f"成功提取{len(knowledge_edges)}条知识层级关系")
         
-        # 5. 构建树形知识图
         update_progress(topology_id, 80, "构建树形知识图...")
         knowledge_graph = build_tree_structure(knowledge_edges)
         
-        # 6. 完成处理
         processing_time = time.time() - start_time
         logger.info(f"树形知识图生成完成，耗时: {processing_time:.2f} 秒")
         
         update_progress(topology_id, 100, "处理完成")
-        time.sleep(1)  # 确保前端有时间获取最终状态
+        time.sleep(1)  
         
         topology_results[topology_id] = {
             "status": "completed",
