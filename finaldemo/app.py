@@ -77,6 +77,7 @@ def init_db():
                 CREATE TABLE IF NOT EXISTS topologies (
                     id TEXT PRIMARY KEY,
                     content TEXT NOT NULL,
+                    max_nodes INTEGER DEFAULT 0,  -- 新增字段：最大节点数限制
                     created_at TEXT
                 );
 
@@ -459,10 +460,10 @@ def save_to_database(topology_id, nodes, edges, content: str):
         db = get_db()
         cursor = db.cursor()
         
-        # 保存拓扑图信息（包含原文内容）
+        # 保存拓扑图信息（包含原文内容和节点数量限制）
         cursor.execute(
-            "INSERT OR REPLACE INTO topologies (id, content, created_at) VALUES (?, ?, ?)",
-            (topology_id, content, time.strftime('%Y-%m-%d %H:%M:%S'))
+            "INSERT OR REPLACE INTO topologies (id, content, max_nodes, created_at) VALUES (?, ?, ?, ?)",
+            (topology_id, content, 0, time.strftime('%Y-%m-%d %H:%M:%S'))
         )
         
         # 保存节点
@@ -543,7 +544,8 @@ def process_document(file_path, topology_id, max_nodes=0):
                 "node_count": len(knowledge_graph["nodes"]),
                 "edge_count": len(knowledge_graph["edges"]),
                 "processing_time": round(processing_time, 2),
-                "text_length": text_length
+                "text_length": text_length,
+                "max_nodes": max_nodes  # 保存节点数量限制
             }
             
     except Exception as e:
@@ -568,8 +570,9 @@ def update_progress(topology_id, progress, message):
 def index():
     return render_template('index.html')
 
-@app.route('/api/upload', methods=['POST'])
-def upload_document():
+@app.route('/api/generate', methods=['POST'])
+def generate_knowledge_graph():
+    """处理用户点击生成按钮后的请求，支持节点数量控制"""
     if 'file' not in request.files:
         logger.error("文件上传错误: 没有文件")
         return jsonify({'status': 'error', 'message': '没有文件上传'}), 400
@@ -578,6 +581,9 @@ def upload_document():
     if file.filename == '':
         logger.error("文件上传错误: 未选择文件")
         return jsonify({'status': 'error', 'message': '未选择文件'}), 400
+    
+    # 获取节点数量
+    max_nodes = request.form.get('max_nodes', 0, type=int)
     
     # 检查文件大小
     file.seek(0, os.SEEK_END)
@@ -592,10 +598,7 @@ def upload_document():
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{topology_id}_{file.filename}")
     file.save(file_path)
     
-    logger.info(f"文件上传成功: {file_path}, 大小: {file_size/1024/1024:.2f} MB")
-    
-    # 获取请求参数中的最大节点数
-    max_nodes = request.form.get('max_nodes', 0, type=int)
+    logger.info(f"文件上传成功: {file_path}, 大小: {file_size/1024/1024:.2f} MB, 最大节点数: {max_nodes}")
     
     # 启动处理线程，并在应用上下文中执行
     threading.Thread(
@@ -605,7 +608,7 @@ def upload_document():
     return jsonify({
         'status': 'success',
         'topology_id': topology_id,
-        'message': '文档上传成功，正在生成树形知识图'
+        'message': '文档上传成功，正在生成知识图谱'
     })
 
 def with_app_context(func, *args, **kwargs):
@@ -621,7 +624,7 @@ def get_topology(topology_id):
             db = get_db()
             cursor = db.cursor()
             cursor.execute(
-                "SELECT id, content, created_at FROM topologies WHERE id = ?",
+                "SELECT id, content, max_nodes, created_at FROM topologies WHERE id = ?",
                 (topology_id,)
             )
             topology = cursor.fetchone()
@@ -655,7 +658,8 @@ def get_topology(topology_id):
                 'created_at': topology["created_at"],
                 'node_count': len(nodes),
                 'edge_count': len(edges),
-                'text_length': len(topology["content"])
+                'text_length': len(topology["content"]),
+                'max_nodes': topology["max_nodes"]  # 返回节点数量限制
             })
     
     topology = topology_results[topology_id]
@@ -664,7 +668,8 @@ def get_topology(topology_id):
         return jsonify({
             'status': 'processing',
             'progress': topology.get('progress', 0),
-            'message': topology.get('message', '正在处理中')
+            'message': topology.get('message', '正在处理中'),
+            'max_nodes': topology.get('max_nodes', 0)  # 返回节点数量限制
         })
     
     if topology['status'] == 'error':
@@ -681,7 +686,8 @@ def get_topology(topology_id):
         'node_count': topology['node_count'],
         'edge_count': topology['edge_count'],
         'processing_time': topology['processing_time'],
-        'text_length': topology.get('text_length', 0)
+        'text_length': topology.get('text_length', 0),
+        'max_nodes': topology.get('max_nodes', 0)  # 返回节点数量限制
     })
 
 @app.route('/api/topology/<topology_id>/regenerate', methods=['POST'])
@@ -692,12 +698,12 @@ def regenerate_topology(topology_id):
         data = request.json
         max_nodes = data.get('max_nodes', 0)
         
-        # 从数据库获取原文内容
+        # 从数据库获取原文内容和之前的节点限制
         with app.app_context():
             db = get_db()
             cursor = db.cursor()
             cursor.execute(
-                "SELECT content FROM topologies WHERE id = ?",
+                "SELECT content, max_nodes FROM topologies WHERE id = ?",
                 (topology_id,)
             )
             topology = cursor.fetchone()
@@ -709,8 +715,12 @@ def regenerate_topology(topology_id):
                 }), 404
             
             content = topology["content"]
+            previous_max_nodes = topology["max_nodes"]
             
-            # 调用DeepSeek API重新生成
+            # 如果用户没有指定新的节点数量，使用之前的设置
+            if max_nodes == 0:
+                max_nodes = previous_max_nodes
+                
             update_progress(topology_id, 30, "重新提取知识层级...")
             knowledge_edges = extract_knowledge_from_text(content, max_nodes)
             logger.info(f"重新生成成功提取{len(knowledge_edges)}条知识层级关系")
@@ -726,14 +736,16 @@ def regenerate_topology(topology_id):
                 "node_count": len(knowledge_graph["nodes"]),
                 "edge_count": len(knowledge_graph["edges"]),
                 "processing_time": 0,
-                "text_length": len(content)
+                "text_length": len(content),
+                "max_nodes": max_nodes  # 保存新的节点数量限制
             }
             
             return jsonify({
                 'status': 'success',
                 'message': '知识图谱重新生成成功',
                 'node_count': len(knowledge_graph["nodes"]),
-                'edge_count': len(knowledge_graph["edges"])
+                'edge_count': len(knowledge_graph["edges"]),
+                'max_nodes': max_nodes  # 返回新的节点数量限制
             })
             
     except Exception as e:

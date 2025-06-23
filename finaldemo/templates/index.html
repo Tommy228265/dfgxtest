@@ -31,17 +31,21 @@
           <h3>上传学习资料</h3>
           <p>支持PPT、PDF、Word、TXT格式</p>
           
+          <label for="fileInput" class="upload-btn">
+            <i class="fa fa-file-text-o"></i>选择文件
+            <input id="fileInput" type="file" accept=".ppt,.pptx,.pdf,.docx,.doc,.txt">
+          </label>
+          
           <div class="node-count-input">
             <label for="nodeCountInput">期望节点数量（可选）:</label>
             <input type="number" id="nodeCountInput" min="0" placeholder="0表示不限制">
           </div>
           
-          <label for="fileInput" class="upload-btn">
-            <i class="fa fa-file-text-o"></i>选择文件
-            <input id="fileInput" type="file" accept=".ppt,.pptx,.pdf,.docx,.doc,.txt">
-          </label>
+          <!-- 添加开始生成按钮 -->
+          <button id="generateBtn" class="generate-btn">
+            <i class="fa fa-cogs"></i>开始生成
+          </button>
         </div>
-      </div>
 
         <div id="progressContainer" class="hidden">
           <div class="progress-card">

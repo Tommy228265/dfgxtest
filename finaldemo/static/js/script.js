@@ -4,6 +4,8 @@ let currentTopologyId = null;
 let selectedNodeId = null;
 let currentQuestionId = null;
 let topologyResults = {};
+let selectedFile = null;
+let maxNodes = 0;
 
 // DOM元素
 const fileInput = document.getElementById('fileInput');
@@ -29,16 +31,68 @@ const feedbackCard = document.getElementById('feedbackCard');
 const nextQuestion = document.getElementById('nextQuestion');
 const searchNode = document.getElementById('searchNode');
 const refreshGraph = document.getElementById('refreshGraph');
+const generateBtn = document.getElementById('generateBtn');
 
 // 文件选择事件
 fileInput.addEventListener('change', (e) => {
   if (e.target.files.length > 0) {
-    const file = e.target.files[0];
-    uploadDocument(file);
+    selectedFile = e.target.files[0];
   }
 });
 
-// 上传文档
+// 开始生成按钮事件
+generateBtn.addEventListener('click', () => {
+  if (!selectedFile) {
+    showNotification('错误', '请先选择文件', 'error');
+    return;
+  }
+  
+  // 获取节点数量
+  maxNodes = document.getElementById('nodeCountInput').value ? 
+             parseInt(document.getElementById('nodeCountInput').value) : 0;
+  
+  // 显示进度区域
+  progressContainer.classList.remove('hidden');
+  graphContainer.classList.add('hidden');
+  quizContainer.classList.add('hidden');
+  
+  // 重置进度
+  progressBar.style.width = '0%';
+  progressPercentage.textContent = '0%';
+  progressMessage.textContent = '准备处理文档...';
+  
+  // 调用新的API开始生成
+  startGeneration(selectedFile, maxNodes);
+});
+
+// 新的API调用函数
+function startGeneration(file, maxNodes) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('max_nodes', maxNodes);
+  
+  fetch('/api/generate', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      currentTopologyId = data.topology_id;
+      monitorProgress(currentTopologyId);
+    } else {
+      showNotification('错误', data.message, 'error');
+      resetUpload();
+    }
+  })
+  .catch(error => {
+    console.error('生成请求错误:', error);
+    showNotification('错误', '请求过程中发生错误，请重试。', 'error');
+    resetUpload();
+  });
+}
+
+// 上传文档（保留原有函数，可能在其他地方使用）
 function uploadDocument(file) {
   // 验证文件类型
   const allowedTypes = [
@@ -421,6 +475,7 @@ function resetUpload() {
   graphContainer.classList.add('hidden');
   quizContainer.classList.add('hidden');
   fileInput.value = '';
+  selectedFile = null;
 }
 
 // 显示通知
