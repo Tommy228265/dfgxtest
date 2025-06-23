@@ -9,10 +9,12 @@ import requests
 from PyPDF2 import PdfReader
 from docx import Document
 from bs4 import BeautifulSoup
+from pptx import Presentation
 from flask import Flask, request, jsonify, render_template, g, current_app
 from flask_cors import CORS
 import sqlite3
 from contextlib import closing
+from collections import defaultdict
 
 # 配置日志
 logging.basicConfig(
@@ -26,7 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger("KnowledgeGraphGenerator")
 
 # 初始化Flask应用
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app)
 
 # 配置上传文件夹
@@ -42,6 +44,9 @@ BACKOFF_FACTOR = 2
 
 # 数据库配置
 DATABASE = os.path.join(app.root_path, 'knowledge_graph.db')  # 使用应用根路径
+
+# 存储节点连续正确回答次数
+node_consecutive_correct = defaultdict(int)
 
 def get_db():
     """获取数据库连接"""
@@ -84,6 +89,8 @@ def init_db():
                     level INTEGER,
                     value INTEGER,
                     mastered INTEGER DEFAULT 0,
+                    mastery_score REAL DEFAULT 0,
+                    consecutive_correct INTEGER DEFAULT 0,
                     PRIMARY KEY (topology_id, id),
                     FOREIGN KEY (topology_id) REFERENCES topologies (id)
                 );
@@ -106,6 +113,7 @@ def init_db():
                     question TEXT,
                     answer TEXT,
                     feedback TEXT,
+                    correctness INTEGER DEFAULT 0,
                     created_at TEXT,
                     answered_at TEXT,
                     FOREIGN KEY (topology_id, node_id) REFERENCES nodes (topology_id, id)
@@ -216,7 +224,6 @@ def extract_knowledge_from_text(text: str, max_retries: int = MAX_RETRIES) -> li
     """调用DeepSeek API提取适合树形结构的知识点层级关系"""
     from openai import OpenAI
     
-    # 创建OpenAI客户端
     client = OpenAI(
         api_key=OPENAI_API_KEY,
         base_url="https://api.deepseek.com"
@@ -278,7 +285,7 @@ def extract_knowledge_from_text(text: str, max_retries: int = MAX_RETRIES) -> li
     raise RuntimeError("多次重试后仍无法获取有效响应")
 
 def parse_document(file_path):
-    """解析文档内容，返回文本"""
+    """解析文档内容，返回文本（新增PPT支持）"""
     file_ext = os.path.splitext(file_path)[1].lower()
     logger.info(f"开始解析文档: {file_path}, 类型: {file_ext}")
     
@@ -310,6 +317,16 @@ def parse_document(file_path):
             soup = BeautifulSoup(html_content, 'lxml')
             text = soup.get_text()
             return ' '.join(text.split())
+        elif file_ext in ['.ppt', '.pptx']:  # 新增PPT/PPTX支持
+            text = ""
+            prs = Presentation(file_path)
+            for slide_num, slide in enumerate(prs.slides):
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        text += shape.text + "\n"
+                if slide_num % 10 == 0:
+                    logger.info(f"已解析PPT第 {slide_num} 页")
+            return text
         else:
             logger.error(f"不支持的文件格式: {file_ext}")
             return None
@@ -336,8 +353,9 @@ def build_tree_structure(knowledge_edges, topology_id):
                 "title": src,  # 鼠标悬停时显示的完整标题
                 "level": 0,    # 默认层级
                 "value": 1,    # 节点大小基准
-                "group": "default",  # 节点分组，用于着色
-                "mastered": False  # 知识点掌握状态
+                "mastered": False,  # 知识点掌握状态
+                "mastery_score": 0,  # 掌握分数
+                "consecutive_correct": 0  # 连续正确回答次数
             }
         if tgt not in nodes:
             nodes[tgt] = {
@@ -346,8 +364,9 @@ def build_tree_structure(knowledge_edges, topology_id):
                 "title": tgt,
                 "level": 0,
                 "value": 1,
-                "group": "default",
-                "mastered": False
+                "mastered": False,
+                "mastery_score": 0,
+                "consecutive_correct": 0
             }
         
         # 添加边
@@ -415,8 +434,8 @@ def save_to_database(topology_id, nodes, edges):
         # 保存节点
         for node in nodes:
             cursor.execute(
-                "INSERT OR REPLACE INTO nodes (topology_id, id, label, level, value, mastered) VALUES (?, ?, ?, ?, ?, ?)",
-                (topology_id, node["id"], node["label"], node["level"], node["value"], 0)
+                "INSERT OR REPLACE INTO nodes (topology_id, id, label, level, value, mastered, mastery_score, consecutive_correct) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (topology_id, node["id"], node["label"], node["level"], node["value"], 0, 0, 0)
             )
         
         # 保存边
@@ -573,7 +592,7 @@ def get_topology(topology_id):
             
             # 从数据库获取节点和边
             cursor.execute(
-                "SELECT id, label, level, value, mastered FROM nodes WHERE topology_id = ?",
+                "SELECT id, label, level, value, mastered, mastery_score, consecutive_correct FROM nodes WHERE topology_id = ?",
                 (topology_id,)
             )
             nodes = [dict(row) for row in cursor.fetchall()]
@@ -639,7 +658,7 @@ def filter_nodes(topology_id):
             
             # 获取节点
             cursor.execute(
-                "SELECT id, label, level, value, mastered FROM nodes WHERE topology_id = ?",
+                "SELECT id, label, level, value, mastered, mastery_score FROM nodes WHERE topology_id = ?",
                 (topology_id,)
             )
             nodes = [dict(row) for row in cursor.fetchall()]
@@ -678,7 +697,7 @@ def filter_nodes(topology_id):
 
 @app.route('/api/topology/<topology_id>/node/<node_id>/question', methods=['GET'])
 def get_question(topology_id, node_id):
-    """获取关于指定节点的问题"""
+    """获取关于指定节点的问题（确保每次都是新问题）"""
     try:
         with app.app_context():
             # 从数据库获取节点标签
@@ -698,7 +717,7 @@ def get_question(topology_id, node_id):
             
             node_label = node["label"]
             
-            # 调用DeepSeek生成问题
+            # 调用DeepSeek生成新问题
             question = generate_question(node_label)
             
             # 保存问题到数据库
@@ -733,11 +752,24 @@ def generate_question(topic):
         base_url="https://api.deepseek.com"
     )
     
+    # 使用不同的提示确保生成不同的问题
+    prompts = [
+        f"请生成一个关于\"{topic}\"的测试问题，用于评估用户对该知识点的理解深度。",
+        f"请针对\"{topic}\"创建一个有挑战性的问题，测试用户的高级理解能力。",
+        f"请设计一个关于\"{topic}\"的开放式问题，鼓励用户进行深入思考。",
+        f"请提出一个关于\"{topic}\"的应用题，测试用户在实际场景中应用知识的能力。",
+        f"请生成一个关于\"{topic}\"的辨析题，帮助用户澄清概念上的误解。"
+    ]
+    
+    # 随机选择一个提示
+    import random
+    prompt = random.choice(prompts)
+    
     messages = [
         {"role": "system", "content": """你是一个教育专家，能够针对特定知识点生成有针对性的问题。
-请生成一个关于"{topic}"的问题，问题应该能够有效测试用户对该知识点的理解。
-问题应该清晰明确，避免歧义。只返回问题文本，不需要其他内容。""".replace("{topic}", topic)},
-        {"role": "user", "content": f"请生成一个关于\"{topic}\"的问题，用于测试用户对该知识点的理解。"}
+请生成的问题应该能够有效测试用户对该知识点的理解。
+问题应该清晰明确，避免歧义。只返回问题文本，不需要其他内容。"""},
+        {"role": "user", "content": prompt}
     ]
     
     try:
@@ -755,7 +787,7 @@ def generate_question(topic):
 
 @app.route('/api/topology/<topology_id>/question/<question_id>/answer', methods=['POST'])
 def answer_question(topology_id, question_id):
-    """处理用户对问题的回答"""
+    """处理用户对问题的回答（支持连续正确回答判定）"""
     try:
         with app.app_context():
             data = request.json
@@ -793,44 +825,60 @@ def answer_question(topology_id, question_id):
                 }), 400
             
             # 调用DeepSeek评估回答
-            feedback = evaluate_answer(question, answer, question_node_id)
+            evaluation = evaluate_answer(question, answer, question_node_id)
+            
+            # 确定回答是否正确
+            is_correct = evaluation["correct"] if "correct" in evaluation else False
+            feedback_text = evaluation["feedback"] if "feedback" in evaluation else "无法评估回答"
             
             # 更新问题状态
             cursor.execute(
-                "UPDATE questions SET answered_at = ?, answer = ?, feedback = ? WHERE id = ?",
-                (time.strftime('%Y-%m-%d %H:%M:%S'), answer, feedback["feedback"], question_id)
+                "UPDATE questions SET answered_at = ?, answer = ?, feedback = ?, correctness = ? WHERE id = ?",
+                (time.strftime('%Y-%m-%d %H:%M:%S'), answer, feedback_text, 1 if is_correct else 0, question_id)
             )
             
-            # 如果回答正确，更新节点掌握状态
-            if feedback["correct"]:
-                # 检查该节点的回答正确率
-                cursor.execute(
-                    "SELECT COUNT(*) as total, SUM(CASE WHEN feedback LIKE '%正确%' THEN 1 ELSE 0 END) as correct "
-                    "FROM questions WHERE topology_id = ? AND node_id = ?",
-                    (topology_id, node_id)
-                )
-                stats = cursor.fetchone()
-                
-                total_questions = stats["total"]
-                correct_questions = stats["correct"]
-                
-                # 如果回答了至少3个问题且正确率达到80%，标记为已掌握
-                if total_questions >= 3 and (correct_questions / total_questions) >= 0.8:
-                    cursor.execute(
-                        "UPDATE nodes SET mastered = 1 WHERE topology_id = ? AND id = ?",
-                        (topology_id, node_id)
-                    )
-                    feedback["mastered"] = True
+            # 更新节点的掌握分数和状态
+            cursor.execute(
+                "SELECT mastery_score, mastered, consecutive_correct FROM nodes WHERE topology_id = ? AND id = ?",
+                (topology_id, node_id)
+            )
+            node = cursor.fetchone()
+            
+            current_score = node["mastery_score"] if node else 0
+            consecutive_correct = node["consecutive_correct"] if node else 0
+            
+            # 更新连续正确计数
+            if is_correct:
+                consecutive_correct += 1
+                # 连续3次正确判定为掌握
+                if consecutive_correct >= 3:
+                    new_score = 10
+                    is_mastered = True
                 else:
-                    feedback["mastered"] = False
+                    new_score = min(10, current_score + 1)
+                    is_mastered = False
             else:
-                feedback["mastered"] = False
+                consecutive_correct = 0
+                new_score = max(0, current_score - 0.5)
+                is_mastered = False
+            
+            # 更新节点状态
+            cursor.execute(
+                "UPDATE nodes SET mastery_score = ?, mastered = ?, consecutive_correct = ? WHERE topology_id = ? AND id = ?",
+                (new_score, 1 if is_mastered else 0, consecutive_correct, topology_id, node_id)
+            )
             
             db.commit()
             
             return jsonify({
                 'status': 'success',
-                'data': feedback
+                'data': {
+                    'correct': is_correct,
+                    'feedback': feedback_text,
+                    'mastered': is_mastered,
+                    'mastery_score': new_score,
+                    'consecutive_correct': consecutive_correct
+                }
             })
     except Exception as e:
         logger.error(f"处理回答错误: {str(e)}", exc_info=True)
@@ -849,7 +897,7 @@ def evaluate_answer(question, answer, topic):
     )
     
     messages = [
-        {"role": "system", "content": """你是一个知识评估专家，能够准确判断用户回答的正确性。
+        {"role": "system", "content": """你是一个知识评估专家，能够准确判断用户回答的正确性，并给出详细反馈。
 请评估用户对问题"{question}"的回答"{answer}"是否正确。
 你的评估应该包括：
 1. 判断回答是否正确（是/否）
@@ -879,6 +927,13 @@ def evaluate_answer(question, answer, topic):
         # 解析响应为JSON
         try:
             feedback = json.loads(clean_json_string(response_text))
+            # 确保包含所有必要字段
+            if 'correct' not in feedback:
+                feedback['correct'] = False
+            if 'feedback' not in feedback:
+                feedback['feedback'] = "无法解析评估结果，请重试"
+            if 'next_question' not in feedback:
+                feedback['next_question'] = None
         except json.JSONDecodeError:
             # 如果解析失败，创建默认反馈
             feedback = {
@@ -896,6 +951,56 @@ def evaluate_answer(question, answer, topic):
             "next_question": None
         }
 
+@app.route('/api/topology/<topology_id>/ignore', methods=['POST'])
+def ignore_nodes(topology_id):
+    """忽略用户选择的节点"""
+    try:
+        with app.app_context():
+            data = request.json
+            ignored_nodes = data.get('ignored_nodes', [])
+            
+            db = get_db()
+            cursor = db.cursor()
+            
+            # 获取所有节点
+            cursor.execute(
+                "SELECT id, label, level, value, mastered, mastery_score FROM nodes WHERE topology_id = ?",
+                (topology_id,)
+            )
+            all_nodes = [dict(row) for row in cursor.fetchall()]
+            
+            # 获取所有边
+            cursor.execute(
+                "SELECT from_node, to_node, label FROM edges WHERE topology_id = ?",
+                (topology_id,)
+            )
+            all_edges = [dict(row) for row in cursor.fetchall()]
+            
+            # 筛选节点（排除被忽略的）
+            filtered_nodes = [node for node in all_nodes if node["id"] not in ignored_nodes]
+            
+            # 筛选边（只保留未被忽略节点之间的边）
+            filtered_edges = []
+            node_ids = set([node["id"] for node in filtered_nodes])
+            for edge in all_edges:
+                if edge["from_node"] in node_ids and edge["to_node"] in node_ids:
+                    filtered_edges.append(edge)
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'nodes': filtered_nodes,
+                    'edges': filtered_edges,
+                    'root': next((node["id"] for node in filtered_nodes if node["level"] == 0), filtered_nodes[0]["id"] if filtered_nodes else None)
+                }
+            })
+    except Exception as e:
+        logger.error(f"忽略节点错误: {str(e)}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f"忽略节点时出错: {str(e)}"
+        }), 500
+
 @app.teardown_appcontext
 def close_db(exception):
     """关闭数据库连接"""
@@ -904,9 +1009,11 @@ def close_db(exception):
         db.close()
 
 if __name__ == '__main__':
-    # 创建uploads文件夹
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
+    # 创建必要的文件夹
+    folders = ['uploads', 'static/css', 'static/js', 'templates']
+    for folder in folders:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
     
     # 初始化数据库
     try:

@@ -1,726 +1,167 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>知识图谱生成系统</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.1/dist/vis-network.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/vis-network@9.1.1/dist/vis-network.min.css" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3B82F6',
-                        secondary: '#10B981',
-                        accent: '#8B5CF6',
-                        neutral: '#1F2937',
-                        "neutral-light": '#F3F4F6',
-                        "mastered": '#10B981',  // 已掌握知识点颜色
-                        "unmastered": '#F59E0B',  // 未掌握知识点颜色
-                        "question": '#3B82F6'    // 问题相关颜色
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                }
-            }
-        }; // 注意：这里添加了分号
-    </script>
-    
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .content-auto {
-                content-visibility: auto;
-            }
-            .bg-gradient-primary {
-                background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-            }
-            .text-shadow {
-                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            .transition-all-300 {
-                transition: all 300ms ease-in-out;
-            }
-            .node-mastered {
-                stroke: #10B981 !important;
-                stroke-width: 3px !important;
-            }
-            .question-modal {
-                backdrop-filter: blur(5px);
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能助教系统</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="bg-gray-50 font-sans">
-    <!-- 顶部导航 -->
-    <header class="bg-gradient-primary text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <i class="fa fa-sitemap text-2xl"></i>
-                <h1 class="text-xl md:text-2xl font-bold text-shadow">知识图谱学习系统</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <button id="helpBtn" class="hover:text-gray-200 transition-all-300">
-                    <i class="fa fa-question-circle text-lg"></i>
-                </button>
-            </div>
-        </div>
-    </header>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">
+        <i class="fa fa-graduation-cap"></i>
+        <h1>智能助教系统</h1>
+      </div>
+    </div>
+  </header>
 
-    <main class="container mx-auto px-4 py-8">
-        <!-- 上传区域 -->
-        <section class="bg-white rounded-xl shadow-md p-6 mb-8 transition-all-300 hover:shadow-lg">
-            <h2 class="text-xl font-bold text-neutral mb-4 flex items-center">
-                <i class="fa fa-upload mr-2 text-primary"></i>上传文档
-            </h2>
-            <div id="uploadContainer" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-all-300 hover:border-primary cursor-pointer">
-                <i class="fa fa-file-text-o text-4xl text-gray-400 mb-4"></i>
-                <p class="text-gray-600 mb-4">拖放文档到此处，或<span class="text-primary font-medium">点击上传</span></p>
-                <p class="text-sm text-gray-500">支持 .txt, .pdf, .docx, .html 格式</p>
-                <input type="file" id="fileInput" class="hidden" accept=".txt,.pdf,.docx,.html">
-            </div>
-        </section>
+  <main class="main">
+    <section class="hero">
+      <div class="container">
+        <h2>智能知识图谱生成系统</h2>
+        <p>上传学习资料，自动生成知识图谱，提升学习效率</p>
+      </div>
+    </section>
 
-        <!-- 筛选控件 -->
-        <section id="filterSection" class="bg-white rounded-xl shadow-md p-6 mb-8 hidden">
-            <h2 class="text-xl font-bold text-neutral mb-4 flex items-center">
-                <i class="fa fa-filter mr-2 text-primary"></i>筛选节点
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label for="minNodes" class="block text-sm font-medium text-gray-700 mb-1">最小连接数</label>
-                    <input type="number" id="minNodes" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                </div>
-                <div>
-                    <label for="maxNodes" class="block text-sm font-medium text-gray-700 mb-1">最大连接数</label>
-                    <input type="number" id="maxNodes" value="100" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                </div>
-                <div class="flex items-end">
-                    <button id="filterBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center ml-auto">
-                        <i class="fa fa-filter mr-1"></i> 应用筛选
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 处理进度 -->
-        <section id="progressSection" class="bg-white rounded-xl shadow-md p-6 mb-8 hidden">
-            <h2 class="text-xl font-bold text-neutral mb-4 flex items-center">
-                <i class="fa fa-cog fa-spin mr-2 text-primary"></i>处理中
-            </h2>
-            <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
-                <div id="progressBar" class="bg-primary h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-            <p id="progressMessage" class="text-gray-600">准备中...</p>
-        </section>
-
-        <!-- 知识图谱结果 -->
-        <section id="resultSection" class="bg-white rounded-xl shadow-md p-6 mb-8 hidden">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <h2 class="text-xl font-bold text-neutral flex items-center">
-                    <i class="fa fa-sitemap mr-2 text-primary"></i>知识图谱
-                </h2>
-                <div class="flex space-x-3 mt-3 md:mt-0">
-                    <button id="zoomInBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center">
-                        <i class="fa fa-search-plus mr-1"></i> 放大
-                    </button>
-                    <button id="zoomOutBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center">
-                        <i class="fa fa-search-minus mr-1"></i> 缩小
-                    </button>
-                    <button id="resetViewBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center">
-                        <i class="fa fa-refresh mr-1"></i> 重置视图
-                    </button>
-                    <button id="showFilterBtn" class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-lg transition-all-300 flex items-center">
-                        <i class="fa fa-sliders mr-1"></i> 筛选节点
-                    </button>
-                </div>
-            </div>
-            
-            <div class="border border-gray-200 rounded-lg overflow-hidden h-[600px] mb-6">
-                <div id="knowledgeGraph" class="w-full h-full"></div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div class="bg-neutral-light p-3 rounded-lg">
-                    <div class="font-medium text-neutral">处理时间</div>
-                    <div id="processingTime" class="text-primary font-semibold">--</div>
-                </div>
-                <div class="bg-neutral-light p-3 rounded-lg">
-                    <div class="font-medium text-neutral">节点数量</div>
-                    <div id="nodeCount" class="text-primary font-semibold">--</div>
-                </div>
-                <div class="bg-neutral-light p-3 rounded-lg">
-                    <div class="font-medium text-neutral">关系数量</div>
-                    <div id="edgeCount" class="text-primary font-semibold">--</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 问题模态框 -->
-        <div id="questionModal" class="question-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 id="questionTitle" class="text-xl font-bold text-neutral">知识点测试</h3>
-                    <button id="closeQuestionModal" class="text-gray-400 hover:text-gray-600">
-                        <i class="fa fa-times text-xl"></i>
-                    </button>
-                </div>
-                <div class="mb-4">
-                    <p id="questionText" class="text-gray-700 mb-2"></p>
-                    <input type="text" id="answerInput" placeholder="输入你的答案..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                </div>
-                <div id="feedbackContainer" class="hidden mb-4">
-                    <div id="feedback" class="p-3 rounded-md"></div>
-                </div>
-                <div id="nextQuestionContainer" class="hidden mb-4">
-                    <p id="nextQuestionText" class="text-gray-700 mb-2"></p>
-                    <input type="text" id="nextAnswerInput" placeholder="输入你的答案..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                </div>
-                <div class="flex space-x-3">
-                    <button id="submitAnswerBtn" class="flex-1 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300">
-                        提交答案
-                    </button>
-                    <button id="skipQuestionBtn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-neutral px-4 py-2 rounded-lg transition-all-300">
-                        跳过
-                    </button>
-                </div>
-            </div>
+    <section class="upload-section">
+      <div class="container">
+        <div id="uploadContainer">
+          <div class="upload-area">
+            <i class="fa fa-cloud-upload"></i>
+            <h3>上传学习资料</h3>
+            <p>支持PPT、PDF、Word、TXT格式</p>
+            <label for="fileInput" class="upload-btn">
+              <i class="fa fa-file-text-o"></i>选择文件
+              <input id="fileInput" type="file" accept=".ppt,.pptx,.pdf,.docx,.doc,.txt">
+            </label>
+          </div>
         </div>
 
-        <!-- 错误信息 -->
-        <section id="errorSection" class="bg-white rounded-xl shadow-md p-6 mb-8 hidden">
-            <div class="bg-red-50 border-l-4 border-red-400 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class="fa fa-exclamation-triangle text-red-500"></i>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">处理出错</h3>
-                        <div class="mt-2 text-sm text-red-700">
-                            <p id="errorMessage">生成知识图谱时出现错误</p>
-                        </div>
-                    </div>
-                </div>
+        <div id="progressContainer" class="hidden">
+          <div class="progress-card">
+            <div class="progress-header">
+              <h3>正在处理文档</h3>
+              <span id="progressPercentage">0%</span>
             </div>
-        </section>
-    </main>
-
-    <footer class="bg-neutral text-white py-6">
-        <div class="container mx-auto px-4 text-center text-sm">
-            <p>© 2025 知识图谱学习系统 | 使用 DeepSeek API 构建</p>
+            <div class="progress-bar">
+              <div id="progressBar"></div>
+            </div>
+            <div class="progress-message">
+              <i class="fa fa-spinner fa-spin"></i>
+              <p id="progressMessage">准备处理文档...</p>
+            </div>
+          </div>
         </div>
-    </footer>
+      </div>
+    </section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 元素引用
-            const uploadContainer = document.getElementById('uploadContainer');
-            const fileInput = document.getElementById('fileInput');
-            const progressSection = document.getElementById('progressSection');
-            const progressBar = document.getElementById('progressBar');
-            const progressMessage = document.getElementById('progressMessage');
-            const resultSection = document.getElementById('resultSection');
-            const errorSection = document.getElementById('errorSection');
-            const errorMessage = document.getElementById('errorMessage');
-            const processingTime = document.getElementById('processingTime');
-            const nodeCount = document.getElementById('nodeCount');
-            const edgeCount = document.getElementById('edgeCount');
-            const helpBtn = document.getElementById('helpBtn');
-            const filterSection = document.getElementById('filterSection');
-            const showFilterBtn = document.getElementById('showFilterBtn');
-            const minNodes = document.getElementById('minNodes');
-            const maxNodes = document.getElementById('maxNodes');
-            const filterBtn = document.getElementById('filterBtn');
-            
-            // 问题模态框相关元素
-            const questionModal = document.getElementById('questionModal');
-            const questionTitle = document.getElementById('questionTitle');
-            const questionText = document.getElementById('questionText');
-            const answerInput = document.getElementById('answerInput');
-            const feedbackContainer = document.getElementById('feedbackContainer');
-            const feedback = document.getElementById('feedback');
-            const nextQuestionContainer = document.getElementById('nextQuestionContainer');
-            const nextQuestionText = document.getElementById('nextQuestionText');
-            const nextAnswerInput = document.getElementById('nextAnswerInput');
-            const submitAnswerBtn = document.getElementById('submitAnswerBtn');
-            const closeQuestionModal = document.getElementById('closeQuestionModal');
-            const skipQuestionBtn = document.getElementById('skipQuestionBtn');
-            
-            // 可视化相关元素
-            const knowledgeGraphContainer = document.getElementById('knowledgeGraph');
-            const zoomInBtn = document.getElementById('zoomInBtn');
-            const zoomOutBtn = document.getElementById('zoomOutBtn');
-            const resetViewBtn = document.getElementById('resetViewBtn');
-            
-            // 知识图谱实例
-            let network = null;
-            let topologyId = null;
-            let currentNodeId = null;
-            let currentQuestionId = null;
-            
-            // 上传区域点击事件
-            uploadContainer.addEventListener('click', function() {
-                console.log("上传区域被点击");
-                fileInput.click();
-            });
-            
-            // 文件拖放事件
-            uploadContainer.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                console.log("文件拖入上传区域");
-                uploadContainer.classList.add('border-primary');
-                uploadContainer.classList.add('bg-blue-50');
-            });
-            
-            uploadContainer.addEventListener('dragleave', function() {
-                console.log("文件拖离上传区域");
-                uploadContainer.classList.remove('border-primary');
-                uploadContainer.classList.remove('bg-blue-50');
-            });
-            
-            uploadContainer.addEventListener('drop', function(e) {
-                e.preventDefault();
-                console.log("文件在上传区域放下");
-                uploadContainer.classList.remove('border-primary');
-                uploadContainer.classList.remove('bg-blue-50');
-                
-                if (e.dataTransfer.files.length > 0) {
-                    uploadFile(e.dataTransfer.files[0]);
-                }
-            });
-            
-            // 文件选择事件
-            fileInput.addEventListener('change', function() {
-                if (fileInput.files.length > 0) {
-                    console.log("选择了文件: " + fileInput.files[0].name);
-                    uploadFile(fileInput.files[0]);
-                }
-            });
-            
-            // 上传文件
-            function uploadFile(file) {
-                console.log("开始上传文件: " + file.name);
-                
-                // 重置状态
-                progressBar.style.width = '0%';
-                progressMessage.textContent = '准备上传...';
-                progressSection.classList.remove('hidden');
-                resultSection.classList.add('hidden');
-                errorSection.classList.add('hidden');
-                filterSection.classList.add('hidden');
-                
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(function(response) {
-                    console.log("API响应状态: " + response.status);
-                    if (!response.ok) {
-                        throw new Error('API请求失败');
-                    }
-                    return response.json();
-                })
-                .then(function(data) {
-                    console.log("API响应数据: ", data);
-                    if (data.status === 'success') {
-                        topologyId = data.topology_id;
-                        checkProgress(topologyId);
-                    } else {
-                        showError(data.message);
-                    }
-                })
-                .catch(function(error) {
-                    console.error("上传错误: ", error);
-                    showError('上传文件时发生错误: ' + error.message);
-                });
-            }
-            
-            // 检查处理进度
-            function checkProgress(topologyId) {
-                console.log("检查处理进度: " + topologyId);
-                fetch(`/api/topology/${topologyId}`)
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    console.log("进度检查响应: ", data);
-                    if (data.status === 'processing') {
-                        if (data.progress) {
-                            progressBar.style.width = `${data.progress}%`;
-                        }
-                        if (data.message) {
-                            progressMessage.textContent = data.message;
-                        }
-                        setTimeout(function() {
-                            checkProgress(topologyId);
-                        }, 1000);
-                    } else if (data.status === 'success') {
-                        progressSection.classList.add('hidden');
-                        resultSection.classList.remove('hidden');
-                        filterSection.classList.remove('hidden');
-                        renderKnowledgeGraph(data.data);
-                        
-                        // 更新统计信息
-                        processingTime.textContent = data.processing_time ? `${data.processing_time} 秒` : '--';
-                        nodeCount.textContent = data.node_count;
-                        edgeCount.textContent = data.edge_count;
-                    } else {
-                        showError(data.message);
-                    }
-                })
-                .catch(function(error) {
-                    console.error("进度检查错误: ", error);
-                    showError('检查处理进度时发生错误: ' + error.message);
-                });
-            }
-            
-            // 显示错误信息
-            function showError(message) {
-                console.error("错误: " + message);
-                progressSection.classList.add('hidden');
-                resultSection.classList.add('hidden');
-                filterSection.classList.add('hidden');
-                errorSection.classList.remove('hidden');
-                errorMessage.textContent = message;
-            }
-            
-            // 渲染知识图谱
-            function renderKnowledgeGraph(graphData) {
-                console.log("渲染知识图谱，节点数: " + graphData.nodes.length);
-                
-                // 销毁现有网络（如果存在）
-                if (network !== null) {
-                    network.destroy();
-                    network = null;
-                }
-                
-                // 准备节点和边数据
-                const nodes = new vis.DataSet(graphData.nodes);
-                const edges = new vis.DataSet(graphData.edges);
-                
-                // 设置节点样式
-                const nodeStyle = {
-                    shape: 'ellipse',
-                    color: {
-                        background: function(params) {
-                            return params.node.mastered ? '#D1FAE5' : '#E0F2FE';
-                        },
-                        border: function(params) {
-                            return params.node.mastered ? '#10B981' : '#3B82F6';
-                        },
-                        highlight: {
-                            background: function(params) {
-                                return params.node.mastered ? '#A7F3D0' : '#BAE6FD';
-                            },
-                            border: function(params) {
-                                return params.node.mastered ? '#059669' : '#2563EB';
-                            }
-                        }
-                    },
-                    font: {
-                        color: '#1E40AF',
-                        size: 14,
-                        face: 'Inter'
-                    },
-                    shadow: {
-                        enabled: true,
-                        color: 'rgba(0,0,0,0.1)',
-                        size: 5,
-                        x: 2,
-                        y: 2
-                    },
-                    widthConstraint: {
-                        maximum: 200
-                    }
-                };
-                
-                // 设置边样式
-                const edgeStyle = {
-                    color: {
-                        color: '#94A3B8',
-                        highlight: '#64748B'
-                    },
-                    width: 1.5,
-                    arrows: {
-                        to: {
-                            enabled: true,
-                            type: 'arrow'
-                        }
-                    },
-                    font: {
-                        color: '#64748B',
-                        size: 12,
-                        face: 'Inter',
-                        align: 'middle'
-                    },
-                    smooth: {
-                        enabled: true,
-                        type: 'dynamic'
-                    }
-                };
-                
-                // 设置网络配置
-                const data = {
-                    nodes: nodes,
-                    edges: edges
-                };
-                
-                const options = {
-                    autoResize: true,
-                    height: '100%',
-                    width: '100%',
-                    interaction: {
-                        hover: true,
-                        zoomView: true,
-                        dragNodes: true,
-                        dragView: true,
-                        selectable: true,
-                        selectNodes: true
-                    },
-                    layout: {
-                        hierarchical: {
-                            enabled: true,
-                            direction: 'UD',
-                            sortMethod: 'directed',
-                            nodeSpacing: 150,
-                            levelSeparation: 200,
-                            shakeTowards: 'roots'
-                        }
-                    },
-                    nodes: nodeStyle,
-                    edges: edgeStyle,
-                    physics: {
-                        enabled: false
-                    },
-                    tooltip: {
-                        formatter: function(node) {
-                            let content = `<div class="font-medium">${node.label}</div>`;
-                            content += `<div>连接数: ${node.value}</div>`;
-                            content += `<div>掌握状态: ${node.mastered ? '已掌握' : '未掌握'}</div>`;
-                            return content;
-                        }
-                    }
-                };
-                
-                // 创建网络
-                network = new vis.Network(knowledgeGraphContainer, data, options);
-                
-                // 节点点击事件
-                network.on('selectNode', function(params) {
-                    if (params.nodes.length > 0) {
-                        currentNodeId = params.nodes[0];
-                        openQuestionModal(currentNodeId);
-                    }
-                });
-                
-                // 设置视图控制
-                zoomInBtn.addEventListener('click', function() {
-                    if (network) network.moveTo({ scale: network.getScale() * 1.2 });
-                });
-                
-                zoomOutBtn.addEventListener('click', function() {
-                    if (network) network.moveTo({ scale: network.getScale() / 1.2 });
-                });
-                
-                resetViewBtn.addEventListener('click', function() {
-                    if (network) network.fit();
-                });
-                
-                // 显示筛选按钮
-                showFilterBtn.addEventListener('click', function() {
-                    filterSection.classList.toggle('hidden');
-                });
-                
-                // 筛选按钮事件
-                filterBtn.addEventListener('click', function() {
-                    const min = parseInt(minNodes.value) || 0;
-                    const max = parseInt(maxNodes.value) || 100;
-                    
-                    if (isNaN(min) || isNaN(max) || min > max) {
-                        alert('请输入有效的最小和最大连接数');
-                        return;
-                    }
-                    
-                    fetch(`/api/topology/${topologyId}/filter`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            min: min,
-                            max: max
-                        })
-                    })
-                    .then(function(response) {
-                        return response.json();
-                    })
-                    .then(function(data) {
-                        if (data.status === 'success') {
-                            renderKnowledgeGraph(data.data);
-                            nodeCount.textContent = data.data.nodes.length;
-                            edgeCount.textContent = data.data.edges.length;
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(function(error) {
-                        alert('筛选节点时发生错误: ' + error.message);
-                    });
-                });
-                
-                // 自动调整视图
-                setTimeout(function() {
-                    if (network) network.fit();
-                }, 500);
-            }
-            
-            // 打开问题模态框
-            function openQuestionModal(nodeId) {
-                console.log("打开问题模态框，节点ID: " + nodeId);
-                currentNodeId = nodeId;
-                
-                fetch(`/api/topology/${topologyId}/node/${nodeId}/question`)
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    if (data.status === 'success') {
-                        currentQuestionId = data.data.question_id;
-                        questionTitle.textContent = `关于 "${data.data.node_id}" 的问题`;
-                        questionText.textContent = data.data.question;
-                        answerInput.value = '';
-                        feedbackContainer.classList.add('hidden');
-                        nextQuestionContainer.classList.add('hidden');
-                        questionModal.classList.remove('hidden');
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(function(error) {
-                    console.error("获取问题错误: ", error);
-                    alert('获取问题时发生错误: ' + error.message);
-                });
-            }
-            
-            // 提交答案
-submitAnswerBtn.addEventListener('click', function() {
-    const answer = answerInput.value.trim();
-    if (!answer) {
-        alert('请输入答案');
-        return;
-    }
+    <!-- 在graph-section部分添加节点控制UI -->
+<section class="graph-section">
+  <div id="graphContainer" class="hidden">
+    <div class="graph-header">
+      <h3>知识图谱</h3>
+      <div class="graph-controls">
+        <div class="search-box">
+          <i class="fa fa-search"></i>
+          <input type="text" id="searchNode" placeholder="搜索知识点...">
+        </div>
+        
+        <!-- 节点控制按钮 -->
+        <div class="node-controls">
+          <button id="ignoreNodeBtn" class="control-btn">
+            <i class="fa fa-eye-slash"></i> 忽略选中节点
+          </button>
+          <button id="resetIgnoredBtn" class="control-btn">
+            <i class="fa fa-eye"></i> 重置忽略
+          </button>
+        </div>
+        
+        <button id="refreshGraph">
+          <i class="fa fa-refresh"></i>
+        </button>
+      </div>
+    </div>
     
-    console.log("提交答案: " + answer);
+    <!-- 节点大小过滤 -->
+    <div class="node-filter">
+      <div class="filter-control">
+        <label for="nodeSizeSlider">节点大小过滤:</label>
+        <input type="range" id="nodeSizeSlider" min="0" max="10" value="0">
+        <span id="nodeSizeValue">0</span>
+        <button id="applySizeFilter">应用过滤</button>
+      </div>
+    </div>
     
-    fetch(`/api/topology/${topologyId}/question/${currentQuestionId}/answer`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            answer: answer,
-            node_id: currentNodeId
-        })
-    })
-    .then(function(response) {
-        if (!response.ok) {
-            throw new Error('API请求失败');
-        }
-        return response.json();
-    })
-    .then(function(data) {
-        console.log("答案评估响应: ", data);
-        if (data.status === 'success') {
-            // 显示反馈
-            feedbackContainer.classList.remove('hidden');
-            
-            if (data.data.correct) {
-                feedback.className = 'p-3 rounded-md bg-green-50 border border-green-200';
-                // 确保HTML字符串中的括号正确匹配
-                feedback.innerHTML = `<i class="fa fa-check-circle text-green-500 mr-2"></i>${data.data.feedback}`;
-                
-                if (data.data.next_question) {
-                    // 显示下一个问题
-                    nextQuestionContainer.classList.remove('hidden');
-                    nextQuestionText.textContent = data.data.next_question;
-                    submitAnswerBtn.textContent = '提交下一个答案';
-                    answerInput.classList.add('hidden');
-                    nextAnswerInput.classList.remove('hidden');
-                    currentQuestionId = ''; // 重置问题ID
-                } else {
-                    if (data.data.mastered) {
-                        // 确保HTML字符串中的括号正确匹配
-                        feedback.innerHTML += '<br><br><i class="fa fa-trophy text-yellow-500 mr-2"></i>你已经掌握了这个知识点！';
-                        
-                        // 更新知识图谱中节点的样式
-                        if (network) {
-                            network.nodes.update({
-                                id: currentNodeId,
-                                mastered: true
-                            });
-                        }
-                    }
-                }
-            } else {
-                feedback.className = 'p-3 rounded-md bg-red-50 border border-red-200';
-                // 确保HTML字符串中的括号正确匹配
-                feedback.innerHTML = `<i class="fa fa-times-circle text-red-500 mr-2"></i>${data.data.feedback}`;
-            }
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(function(error) {
-        console.error("提交答案错误: ", error);
-        alert('提交答案时发生错误: ' + error.message);
-    });
-});
-            
-            // 关闭问题模态框
-            closeQuestionModal.addEventListener('click', function() {
-                console.log("关闭问题模态框");
-                questionModal.classList.add('hidden');
-                resetQuestionModal();
-            });
-            
-            // 跳过问题
-            skipQuestionBtn.addEventListener('click', function() {
-                console.log("跳过问题");
-                questionModal.classList.add('hidden');
-                resetQuestionModal();
-            });
-            
-            // 重置问题模态框
-            function resetQuestionModal() {
-                questionText.textContent = '';
-                answerInput.value = '';
-                feedbackContainer.classList.add('hidden');
-                nextQuestionContainer.classList.add('hidden');
-                submitAnswerBtn.textContent = '提交答案';
-                answerInput.classList.remove('hidden');
-                nextAnswerInput.classList.add('hidden');
-                currentQuestionId = null;
-            }
-            
-            // 帮助按钮事件
-            helpBtn.addEventListener('click', function() {
-                alert('知识图谱学习系统帮助:\n\n' +
-                      '1. 上传支持的文档格式(.txt, .pdf, .docx, .html)\n' +
-                      '2. 系统将自动分析文档内容并提取知识点\n' +
-                      '3. 生成的知识图谱将以树形结构展示知识点及其关系\n' +
-                      '4. 点击知识点节点可进行互动问答学习\n' +
-                      '5. 正确回答问题可逐步掌握知识点，已掌握的知识点会高亮显示\n' +
-                      '6. 使用筛选功能可根据节点连接数过滤显示的知识点');
-            });
-        });
-    </script>
+    <div id="networkContainer"></div>
+    
+    <div class="graph-footer">
+      <div class="legend">
+        <div class="legend-item">
+          <span class="color mastered"></span>
+          <span>已掌握</span>
+        </div>
+        <div class="legend-item">
+          <span class="color partial"></span>
+          <span>部分掌握</span>
+        </div>
+        <div class="legend-item">
+          <span class="color unmastered"></span>
+          <span>未掌握</span>
+        </div>
+      </div>
+      <div class="stats">
+        <span id="nodeCount">0</span> 个节点 | <span id="edgeCount">0</span> 条关系
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section class="quiz-section">
+      <div id="quizContainer" class="hidden">
+        <div class="quiz-header">
+          <h3>知识测试</h3>
+          <p>回答问题，巩固你的理解</p>
+        </div>
+        <div class="quiz-body">
+          <div id="questionCard" class="hidden">
+            <div class="question-box">
+              <h4>问题</h4>
+              <p id="currentQuestion"></p>
+            </div>
+            <div class="answer-box">
+              <h4>你的回答</h4>
+              <textarea id="userAnswer" placeholder="请输入你的回答..."></textarea>
+            </div>
+            <button id="submitAnswer">提交答案</button>
+          </div>
+          
+          <div id="answerFeedback" class="hidden">
+            <div class="feedback-box" id="feedbackCard">
+              <h4 id="feedbackTitle"></h4>
+              <p id="feedbackText"></p>
+            </div>
+            <button id="nextQuestion">下一个问题</button>
+          </div>
+          
+          <div id="noQuestion">
+            <i class="fa fa-question-circle"></i>
+            <h4>请先选择一个知识点</h4>
+            <p>在知识图谱中点击一个节点，开始测试</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 智能助教系统 | 知识图谱学习平台</p>
+    </div>
+  </footer>
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
