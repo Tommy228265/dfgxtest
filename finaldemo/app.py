@@ -6,13 +6,13 @@ import time
 import threading
 import logging
 import requests
+import sqlite3
 from PyPDF2 import PdfReader
 from docx import Document
 from bs4 import BeautifulSoup
 from pptx import Presentation
-from flask import Flask, request, jsonify, render_template, g, current_app
+from flask import Flask, request, jsonify, render_template, g
 from flask_cors import CORS
-import sqlite3
 from contextlib import closing
 from collections import defaultdict
 
@@ -21,7 +21,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("topology_generator.log"),
+        logging.FileHandler("knowledge_graph.log"),
         logging.StreamHandler()
     ]
 )
@@ -29,7 +29,7 @@ logger = logging.getLogger("KnowledgeGraphGenerator")
 
 # 初始化Flask应用
 app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # 增强CORS配置
 
 # 配置上传文件夹
 UPLOAD_FOLDER = 'uploads'
@@ -43,10 +43,7 @@ MAX_RETRIES = 3
 BACKOFF_FACTOR = 2
 
 # 数据库配置
-DATABASE = os.path.join(app.root_path, 'knowledge_graph.db')  # 使用应用根路径
-
-# 存储节点连续正确回答次数
-node_consecutive_correct = defaultdict(int)
+DATABASE = os.path.join(app.root_path, 'knowledge_graph.db')
 
 def get_db():
     """获取数据库连接"""
@@ -57,7 +54,7 @@ def get_db():
     return db
 
 def init_db():
-    """初始化数据库"""
+    """初始化数据库（重新设计）"""
     logger.info("开始初始化数据库...")
     with app.app_context():
         db_path = os.path.abspath(DATABASE)
@@ -79,6 +76,7 @@ def init_db():
                 schema = """
                 CREATE TABLE IF NOT EXISTS topologies (
                     id TEXT PRIMARY KEY,
+                    content TEXT NOT NULL,
                     created_at TEXT
                 );
 
@@ -91,6 +89,7 @@ def init_db():
                     mastered INTEGER DEFAULT 0,
                     mastery_score REAL DEFAULT 0,
                     consecutive_correct INTEGER DEFAULT 0,
+                    content_snippet TEXT,
                     PRIMARY KEY (topology_id, id),
                     FOREIGN KEY (topology_id) REFERENCES topologies (id)
                 );
@@ -220,7 +219,7 @@ def sanitize_text(text: str) -> str:
     text = text.replace('"', '\\"')
     return text
 
-def extract_knowledge_from_text(text: str, max_retries: int = MAX_RETRIES) -> list:
+def extract_knowledge_from_text(text: str, max_nodes: int = 0, max_retries: int = MAX_RETRIES) -> list:
     """调用DeepSeek API提取适合树形结构的知识点层级关系"""
     from openai import OpenAI
     
@@ -232,11 +231,17 @@ def extract_knowledge_from_text(text: str, max_retries: int = MAX_RETRIES) -> li
     # 清理文本
     sanitized_text = sanitize_text(text)
     
+    # 根据节点数量限制调整提示
+    node_limit_prompt = ""
+    if max_nodes > 0:
+        node_limit_prompt = f"请确保最终提取的知识点数量不超过{max_nodes}个。"
+    
     messages = [
-        {"role": "system", "content": """你是一个知识图谱构建专家，能够从文本中提取知识点并构建树形结构。
+        {"role": "system", "content": f"""你是一个知识图谱构建专家，能够从文本中提取知识点并构建树形结构。
 请分析文本内容，识别出主要知识点及其层级关系（如父节点-子节点关系），
 以JSON数组形式输出，每个元素格式为 [父知识点, 关系, 子知识点]。
-关系应体现层级结构，如"包含"、"属于"、"是子类"等。确保输出格式正确，仅返回JSON数组。"""},
+关系应体现层级结构，如"包含"、"属于"、"是子类"等。确保输出格式正确，仅返回JSON数组。
+{node_limit_prompt}"""},
         {"role": "user", "content": f"请从下面文本中提取知识点及其层级关系，输出JSON数组，每个元素格式为 [父知识点, 关系, 子知识点]：\n{sanitized_text}"}
     ]
     
@@ -334,8 +339,32 @@ def parse_document(file_path):
         logger.error(f"解析文档出错: {str(e)}", exc_info=True)
         return None
 
-def build_tree_structure(knowledge_edges, topology_id):
-    """构建树形知识图数据结构，优化可视化效果并保存到数据库"""
+def extract_content_snippet(content: str, topic: str) -> str:
+    """从原文中提取与主题相关的片段"""
+    # 查找主题在内容中的位置
+    index = content.lower().find(topic.lower())
+    if index == -1:
+        return ""
+    
+    # 提取上下文片段（主题前后各200个字符）
+    start = max(0, index - 200)
+    end = min(len(content), index + len(topic) + 200)
+    snippet = content[start:end]
+    
+    # 确保片段包含主题
+    if topic.lower() not in snippet.lower():
+        return ""
+    
+    # 添加省略号表示截断
+    if start > 0:
+        snippet = "..." + snippet
+    if end < len(content):
+        snippet = snippet + "..."
+    
+    return snippet
+
+def build_tree_structure(knowledge_edges, topology_id, content: str):
+    """构建树形知识图数据结构，保存原文片段"""
     nodes = {}
     edges = []
     all_node_ids = set()
@@ -347,6 +376,8 @@ def build_tree_structure(knowledge_edges, topology_id):
         
         # 确保节点存在
         if src not in nodes:
+            # 提取原文片段
+            snippet = extract_content_snippet(content, src)
             nodes[src] = {
                 "id": src,
                 "label": src,
@@ -355,9 +386,11 @@ def build_tree_structure(knowledge_edges, topology_id):
                 "value": 1,    # 节点大小基准
                 "mastered": False,  # 知识点掌握状态
                 "mastery_score": 0,  # 掌握分数
-                "consecutive_correct": 0  # 连续正确回答次数
+                "consecutive_correct": 0,  # 连续正确回答次数
+                "content_snippet": snippet  # 保存原文片段
             }
         if tgt not in nodes:
+            snippet = extract_content_snippet(content, tgt)
             nodes[tgt] = {
                 "id": tgt,
                 "label": tgt,
@@ -366,7 +399,8 @@ def build_tree_structure(knowledge_edges, topology_id):
                 "value": 1,
                 "mastered": False,
                 "mastery_score": 0,
-                "consecutive_correct": 0
+                "consecutive_correct": 0,
+                "content_snippet": snippet
             }
         
         # 添加边
@@ -408,7 +442,7 @@ def build_tree_structure(knowledge_edges, topology_id):
         nodes[node_id]["value"] = max(1, in_connections + out_connections)
     
     # 保存节点和边到数据库
-    save_to_database(topology_id, list(nodes.values()), edges)
+    save_to_database(topology_id, list(nodes.values()), edges, content)
     
     # 转换为节点列表
     tree_nodes = list(nodes.values())
@@ -419,23 +453,26 @@ def build_tree_structure(knowledge_edges, topology_id):
         "root": root
     }
 
-def save_to_database(topology_id, nodes, edges):
-    """将知识图谱数据保存到数据库"""
+def save_to_database(topology_id, nodes, edges, content: str):
+    """将知识图谱数据保存到数据库（保存原文内容）"""
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
         
-        # 保存拓扑图信息
+        # 保存拓扑图信息（包含原文内容）
         cursor.execute(
-            "INSERT OR REPLACE INTO topologies (id, created_at) VALUES (?, ?)",
-            (topology_id, time.strftime('%Y-%m-%d %H:%M:%S'))
+            "INSERT OR REPLACE INTO topologies (id, content, created_at) VALUES (?, ?, ?)",
+            (topology_id, content, time.strftime('%Y-%m-%d %H:%M:%S'))
         )
         
         # 保存节点
         for node in nodes:
             cursor.execute(
-                "INSERT OR REPLACE INTO nodes (topology_id, id, label, level, value, mastered, mastery_score, consecutive_correct) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (topology_id, node["id"], node["label"], node["level"], node["value"], 0, 0, 0)
+                """INSERT OR REPLACE INTO nodes 
+                (topology_id, id, label, level, value, mastered, mastery_score, consecutive_correct, content_snippet) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (topology_id, node["id"], node["label"], node["level"], node["value"], 
+                 0, 0, 0, node.get("content_snippet", ""))
             )
         
         # 保存边
@@ -447,10 +484,10 @@ def save_to_database(topology_id, nodes, edges):
         
         db.commit()
 
-def process_document(file_path, topology_id):
-    """处理文档并生成树形知识图"""
+def process_document(file_path, topology_id, max_nodes=0):
+    """处理文档并生成树形知识图（支持节点数量限制）"""
     start_time = time.time()
-    logger.info(f"开始处理文档: {file_path}, 拓扑ID: {topology_id}")
+    logger.info(f"开始处理文档: {file_path}, 拓扑ID: {topology_id}, 最大节点数: {max_nodes}")
     
     # 更新状态为处理中
     topology_results[topology_id] = {
@@ -487,11 +524,11 @@ def process_document(file_path, topology_id):
                 text = text[:MAX_TEXT_LENGTH]
             
             update_progress(topology_id, 60, "调用DeepSeek API提取知识层级...")
-            knowledge_edges = extract_knowledge_from_text(text)
+            knowledge_edges = extract_knowledge_from_text(text, max_nodes)
             logger.info(f"成功提取{len(knowledge_edges)}条知识层级关系")
             
-            update_progress(topology_id, 80, "构建树形知识图...")
-            knowledge_graph = build_tree_structure(knowledge_edges, topology_id)
+            update_progress(topology_id, 80, "构建树形知识图并提取原文片段...")
+            knowledge_graph = build_tree_structure(knowledge_edges, topology_id, text)
             
             processing_time = time.time() - start_time
             logger.info(f"树形知识图生成完成，耗时: {processing_time:.2f} 秒")
@@ -557,9 +594,12 @@ def upload_document():
     
     logger.info(f"文件上传成功: {file_path}, 大小: {file_size/1024/1024:.2f} MB")
     
+    # 获取请求参数中的最大节点数
+    max_nodes = request.form.get('max_nodes', 0, type=int)
+    
     # 启动处理线程，并在应用上下文中执行
     threading.Thread(
-        target=lambda: with_app_context(process_document, file_path, topology_id)
+        target=lambda: with_app_context(process_document, file_path, topology_id, max_nodes)
     ).start()
     
     return jsonify({
@@ -581,7 +621,7 @@ def get_topology(topology_id):
             db = get_db()
             cursor = db.cursor()
             cursor.execute(
-                "SELECT id, created_at FROM topologies WHERE id = ?",
+                "SELECT id, content, created_at FROM topologies WHERE id = ?",
                 (topology_id,)
             )
             topology = cursor.fetchone()
@@ -592,7 +632,7 @@ def get_topology(topology_id):
             
             # 从数据库获取节点和边
             cursor.execute(
-                "SELECT id, label, level, value, mastered, mastery_score, consecutive_correct FROM nodes WHERE topology_id = ?",
+                "SELECT id, label, level, value, mastered, mastery_score, consecutive_correct, content_snippet FROM nodes WHERE topology_id = ?",
                 (topology_id,)
             )
             nodes = [dict(row) for row in cursor.fetchall()]
@@ -615,7 +655,7 @@ def get_topology(topology_id):
                 'created_at': topology["created_at"],
                 'node_count': len(nodes),
                 'edge_count': len(edges),
-                'text_length': 0
+                'text_length': len(topology["content"])
             })
     
     topology = topology_results[topology_id]
@@ -644,67 +684,75 @@ def get_topology(topology_id):
         'text_length': topology.get('text_length', 0)
     })
 
-@app.route('/api/topology/<topology_id>/filter', methods=['POST'])
-def filter_nodes(topology_id):
-    """根据节点数量筛选知识图谱"""
+@app.route('/api/topology/<topology_id>/regenerate', methods=['POST'])
+def regenerate_topology(topology_id):
+    """重新生成知识图谱（指定节点数量）"""
     try:
+        # 获取请求参数
+        data = request.json
+        max_nodes = data.get('max_nodes', 0)
+        
+        # 从数据库获取原文内容
         with app.app_context():
-            data = request.json
-            min_nodes = data.get('min', 0)
-            max_nodes = data.get('max', float('inf'))
-            
             db = get_db()
             cursor = db.cursor()
-            
-            # 获取节点
             cursor.execute(
-                "SELECT id, label, level, value, mastered, mastery_score FROM nodes WHERE topology_id = ?",
+                "SELECT content FROM topologies WHERE id = ?",
                 (topology_id,)
             )
-            nodes = [dict(row) for row in cursor.fetchall()]
+            topology = cursor.fetchone()
             
-            # 获取边
-            cursor.execute(
-                "SELECT from_node, to_node, label FROM edges WHERE topology_id = ?",
-                (topology_id,)
-            )
-            edges = [dict(row) for row in cursor.fetchall()]
+            if not topology:
+                return jsonify({
+                    'status': 'error',
+                    'message': '拓扑图不存在'
+                }), 404
             
-            # 筛选节点
-            filtered_nodes = [node for node in nodes if min_nodes <= node["value"] <= max_nodes]
+            content = topology["content"]
             
-            # 筛选边
-            filtered_edges = []
-            node_ids = set([node["id"] for node in filtered_nodes])
-            for edge in edges:
-                if edge["from_node"] in node_ids and edge["to_node"] in node_ids:
-                    filtered_edges.append(edge)
+            # 调用DeepSeek API重新生成
+            update_progress(topology_id, 30, "重新提取知识层级...")
+            knowledge_edges = extract_knowledge_from_text(content, max_nodes)
+            logger.info(f"重新生成成功提取{len(knowledge_edges)}条知识层级关系")
+            
+            update_progress(topology_id, 70, "重新构建树形知识图...")
+            knowledge_graph = build_tree_structure(knowledge_edges, topology_id, content)
+            
+            # 更新处理结果
+            topology_results[topology_id] = {
+                "status": "completed",
+                "data": knowledge_graph,
+                "created_at": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "node_count": len(knowledge_graph["nodes"]),
+                "edge_count": len(knowledge_graph["edges"]),
+                "processing_time": 0,
+                "text_length": len(content)
+            }
             
             return jsonify({
                 'status': 'success',
-                'data': {
-                    'nodes': filtered_nodes,
-                    'edges': filtered_edges,
-                    'root': next((node["id"] for node in filtered_nodes if node["level"] == 0), filtered_nodes[0]["id"] if filtered_nodes else None)
-                }
+                'message': '知识图谱重新生成成功',
+                'node_count': len(knowledge_graph["nodes"]),
+                'edge_count': len(knowledge_graph["edges"])
             })
+            
     except Exception as e:
-        logger.error(f"节点筛选错误: {str(e)}", exc_info=True)
+        logger.error(f"重新生成知识图谱错误: {str(e)}", exc_info=True)
         return jsonify({
             'status': 'error',
-            'message': f"筛选节点时出错: {str(e)}"
+            'message': f"重新生成知识图谱时出错: {str(e)}"
         }), 500
 
 @app.route('/api/topology/<topology_id>/node/<node_id>/question', methods=['GET'])
 def get_question(topology_id, node_id):
-    """获取关于指定节点的问题（确保每次都是新问题）"""
+    """获取关于指定节点的问题（基于原文内容）"""
     try:
         with app.app_context():
-            # 从数据库获取节点标签
+            # 从数据库获取节点信息
             db = get_db()
             cursor = db.cursor()
             cursor.execute(
-                "SELECT label FROM nodes WHERE topology_id = ? AND id = ?",
+                "SELECT label, content_snippet FROM nodes WHERE topology_id = ? AND id = ?",
                 (topology_id, node_id)
             )
             node = cursor.fetchone()
@@ -716,9 +764,10 @@ def get_question(topology_id, node_id):
                 }), 404
             
             node_label = node["label"]
+            content_snippet = node["content_snippet"]
             
-            # 调用DeepSeek生成新问题
-            question = generate_question(node_label)
+            # 调用DeepSeek生成新问题（基于原文片段）
+            question = generate_question(node_label, content_snippet)
             
             # 保存问题到数据库
             question_id = str(uuid.uuid4())
@@ -743,8 +792,8 @@ def get_question(topology_id, node_id):
             'message': f"生成问题时出错: {str(e)}"
         }), 500
 
-def generate_question(topic):
-    """调用DeepSeek生成关于特定主题的问题"""
+def generate_question(topic, context):
+    """调用DeepSeek生成关于特定主题的问题（基于原文内容）"""
     from openai import OpenAI
     
     client = OpenAI(
@@ -754,11 +803,11 @@ def generate_question(topic):
     
     # 使用不同的提示确保生成不同的问题
     prompts = [
-        f"请生成一个关于\"{topic}\"的测试问题，用于评估用户对该知识点的理解深度。",
-        f"请针对\"{topic}\"创建一个有挑战性的问题，测试用户的高级理解能力。",
-        f"请设计一个关于\"{topic}\"的开放式问题，鼓励用户进行深入思考。",
-        f"请提出一个关于\"{topic}\"的应用题，测试用户在实际场景中应用知识的能力。",
-        f"请生成一个关于\"{topic}\"的辨析题，帮助用户澄清概念上的误解。"
+        f"请基于以下原文片段，生成一个关于\"{topic}\"的测试问题:\n\n{context}\n\n问题:",
+        f"请根据以下原文内容，设计一个关于\"{topic}\"的应用题:\n\n{context}\n\n问题:",
+        f"请基于以下文本，提出一个关于\"{topic}\"的辨析题:\n\n{context}\n\n问题:",
+        f"请根据以下原文片段，创建一个关于\"{topic}\"的理解题:\n\n{context}\n\n问题:",
+        f"请基于以下内容，生成一个关于\"{topic}\"的分析题:\n\n{context}\n\n问题:"
     ]
     
     # 随机选择一个提示
@@ -766,9 +815,10 @@ def generate_question(topic):
     prompt = random.choice(prompts)
     
     messages = [
-        {"role": "system", "content": """你是一个教育专家，能够针对特定知识点生成有针对性的问题。
+        {"role": "system", "content": """你是一个教育专家，能够基于原文内容生成有针对性的问题。
 请生成的问题应该能够有效测试用户对该知识点的理解。
-问题应该清晰明确，避免歧义。只返回问题文本，不需要其他内容。"""},
+问题应该清晰明确，避免歧义，并且基于提供的原文内容。
+只返回问题文本，不需要其他内容。"""},
         {"role": "user", "content": prompt}
     ]
     
@@ -776,14 +826,14 @@ def generate_question(topic):
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=messages,
-            max_tokens=100
+            max_tokens=150
         )
         
         question = response.choices[0].message.content.strip()
         return question
     except Exception as e:
         logger.error(f"生成问题出错: {str(e)}", exc_info=True)
-        return f"关于{topic}的问题"
+        return f"关于{topic}的问题（基于原文）"
 
 @app.route('/api/topology/<topology_id>/question/<question_id>/answer', methods=['POST'])
 def answer_question(topology_id, question_id):
@@ -964,7 +1014,7 @@ def ignore_nodes(topology_id):
             
             # 获取所有节点
             cursor.execute(
-                "SELECT id, label, level, value, mastered, mastery_score FROM nodes WHERE topology_id = ?",
+                "SELECT id, label, level, value, mastered, mastery_score, content_snippet FROM nodes WHERE topology_id = ?",
                 (topology_id,)
             )
             all_nodes = [dict(row) for row in cursor.fetchall()]
@@ -1026,5 +1076,5 @@ if __name__ == '__main__':
     # 拓扑图处理结果存储
     topology_results = {}
     
-    logger.info("树形知识图生成系统启动中...")
+    logger.info("知识图谱生成系统启动中...")
     app.run(debug=True, port=5000)

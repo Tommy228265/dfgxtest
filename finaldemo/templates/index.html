@@ -26,17 +26,22 @@
 
     <section class="upload-section">
       <div class="container">
-        <div id="uploadContainer">
-          <div class="upload-area">
-            <i class="fa fa-cloud-upload"></i>
-            <h3>上传学习资料</h3>
-            <p>支持PPT、PDF、Word、TXT格式</p>
-            <label for="fileInput" class="upload-btn">
-              <i class="fa fa-file-text-o"></i>选择文件
-              <input id="fileInput" type="file" accept=".ppt,.pptx,.pdf,.docx,.doc,.txt">
-            </label>
+        <div class="upload-area">
+          <i class="fa fa-cloud-upload"></i>
+          <h3>上传学习资料</h3>
+          <p>支持PPT、PDF、Word、TXT格式</p>
+          
+          <div class="node-count-input">
+            <label for="nodeCountInput">期望节点数量（可选）:</label>
+            <input type="number" id="nodeCountInput" min="0" placeholder="0表示不限制">
           </div>
+          
+          <label for="fileInput" class="upload-btn">
+            <i class="fa fa-file-text-o"></i>选择文件
+            <input id="fileInput" type="file" accept=".ppt,.pptx,.pdf,.docx,.doc,.txt">
+          </label>
         </div>
+      </div>
 
         <div id="progressContainer" class="hidden">
           <div class="progress-card">
@@ -57,65 +62,58 @@
     </section>
 
     <!-- 在graph-section部分添加节点控制UI -->
-<section class="graph-section">
-  <div id="graphContainer" class="hidden">
-    <div class="graph-header">
-      <h3>知识图谱</h3>
-      <div class="graph-controls">
-        <div class="search-box">
-          <i class="fa fa-search"></i>
-          <input type="text" id="searchNode" placeholder="搜索知识点...">
+    <section class="graph-section">
+      <div id="graphContainer" class="hidden">
+        <div class="graph-header">
+          <h3>知识图谱</h3>
+          <div class="graph-controls">
+            <div class="search-box">
+              <i class="fa fa-search"></i>
+              <input type="text" id="searchNode" placeholder="搜索知识点...">
+            </div>
+            
+            <div class="action-buttons">
+              <button id="regenerateBtn" class="action-btn">
+                <i class="fa fa-refresh"></i> 重新生成
+              </button>
+              <button id="ignoreNodeBtn" class="action-btn">
+                <i class="fa fa-eye-slash"></i> 忽略节点
+              </button>
+              <button id="resetIgnoredBtn" class="action-btn">
+                <i class="fa fa-eye"></i> 重置忽略
+              </button>
+            </div>
+            
+            <button id="refreshGraph" class="icon-btn">
+              <i class="fa fa-refresh"></i>
+            </button>
+          </div>
         </div>
-        
-        <!-- 节点控制按钮 -->
-        <div class="node-controls">
-          <button id="ignoreNodeBtn" class="control-btn">
-            <i class="fa fa-eye-slash"></i> 忽略选中节点
-          </button>
-          <button id="resetIgnoredBtn" class="control-btn">
-            <i class="fa fa-eye"></i> 重置忽略
-          </button>
-        </div>
-        
-        <button id="refreshGraph">
-          <i class="fa fa-refresh"></i>
-        </button>
-      </div>
-    </div>
-    
-    <!-- 节点大小过滤 -->
-    <div class="node-filter">
-      <div class="filter-control">
-        <label for="nodeSizeSlider">节点大小过滤:</label>
-        <input type="range" id="nodeSizeSlider" min="0" max="10" value="0">
-        <span id="nodeSizeValue">0</span>
-        <button id="applySizeFilter">应用过滤</button>
-      </div>
-    </div>
-    
-    <div id="networkContainer"></div>
-    
-    <div class="graph-footer">
-      <div class="legend">
-        <div class="legend-item">
-          <span class="color mastered"></span>
-          <span>已掌握</span>
-        </div>
-        <div class="legend-item">
-          <span class="color partial"></span>
-          <span>部分掌握</span>
-        </div>
-        <div class="legend-item">
-          <span class="color unmastered"></span>
-          <span>未掌握</span>
+
+        <div id="networkContainer"></div>
+
+        <div class="graph-footer">
+          <div class="legend">
+            <div class="legend-item">
+              <div class="color mastered"></div>
+              <span>已掌握</span>
+            </div>
+            <div class="legend-item">
+              <div class="color partial"></div>
+              <span>部分掌握</span>
+            </div>
+            <div class="legend-item">
+              <div class="color unmastered"></div>
+              <span>未掌握</span>
+            </div>
+          </div>
+          <div class="stats">
+            <span>节点: <span id="nodeCount">0</span></span>
+            <span>边: <span id="edgeCount">0</span></span>
+          </div>
         </div>
       </div>
-      <div class="stats">
-        <span id="nodeCount">0</span> 个节点 | <span id="edgeCount">0</span> 条关系
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
     <section class="quiz-section">
       <div id="quizContainer" class="hidden">
@@ -160,8 +158,20 @@
     </div>
   </footer>
 
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- 修改后的Font Awesome链接 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  
+  <!-- 上下文模态框 -->
+  <div id="contextModal" class="context-modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">原文上下文</h3>
+        <button id="closeContextModal" class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="contextContent"></div>
+    </div>
+  </div>
 </body>
 </html>
