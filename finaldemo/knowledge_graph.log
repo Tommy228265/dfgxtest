@@ -2276,3 +2276,165 @@ sqlite3.OperationalError: no such table: questions
 2025-06-23 23:18:27,032 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 23:18:27] "GET /api/topology/051e3d43-d877-4984-8154-b29585afbe08 HTTP/1.1" 200 -
 2025-06-23 23:18:38,710 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
 2025-06-23 23:18:44,681 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 23:18:44] "GET /api/topology/051e3d43-d877-4984-8154-b29585afbe08/node/Artificial%20Intelligence/question HTTP/1.1" 200 -
+2025-06-24 11:30:07,811 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 11:30:07,812 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 11:30:07,812 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 11:30:07,812 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 11:30:07,812 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 11:30:07,877 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-24 11:30:07,877 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-24 11:30:07,878 - werkzeug - INFO -  * Restarting with stat
+2025-06-24 11:30:08,371 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 11:30:08,372 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 11:30:08,372 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 11:30:08,372 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 11:30:08,372 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 11:30:08,384 - werkzeug - WARNING -  * Debugger is active!
+2025-06-24 11:30:08,386 - werkzeug - INFO -  * Debugger PIN: 123-364-347
+2025-06-24 11:30:19,233 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:30:19] "GET / HTTP/1.1" 200 -
+2025-06-24 11:30:19,367 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:30:19] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-06-24 11:30:19,466 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:30:19] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-06-24 11:30:19,900 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:30:19] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-06-24 11:38:34,701 - KnowledgeGraphGenerator - INFO - ÎÄ¼þÉÏ´«³É¹¦: uploads\435771fa-2e89-4c9c-847f-c4c8d6484709_The Development History of Artificial Intelligence.pdf, ´óÐ¡: 0.05 MB, ×î´ó½ÚµãÊý: 10
+2025-06-24 11:38:34,707 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼´¦ÀíÎÄµµ: uploads\435771fa-2e89-4c9c-847f-c4c8d6484709_The Development History of Artificial Intelligence.pdf, ÍØÆËID: 435771fa-2e89-4c9c-847f-c4c8d6484709, ×î´ó½ÚµãÊý: 10
+2025-06-24 11:38:34,708 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:34] "POST /api/generate HTTP/1.1" 200 -
+2025-06-24 11:38:34,708 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 435771fa-2e89-4c9c-847f-c4c8d6484709, ½ø¶È: 10%, ÏûÏ¢: ½âÎöÎÄµµÄÚÈÝ...
+2025-06-24 11:38:34,710 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼½âÎöÎÄµµ: uploads\435771fa-2e89-4c9c-847f-c4c8d6484709_The Development History of Artificial Intelligence.pdf, ÀàÐÍ: .pdf
+2025-06-24 11:38:34,796 - KnowledgeGraphGenerator - INFO - ÒÑ½âÎöPDFµÚ 0 Ò³
+2025-06-24 11:38:35,217 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 435771fa-2e89-4c9c-847f-c4c8d6484709, ½ø¶È: 20%, ÏûÏ¢: ×¼±¸ÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-24 11:38:35,218 - KnowledgeGraphGenerator - INFO - ÎÄµµÄÚÈÝ¹ý³¤£¬½ØÈ¡Ç°8000×Ö·û
+2025-06-24 11:38:35,219 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 435771fa-2e89-4c9c-847f-c4c8d6484709, ½ø¶È: 60%, ÏûÏ¢: µ÷ÓÃDeepSeek APIÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-24 11:38:35,716 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:35] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:37,035 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:37] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:37,716 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:37] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:39,208 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:39] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:39,344 - KnowledgeGraphGenerator - INFO - µÚ1´Î³¢ÊÔµ÷ÓÃDeepSeek API...
+2025-06-24 11:38:39,902 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:39] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:40,752 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-24 11:38:41,209 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:41] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:41,896 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:41] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:43,204 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:43] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:43,908 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:43] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:45,208 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:45] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:45,919 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:45] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:47,207 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:47] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:47,899 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:47] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:48,605 - KnowledgeGraphGenerator - INFO - API·µ»ØÖªÊ¶¹ØÏµ: [
+    ["Artificial Intelligence", "°üº¬", "Development History"],
+    ["Development History", "°üº¬", "Early Ideological Sprouts"],
+    ["Development History", "°üº¬", "Birth Stage"],
+    ["Development Hist...
+2025-06-24 11:38:48,611 - KnowledgeGraphGenerator - INFO - Ô­Ê¼JSONÄÚÈÝ: [
+    ["Artificial Intelligence", "°üº¬", "Development History"],
+    ["Development History", "°üº¬", "Early Ideological Sprouts"],
+    ["Development History", "°üº¬", "Birth Stage"],
+    ["Development Hist...
+2025-06-24 11:38:48,612 - KnowledgeGraphGenerator - INFO - ³É¹¦½âÎöÖªÊ¶¹ØÏµ£¬¹²10Ìõ
+2025-06-24 11:38:48,612 - KnowledgeGraphGenerator - INFO - ³É¹¦ÌáÈ¡10ÌõÖªÊ¶²ã¼¶¹ØÏµ
+2025-06-24 11:38:48,612 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 435771fa-2e89-4c9c-847f-c4c8d6484709, ½ø¶È: 80%, ÏûÏ¢: ¹¹½¨Ê÷ÐÎÖªÊ¶Í¼²¢ÌáÈ¡Ô­ÎÄÆ¬¶Î...
+2025-06-24 11:38:48,688 - KnowledgeGraphGenerator - INFO - Ê÷ÐÎÖªÊ¶Í¼Éú³ÉÍê³É£¬ºÄÊ±: 13.98 Ãë
+2025-06-24 11:38:48,688 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 435771fa-2e89-4c9c-847f-c4c8d6484709, ½ø¶È: 100%, ÏûÏ¢: ´¦ÀíÍê³É
+2025-06-24 11:38:49,204 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:49] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 11:38:49,899 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 11:38:49] "GET /api/topology/435771fa-2e89-4c9c-847f-c4c8d6484709 HTTP/1.1" 200 -
+2025-06-24 14:35:00,239 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 14:35:00,239 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 14:35:00,240 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 14:35:00,240 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 14:35:00,240 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:35:00,256 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-24 14:35:00,257 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-24 14:35:00,257 - werkzeug - INFO -  * Restarting with stat
+2025-06-24 14:35:00,752 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 14:35:00,752 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 14:35:00,752 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 14:35:00,753 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 14:35:00,753 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:35:00,766 - werkzeug - WARNING -  * Debugger is active!
+2025-06-24 14:35:00,768 - werkzeug - INFO -  * Debugger PIN: 123-364-347
+2025-06-24 14:35:07,753 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:35:07] "GET / HTTP/1.1" 200 -
+2025-06-24 14:35:07,804 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:35:07] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-06-24 14:35:08,028 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:35:08] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-06-24 14:52:06,792 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 14:52:06,792 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 14:52:06,792 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 14:52:06,792 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 14:52:06,792 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:52:06,808 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-24 14:52:06,808 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-24 14:52:06,809 - werkzeug - INFO -  * Restarting with stat
+2025-06-24 14:52:07,320 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 14:52:07,321 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 14:52:07,321 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 14:52:07,321 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 14:52:07,321 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:52:07,335 - werkzeug - WARNING -  * Debugger is active!
+2025-06-24 14:52:07,338 - werkzeug - INFO -  * Debugger PIN: 123-364-347
+2025-06-24 14:52:14,295 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:52:14] "GET / HTTP/1.1" 200 -
+2025-06-24 14:52:14,337 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:52:14] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-06-24 14:52:14,549 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:52:14] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-06-24 14:53:32,046 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 14:53:32,047 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 14:53:32,047 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 14:53:32,047 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 14:53:32,047 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:53:32,063 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-24 14:53:32,063 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-24 14:53:32,064 - werkzeug - INFO -  * Restarting with stat
+2025-06-24 14:53:32,551 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-24 14:53:32,551 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\xampp\htdocs\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-24 14:53:32,551 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-24 14:53:32,552 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-24 14:53:32,552 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:53:32,562 - werkzeug - WARNING -  * Debugger is active!
+2025-06-24 14:53:32,563 - werkzeug - INFO -  * Debugger PIN: 123-364-347
+2025-06-24 14:53:37,036 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:37] "GET / HTTP/1.1" 200 -
+2025-06-24 14:53:37,080 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:37] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-06-24 14:53:37,319 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:37] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-06-24 14:53:46,296 - KnowledgeGraphGenerator - INFO - ÎÄ¼þÉÏ´«³É¹¦: uploads\3c945b27-169b-4415-8f02-004454e0393f_The Development History of Artificial Intelligence.pdf, ´óÐ¡: 0.05 MB, ×î´ó½ÚµãÊý: 10
+2025-06-24 14:53:46,298 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼´¦ÀíÎÄµµ: uploads\3c945b27-169b-4415-8f02-004454e0393f_The Development History of Artificial Intelligence.pdf, ÍØÆËID: 3c945b27-169b-4415-8f02-004454e0393f, ×î´ó½ÚµãÊý: 10
+2025-06-24 14:53:46,298 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:46] "POST /api/generate HTTP/1.1" 200 -
+2025-06-24 14:53:46,299 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c945b27-169b-4415-8f02-004454e0393f, ½ø¶È: 10%, ÏûÏ¢: ½âÎöÎÄµµÄÚÈÝ...
+2025-06-24 14:53:46,300 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼½âÎöÎÄµµ: uploads\3c945b27-169b-4415-8f02-004454e0393f_The Development History of Artificial Intelligence.pdf, ÀàÐÍ: .pdf
+2025-06-24 14:53:46,416 - KnowledgeGraphGenerator - INFO - ÒÑ½âÎöPDFµÚ 0 Ò³
+2025-06-24 14:53:46,839 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c945b27-169b-4415-8f02-004454e0393f, ½ø¶È: 20%, ÏûÏ¢: ×¼±¸ÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-24 14:53:46,843 - KnowledgeGraphGenerator - INFO - ÎÄµµÄÚÈÝ¹ý³¤£¬½ØÈ¡Ç°8000×Ö·û
+2025-06-24 14:53:46,844 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c945b27-169b-4415-8f02-004454e0393f, ½ø¶È: 60%, ÏûÏ¢: µ÷ÓÃDeepSeek APIÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-24 14:53:47,305 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:47] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:48,613 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:48] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:49,305 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:49] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:49,617 - KnowledgeGraphGenerator - INFO - µÚ1´Î³¢ÊÔµ÷ÓÃDeepSeek API...
+2025-06-24 14:53:50,621 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:50] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:50,860 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-24 14:53:51,305 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:51] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:52,617 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:52] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:53,305 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:53] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:54,613 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:54] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:55,304 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:55] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:56,616 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:56] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:57,304 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:57] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:58,616 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:58] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:53:58,990 - KnowledgeGraphGenerator - INFO - API·µ»ØÖªÊ¶¹ØÏµ: [
+  ["Artificial Intelligence", "°üº¬", "Development History"],
+  ["Development History", "°üº¬", "Early Ideological Sprouts"],
+  ["Development History", "°üº¬", "Birth Stage"],
+  ["Development History", "°ü...
+2025-06-24 14:53:58,991 - KnowledgeGraphGenerator - INFO - Ô­Ê¼JSONÄÚÈÝ: [
+  ["Artificial Intelligence", "°üº¬", "Development History"],
+  ["Development History", "°üº¬", "Early Ideological Sprouts"],
+  ["Development History", "°üº¬", "Birth Stage"],
+  ["Development History", "°ü...
+2025-06-24 14:53:58,993 - KnowledgeGraphGenerator - INFO - ³É¹¦½âÎöÖªÊ¶¹ØÏµ£¬¹²10Ìõ
+2025-06-24 14:53:58,993 - KnowledgeGraphGenerator - INFO - ³É¹¦ÌáÈ¡10ÌõÖªÊ¶²ã¼¶¹ØÏµ
+2025-06-24 14:53:58,994 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c945b27-169b-4415-8f02-004454e0393f, ½ø¶È: 80%, ÏûÏ¢: ¹¹½¨Ê÷ÐÎÖªÊ¶Í¼²¢ÌáÈ¡Ô­ÎÄÆ¬¶Î...
+2025-06-24 14:53:59,010 - KnowledgeGraphGenerator - INFO - Ê÷ÐÎÖªÊ¶Í¼Éú³ÉÍê³É£¬ºÄÊ±: 12.71 Ãë
+2025-06-24 14:53:59,011 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c945b27-169b-4415-8f02-004454e0393f, ½ø¶È: 100%, ÏûÏ¢: ´¦ÀíÍê³É
+2025-06-24 14:53:59,305 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:53:59] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:54:00,609 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:54:00] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f HTTP/1.1" 200 -
+2025-06-24 14:54:09,169 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-24 14:54:19,865 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:54:19] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f/node/Turing%20Test/question HTTP/1.1" 200 -
+2025-06-24 14:56:40,655 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-24 14:56:47,154 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:56:47] "GET /api/topology/3c945b27-169b-4415-8f02-004454e0393f/node/Birth%20Stage/question HTTP/1.1" 200 -

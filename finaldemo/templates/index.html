@@ -36,12 +36,17 @@
             <input id="fileInput" type="file" accept=".ppt,.pptx,.pdf,.docx,.doc,.txt">
           </label>
           
+          <!-- 添加文件状态提示区域 -->
+          <div id="fileStatus" class="file-status hidden">
+            <i class="fa fa-check-circle"></i>
+            <span id="fileNameDisplay"></span> 已准备就绪
+          </div>
+          
           <div class="node-count-input">
             <label for="nodeCountInput">期望节点数量（可选）:</label>
             <input type="number" id="nodeCountInput" min="0" placeholder="0表示不限制">
           </div>
           
-          <!-- 添加开始生成按钮 -->
           <button id="generateBtn" class="generate-btn">
             <i class="fa fa-cogs"></i>开始生成
           </button>
@@ -65,7 +70,6 @@
       </div>
     </section>
 
-    <!-- 在graph-section部分添加节点控制UI -->
     <section class="graph-section">
       <div id="graphContainer" class="hidden">
         <div class="graph-header">
@@ -162,12 +166,10 @@
     </div>
   </footer>
 
-  <!-- 修改后的Font Awesome链接 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   
-  <!-- 上下文模态框 -->
   <div id="contextModal" class="context-modal hidden">
     <div class="modal-content">
       <div class="modal-header">

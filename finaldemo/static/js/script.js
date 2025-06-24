@@ -33,10 +33,32 @@ const searchNode = document.getElementById('searchNode');
 const refreshGraph = document.getElementById('refreshGraph');
 const generateBtn = document.getElementById('generateBtn');
 
+// 新增DOM元素
+const fileStatus = document.getElementById('fileStatus');
+const fileNameDisplay = document.getElementById('fileNameDisplay');
+
 // 文件选择事件
 fileInput.addEventListener('change', (e) => {
   if (e.target.files.length > 0) {
     selectedFile = e.target.files[0];
+    
+    // 显示文件状态
+    fileNameDisplay.textContent = selectedFile.name;
+    fileStatus.classList.remove('hidden');
+    
+    // 添加按钮动画效果
+    generateBtn.classList.add('pulse');
+    
+    // 添加上传区域高亮效果
+    document.querySelector('.upload-area').classList.add('file-selected');
+    
+    // 显示通知
+    showNotification('文件已上传', `${selectedFile.name} 准备就绪，点击"开始生成"按钮`, 'success');
+  } else {
+    // 如果没有选择文件，重置状态
+    fileStatus.classList.add('hidden');
+    generateBtn.classList.remove('pulse');
+    document.querySelector('.upload-area').classList.remove('file-selected');
   }
 });
 
@@ -60,6 +82,15 @@ generateBtn.addEventListener('click', () => {
   progressBar.style.width = '0%';
   progressPercentage.textContent = '0%';
   progressMessage.textContent = '准备处理文档...';
+  
+  // 移除按钮动画
+  generateBtn.classList.remove('pulse');
+  
+  // 隐藏文件状态提示
+  fileStatus.classList.add('hidden');
+  
+  // 移除上传区域高亮
+  document.querySelector('.upload-area').classList.remove('file-selected');
   
   // 调用新的API开始生成
   startGeneration(selectedFile, maxNodes);
@@ -459,7 +490,7 @@ submitAnswer.addEventListener('click', function() {
     console.error('提交答案错误:', error);
     showNotification('错误', '提交答案时发生错误，请重试。', 'error');
   });
-});
+})
 
 // 获取下一个问题
 nextQuestion.addEventListener('click', function() {
@@ -605,3 +636,4 @@ document.addEventListener('DOMContentLoaded', function() {
   `;
   document.head.appendChild(style);
 });
+

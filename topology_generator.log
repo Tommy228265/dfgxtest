@@ -2958,3 +2958,29 @@ RuntimeError: ÎÞ·¨½âÎöAPI·µ»ØµÄJSON¸ñÊ½
 2025-06-19 17:13:22,403 - KnowledgeGraphGenerator - INFO - Ê÷ÐÎÖªÊ¶Í¼Éú³ÉÍê³É£¬ºÄÊ±: 30.12 Ãë
 2025-06-19 17:13:22,404 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 56bc3a0d-f556-458e-99cf-1e8d6e9df1a0, ½ø¶È: 100%, ÏûÏ¢: ´¦ÀíÍê³É
 2025-06-19 17:13:23,726 - werkzeug - INFO - 127.0.0.1 - - [19/Jun/2025 17:13:23] "GET /api/topology/56bc3a0d-f556-458e-99cf-1e8d6e9df1a0 HTTP/1.1" 200 -
+2025-06-24 14:32:36,512 - KnowledgeGraphGenerator - INFO - Ê÷ÐÎÖªÊ¶Í¼Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:32:36,606 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-24 14:32:36,606 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-24 14:32:36,608 - werkzeug - INFO -  * Restarting with stat
+2025-06-24 14:32:37,126 - KnowledgeGraphGenerator - INFO - Ê÷ÐÎÖªÊ¶Í¼Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-24 14:32:37,137 - werkzeug - WARNING -  * Debugger is active!
+2025-06-24 14:32:37,139 - werkzeug - INFO -  * Debugger PIN: 123-364-347
+2025-06-24 14:34:32,592 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:32] "GET / HTTP/1.1" 200 -
+2025-06-24 14:34:40,604 - KnowledgeGraphGenerator - INFO - ÎÄ¼þÉÏ´«³É¹¦: uploads\ab00292e-310c-43e1-b7f7-346972908127_The Development History of Artificial Intelligence.pdf, ´óÐ¡: 0.05 MB
+2025-06-24 14:34:40,605 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼´¦ÀíÎÄµµ: uploads\ab00292e-310c-43e1-b7f7-346972908127_The Development History of Artificial Intelligence.pdf, ÍØÆËID: ab00292e-310c-43e1-b7f7-346972908127
+2025-06-24 14:34:40,606 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:40] "POST /api/upload HTTP/1.1" 200 -
+2025-06-24 14:34:40,606 - KnowledgeGraphGenerator - INFO - ÍØÆËID: ab00292e-310c-43e1-b7f7-346972908127, ½ø¶È: 10%, ÏûÏ¢: ½âÎöÎÄµµÄÚÈÝ...
+2025-06-24 14:34:40,607 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼½âÎöÎÄµµ: uploads\ab00292e-310c-43e1-b7f7-346972908127_The Development History of Artificial Intelligence.pdf, ÀàÐÍ: .pdf
+2025-06-24 14:34:40,609 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:40] "GET /api/topology/ab00292e-310c-43e1-b7f7-346972908127 HTTP/1.1" 200 -
+2025-06-24 14:34:40,712 - KnowledgeGraphGenerator - INFO - ÒÑ½âÎöPDFµÚ 0 Ò³
+2025-06-24 14:34:41,133 - KnowledgeGraphGenerator - INFO - ÍØÆËID: ab00292e-310c-43e1-b7f7-346972908127, ½ø¶È: 20%, ÏûÏ¢: ×¼±¸ÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-24 14:34:41,134 - KnowledgeGraphGenerator - INFO - ÎÄµµÄÚÈÝ¹ý³¤£¬½ØÈ¡Ç°8000×Ö·û
+2025-06-24 14:34:41,134 - KnowledgeGraphGenerator - INFO - ÍØÆËID: ab00292e-310c-43e1-b7f7-346972908127, ½ø¶È: 60%, ÏûÏ¢: µ÷ÓÃDeepSeek APIÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-24 14:34:41,922 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:41] "GET /api/topology/ab00292e-310c-43e1-b7f7-346972908127 HTTP/1.1" 200 -
+2025-06-24 14:34:42,930 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:42] "GET /api/topology/ab00292e-310c-43e1-b7f7-346972908127 HTTP/1.1" 200 -
+2025-06-24 14:34:44,246 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:44] "GET /api/topology/ab00292e-310c-43e1-b7f7-346972908127 HTTP/1.1" 200 -
+2025-06-24 14:34:44,292 - KnowledgeGraphGenerator - INFO - µÚ1´Î³¢ÊÔµ÷ÓÃDeepSeek API...
+2025-06-24 14:34:45,250 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:45] "GET /api/topology/ab00292e-310c-43e1-b7f7-346972908127 HTTP/1.1" 200 -
+2025-06-24 14:34:45,625 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-24 14:34:46,562 - werkzeug - INFO - 127.0.0.1 - - [24/Jun/2025 14:34:46] "GET /api/topology/ab00292e-310c-43e1-b7f7-346972908127 HTTP/1.1" 200 -
