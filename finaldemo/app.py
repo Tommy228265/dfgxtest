@@ -54,7 +54,7 @@ def get_db():
     return db
 
 def init_db():
-    """初始化数据库（重新设计）"""
+    """初始化数据库（包含问答会话表）"""
     logger.info("开始初始化数据库...")
     with app.app_context():
         db_path = os.path.abspath(DATABASE)
@@ -77,7 +77,7 @@ def init_db():
                 CREATE TABLE IF NOT EXISTS topologies (
                     id TEXT PRIMARY KEY,
                     content TEXT NOT NULL,
-                    max_nodes INTEGER DEFAULT 0,  -- 新增字段：最大节点数限制
+                    max_nodes INTEGER DEFAULT 0,
                     created_at TEXT
                 );
 
@@ -116,6 +116,19 @@ def init_db():
                     correctness INTEGER DEFAULT 0,
                     created_at TEXT,
                     answered_at TEXT,
+                    session_id TEXT,
+                    FOREIGN KEY (topology_id, node_id) REFERENCES nodes (topology_id, id)
+                );
+
+                -- 新增：问答会话表
+                CREATE TABLE IF NOT EXISTS quiz_sessions (
+                    id TEXT PRIMARY KEY,
+                    topology_id TEXT,
+                    node_id TEXT,
+                    created_at TEXT,
+                    questions_answered INTEGER DEFAULT 0,
+                    consecutive_correct INTEGER DEFAULT 0,
+                    mastered INTEGER DEFAULT 0,
                     FOREIGN KEY (topology_id, node_id) REFERENCES nodes (topology_id, id)
                 );
                 """
@@ -757,7 +770,7 @@ def regenerate_topology(topology_id):
 
 @app.route('/api/topology/<topology_id>/node/<node_id>/question', methods=['GET'])
 def get_question(topology_id, node_id):
-    """获取关于指定节点的问题（基于原文内容）"""
+    """获取关于指定节点的问题（基于原文内容，支持会话管理）"""
     try:
         with app.app_context():
             # 从数据库获取节点信息
@@ -778,14 +791,46 @@ def get_question(topology_id, node_id):
             node_label = node["label"]
             content_snippet = node["content_snippet"]
             
-            # 调用DeepSeek生成新问题（基于原文片段）
-            question = generate_question(node_label, content_snippet)
+            # 检查是否已有活跃会话
+            session_id = request.args.get('session_id')
+            if session_id:
+                cursor.execute(
+                    "SELECT mastered, consecutive_correct FROM quiz_sessions WHERE id = ?",
+                    (session_id,)
+                )
+                session = cursor.fetchone()
+                if session and session["mastered"]:
+                    return jsonify({
+                        'status': 'success',
+                        'mastered': True,
+                        'message': '该知识点已掌握'
+                    })
+            
+            # 创建或获取会话
+            if not session_id:
+                session_id = str(uuid.uuid4())
+                cursor.execute(
+                    "INSERT INTO quiz_sessions (id, topology_id, node_id, created_at) VALUES (?, ?, ?, ?)",
+                    (session_id, topology_id, node_id, time.strftime('%Y-%m-%d %H:%M:%S'))
+                )
+                db.commit()
+            
+            # 获取会话状态
+            cursor.execute(
+                "SELECT consecutive_correct FROM quiz_sessions WHERE id = ?",
+                (session_id,)
+            )
+            session = cursor.fetchone()
+            consecutive_correct = session["consecutive_correct"] if session else 0
+            
+            # 生成问题（基于会话状态）
+            question = generate_question(node_label, content_snippet, consecutive_correct)
             
             # 保存问题到数据库
             question_id = str(uuid.uuid4())
             cursor.execute(
-                "INSERT INTO questions (id, topology_id, node_id, question, created_at) VALUES (?, ?, ?, ?, ?)",
-                (question_id, topology_id, node_id, question, time.strftime('%Y-%m-%d %H:%M:%S'))
+                "INSERT INTO questions (id, topology_id, node_id, question, session_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (question_id, topology_id, node_id, question, session_id, time.strftime('%Y-%m-%d %H:%M:%S'))
             )
             db.commit()
             
@@ -794,7 +839,8 @@ def get_question(topology_id, node_id):
                 'data': {
                     'question_id': question_id,
                     'question': question,
-                    'node_id': node_id
+                    'node_id': node_id,
+                    'session_id': session_id
                 }
             })
     except Exception as e:
@@ -804,8 +850,8 @@ def get_question(topology_id, node_id):
             'message': f"生成问题时出错: {str(e)}"
         }), 500
 
-def generate_question(topic, context):
-    """调用DeepSeek生成关于特定主题的问题（基于原文内容）"""
+def generate_question(topic, context, consecutive_correct=0):
+    """根据连续正确次数生成不同难度的问题"""
     from openai import OpenAI
     
     client = OpenAI(
@@ -813,25 +859,21 @@ def generate_question(topic, context):
         base_url="https://api.deepseek.com"
     )
     
-    # 使用不同的提示确保生成不同的问题
-    prompts = [
-        f"请基于以下原文片段，生成一个关于\"{topic}\"的测试问题:\n\n{context}\n\n问题:",
-        f"请根据以下原文内容，设计一个关于\"{topic}\"的应用题:\n\n{context}\n\n问题:",
-        f"请基于以下文本，提出一个关于\"{topic}\"的辨析题:\n\n{context}\n\n问题:",
-        f"请根据以下原文片段，创建一个关于\"{topic}\"的理解题:\n\n{context}\n\n问题:",
-        f"请基于以下内容，生成一个关于\"{topic}\"的分析题:\n\n{context}\n\n问题:"
-    ]
+    # 根据掌握程度生成不同难度的问题
+    difficulty_map = {
+        0: "基础概念题，用简洁的语言解释",
+        1: "理解应用题，结合实例说明",
+        2: "综合分析题，比较相关概念"
+    }
+    difficulty = difficulty_map.get(consecutive_correct, "进阶思考题，拓展应用场景")
     
-    # 随机选择一个提示
-    import random
-    prompt = random.choice(prompts)
-    
+    # 构建提示词
     messages = [
-        {"role": "system", "content": """你是一个教育专家，能够基于原文内容生成有针对性的问题。
-请生成的问题应该能够有效测试用户对该知识点的理解。
-问题应该清晰明确，避免歧义，并且基于提供的原文内容。
+        {"role": "system", "content": f"""你是一个教育专家，能够基于原文内容生成有针对性的问题。
+请生成一个{difficulty}，测试用户对"{topic}"的理解。
+问题应该清晰明确，基于提供的原文内容，难度适合当前掌握程度。
 只返回问题文本，不需要其他内容。"""},
-        {"role": "user", "content": prompt}
+        {"role": "user", "content": f"原文片段: {context}\n问题:"}
     ]
     
     try:
@@ -849,14 +891,15 @@ def generate_question(topic, context):
 
 @app.route('/api/topology/<topology_id>/question/<question_id>/answer', methods=['POST'])
 def answer_question(topology_id, question_id):
-    """处理用户对问题的回答（支持连续正确回答判定）"""
+    """处理用户对问题的回答（支持会话状态管理）"""
     try:
         with app.app_context():
             data = request.json
             answer = data.get('answer', '')
             node_id = data.get('node_id', '')
+            session_id = data.get('session_id', '')
             
-            if not answer or not node_id:
+            if not answer or not node_id or not session_id:
                 return jsonify({
                     'status': 'error',
                     'message': '缺少必要的参数'
@@ -866,7 +909,7 @@ def answer_question(topology_id, question_id):
             db = get_db()
             cursor = db.cursor()
             cursor.execute(
-                "SELECT question, node_id FROM questions WHERE id = ? AND topology_id = ?",
+                "SELECT question, node_id, session_id FROM questions WHERE id = ? AND topology_id = ?",
                 (question_id, topology_id)
             )
             question_data = cursor.fetchone()
@@ -878,16 +921,32 @@ def answer_question(topology_id, question_id):
                 }), 404
             
             question = question_data["question"]
-            question_node_id = question_data["node_id"]
+            stored_node_id = question_data["node_id"]
+            stored_session_id = question_data["session_id"]
             
-            if question_node_id != node_id:
+            if stored_node_id != node_id or stored_session_id != session_id:
                 return jsonify({
                     'status': 'error',
-                    'message': '问题与节点不匹配'
+                    'message': '问题与会话不匹配'
                 }), 400
             
+            # 从数据库获取节点信息
+            cursor.execute(
+                "SELECT label, content_snippet FROM nodes WHERE topology_id = ? AND id = ?",
+                (topology_id, node_id)
+            )
+            node = cursor.fetchone()
+            if not node:
+                return jsonify({
+                    'status': 'error',
+                    'message': '节点不存在'
+                }), 404
+            
+            node_label = node["label"]
+            content_snippet = node["content_snippet"]
+            
             # 调用DeepSeek评估回答
-            evaluation = evaluate_answer(question, answer, question_node_id)
+            evaluation = evaluate_answer(question, answer, node_label, content_snippet)
             
             # 确定回答是否正确
             is_correct = evaluation["correct"] if "correct" in evaluation else False
@@ -899,36 +958,64 @@ def answer_question(topology_id, question_id):
                 (time.strftime('%Y-%m-%d %H:%M:%S'), answer, feedback_text, 1 if is_correct else 0, question_id)
             )
             
-            # 更新节点的掌握分数和状态
+            # 更新会话状态
             cursor.execute(
-                "SELECT mastery_score, mastered, consecutive_correct FROM nodes WHERE topology_id = ? AND id = ?",
-                (topology_id, node_id)
+                "SELECT consecutive_correct, mastered FROM quiz_sessions WHERE id = ?",
+                (session_id,)
             )
-            node = cursor.fetchone()
+            session = cursor.fetchone()
+            if not session:
+                return jsonify({
+                    'status': 'error',
+                    'message': '问答会话不存在'
+                }), 404
             
-            current_score = node["mastery_score"] if node else 0
-            consecutive_correct = node["consecutive_correct"] if node else 0
+            current_consecutive = session["consecutive_correct"]
+            current_mastered = session["mastered"]
             
             # 更新连续正确计数
-            if is_correct:
-                consecutive_correct += 1
-                # 连续3次正确判定为掌握
-                if consecutive_correct >= 3:
-                    new_score = 10
-                    is_mastered = True
-                else:
-                    new_score = min(10, current_score + 1)
-                    is_mastered = False
-            else:
-                consecutive_correct = 0
-                new_score = max(0, current_score - 0.5)
-                is_mastered = False
+            new_consecutive = current_consecutive + 1 if is_correct else 0
+            new_mastered = 1 if new_consecutive >= 3 else 0
             
-            # 更新节点状态
             cursor.execute(
-                "UPDATE nodes SET mastery_score = ?, mastered = ?, consecutive_correct = ? WHERE topology_id = ? AND id = ?",
-                (new_score, 1 if is_mastered else 0, consecutive_correct, topology_id, node_id)
+                """UPDATE quiz_sessions SET 
+                questions_answered = questions_answered + 1,
+                consecutive_correct = ?,
+                mastered = ?
+                WHERE id = ?""",
+                (new_consecutive, new_mastered, session_id)
             )
+            
+            # 更新节点的掌握状态（与原有逻辑保持一致）
+            cursor.execute(
+                "SELECT mastery_score, consecutive_correct FROM nodes WHERE topology_id = ? AND id = ?",
+                (topology_id, node_id)
+            )
+            node_status = cursor.fetchone()
+            current_node_score = node_status["mastery_score"] if node_status else 0
+            current_node_consecutive = node_status["consecutive_correct"] if node_status else 0
+            
+            node_new_score = min(10, current_node_score + (1 if is_correct else -0.5))
+            node_new_consecutive = new_consecutive
+            node_new_mastered = new_mastered
+            
+            cursor.execute(
+                "UPDATE nodes SET mastery_score = ?, consecutive_correct = ?, mastered = ? WHERE topology_id = ? AND id = ?",
+                (node_new_score, node_new_consecutive, node_new_mastered, topology_id, node_id)
+            )
+            
+            # 如果未掌握，生成下一个问题
+            next_question = None
+            next_question_id = None
+            if not new_mastered:
+                # 生成下一个问题（基于更新后的状态）
+                next_question = generate_question(node_label, content_snippet, new_consecutive)
+                if next_question:
+                    next_question_id = str(uuid.uuid4())
+                    cursor.execute(
+                        "INSERT INTO questions (id, topology_id, node_id, question, session_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                        (next_question_id, topology_id, node_id, next_question, session_id, time.strftime('%Y-%m-%d %H:%M:%S'))
+                    )
             
             db.commit()
             
@@ -937,9 +1024,13 @@ def answer_question(topology_id, question_id):
                 'data': {
                     'correct': is_correct,
                     'feedback': feedback_text,
-                    'mastered': is_mastered,
-                    'mastery_score': new_score,
-                    'consecutive_correct': consecutive_correct
+                    'mastered': new_mastered,
+                    'consecutive_correct': new_consecutive,
+                    'session_id': session_id,
+                    'next_question': {
+                        'id': next_question_id,
+                        'question': next_question
+                    } if next_question else None
                 }
             })
     except Exception as e:
@@ -949,8 +1040,8 @@ def answer_question(topology_id, question_id):
             'message': f"处理回答时出错: {str(e)}"
         }), 500
 
-def evaluate_answer(question, answer, topic):
-    """调用DeepSeek评估回答是否正确"""
+def evaluate_answer(question, answer, topic, context):
+    """调用DeepSeek评估回答是否正确（包含上下文）"""
     from openai import OpenAI
     
     client = OpenAI(
@@ -960,7 +1051,7 @@ def evaluate_answer(question, answer, topic):
     
     messages = [
         {"role": "system", "content": """你是一个知识评估专家，能够准确判断用户回答的正确性，并给出详细反馈。
-请评估用户对问题"{question}"的回答"{answer}"是否正确。
+请评估用户对问题"{question}"的回答"{answer}"是否正确，参考原文片段："{context}"。
 你的评估应该包括：
 1. 判断回答是否正确（是/否）
 2. 提供具体的反馈，解释为什么正确或错误
@@ -972,8 +1063,8 @@ def evaluate_answer(question, answer, topic):
   "correct": true/false,
   "feedback": "具体的反馈信息",
   "next_question": "如果需要进一步提问，这里是下一个问题，否则为null"
-}""".replace("{question}", question).replace("{answer}", answer)},
-        {"role": "user", "content": f"问题: {question}\n回答: {answer}\n请评估这个回答是否正确，并提供反馈。如果正确，考虑是否需要进一步提问。"}
+}""".replace("{question}", question).replace("{answer}", answer).replace("{context}", context)},
+        {"role": "user", "content": f"问题: {question}\n回答: {answer}\n原文片段: {context}\n请评估这个回答是否正确，并提供反馈。如果正确，考虑是否需要进一步提问。"}
     ]
     
     try:

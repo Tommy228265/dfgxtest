@@ -470,6 +470,29 @@ body {
   color: #7f8c8d;
 }
 
+/* 添加反馈区域样式 */
+.feedback-box p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.success-text {
+  color: #2ecc71;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.error-text {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.countdown {
+  font-style: italic;
+  color: #7f8c8d;
+  margin-top: 10px;
+}
+
 /* 页脚样式 */
 .footer {
   background: #2c3e50;

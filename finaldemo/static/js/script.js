@@ -3,6 +3,7 @@ let network = null;
 let currentTopologyId = null;
 let selectedNodeId = null;
 let currentQuestionId = null;
+let currentQuizSession = null; // 新增：当前问答会话
 let topologyResults = {};
 let selectedFile = null;
 let maxNodes = 0;
@@ -339,7 +340,7 @@ function renderGraph(graphData) {
   network.on('click', function(params) {
     if (params.nodes.length > 0) {
       selectedNodeId = params.nodes[0];
-      getQuestion(selectedNodeId);
+      startQuizSession(selectedNodeId); // 启动问答会话
     }
   });
   
@@ -402,7 +403,27 @@ function renderGraph(graphData) {
   });
 }
 
-// 获取问题
+// 新增：开始问答会话
+function startQuizSession(nodeId) {
+  // 重置UI
+  noQuestion.classList.add('hidden');
+  questionCard.classList.remove('hidden');
+  answerFeedback.classList.add('hidden');
+  userAnswer.value = '';
+  
+  // 初始化会话
+  currentQuizSession = {
+    nodeId: nodeId,
+    questionsAnswered: 0,
+    consecutiveCorrect: 0,
+    mastered: false,
+    sessionId: null // 会话ID将从API响应中获取
+  };
+  
+  getQuestion(nodeId);
+}
+
+// 获取问题（更新以支持会话）
 function getQuestion(nodeId) {
   if (!currentTopologyId || !nodeId) return;
   
@@ -410,18 +431,34 @@ function getQuestion(nodeId) {
   questionCard.classList.remove('hidden');
   answerFeedback.classList.add('hidden');
   
-  fetch(`/api/topology/${currentTopologyId}/node/${nodeId}/question`)
+  // 携带会话ID获取问题
+  const sessionParam = currentQuizSession && currentQuizSession.sessionId 
+    ? `?session_id=${currentQuizSession.sessionId}` 
+    : '';
+  
+  fetch(`/api/topology/${currentTopologyId}/node/${nodeId}/question${sessionParam}`)
     .then(response => response.json())
     .then(data => {
       if (data.status === 'success') {
+        // 处理已掌握的情况
+        if (data.mastered) {
+          noQuestion.classList.remove('hidden');
+          questionCard.classList.add('hidden');
+          showNotification('提示', '该知识点已掌握！', 'info');
+          currentQuizSession = null;
+          return;
+        }
+        
         currentQuestion.textContent = data.data.question;
         currentQuestionId = data.data.question_id;
+        currentQuizSession.sessionId = data.data.session_id; // 保存会话ID
         userAnswer.value = '';
         userAnswer.focus();
       } else {
         showNotification('错误', data.message, 'error');
         noQuestion.classList.remove('hidden');
         questionCard.classList.add('hidden');
+        currentQuizSession = null;
       }
     })
     .catch(error => {
@@ -429,12 +466,13 @@ function getQuestion(nodeId) {
       showNotification('错误', '获取问题时发生错误，请重试。', 'error');
       noQuestion.classList.remove('hidden');
       questionCard.classList.add('hidden');
+      currentQuizSession = null;
     });
 }
 
-// 提交答案
+// 提交答案（更新以支持会话）
 submitAnswer.addEventListener('click', function() {
-  if (!currentTopologyId || !selectedNodeId || !currentQuestionId) return;
+  if (!currentTopologyId || !selectedNodeId || !currentQuestionId || !currentQuizSession) return;
   
   const answer = userAnswer.value.trim();
   if (!answer) {
@@ -449,50 +487,73 @@ submitAnswer.addEventListener('click', function() {
     },
     body: JSON.stringify({
       answer: answer,
-      node_id: selectedNodeId
+      node_id: currentQuizSession.nodeId,
+      session_id: currentQuizSession.sessionId
     })
   })
   .then(response => response.json())
   .then(data => {
     if (data.status === 'success') {
+      // 更新会话状态
+      currentQuizSession.questionsAnswered++;
+      currentQuizSession.consecutiveCorrect = data.data.consecutive_correct;
+      currentQuizSession.mastered = data.data.mastered;
+      
+      // 显示反馈
+      feedbackTitle.textContent = data.data.correct ? '回答正确!' : '回答错误';
+      feedbackCard.className = data.data.correct ? 'feedback-box success' : 'feedback-box error';
+      
+      // 清空现有反馈内容并添加新内容
+      feedbackText.innerHTML = '';
+      const feedbackParagraph = document.createElement('p');
+      feedbackParagraph.textContent = data.data.feedback;
+      feedbackText.appendChild(feedbackParagraph);
+      
+      // 添加下一步提示
+      const nextStep = document.createElement('p');
+      if (data.data.mastered) {
+        nextStep.textContent = '恭喜！你已掌握该知识点！';
+        nextStep.className = 'success-text';
+      } else if (data.data.next_question) {
+        nextStep.textContent = '系统正在准备下一个问题...';
+      } else {
+        nextStep.textContent = '请完善你的回答并再次提交';
+      }
+      feedbackText.appendChild(nextStep);
+      
+      // 更新UI
       questionCard.classList.add('hidden');
       answerFeedback.classList.remove('hidden');
       
-      // 设置反馈样式
-      if (data.data.correct) {
-        feedbackCard.className = 'feedback-box success';
-        feedbackTitle.textContent = '回答正确!';
-        feedbackTitle.className = 'success-text';
-      } else {
-        feedbackCard.className = 'feedback-box error';
-        feedbackTitle.textContent = '回答错误';
-        feedbackTitle.className = 'error-text';
+      // 如果已掌握，更新图谱并重置会话
+      if (data.data.mastered) {
+        refreshGraph.click();
+        setTimeout(() => {
+          answerFeedback.classList.add('hidden');
+          noQuestion.classList.remove('hidden');
+          currentQuizSession = null;
+        }, 3000);
+      } 
+      // 如果有下一个问题，自动加载
+      else if (data.data.next_question) {
+        currentQuestionId = data.data.next_question.id;
+        currentQuestion.textContent = data.data.next_question.question;
+        setTimeout(() => {
+          answerFeedback.classList.add('hidden');
+          questionCard.classList.remove('hidden');
+          userAnswer.value = '';
+          userAnswer.focus();
+        }, 2000);
       }
-      
-      feedbackText.textContent = data.data.feedback;
-      
-      // 刷新图谱以反映掌握状态的变化
-      fetch(`/api/topology/${currentTopologyId}`)
-        .then(response => response.json())
-        .then(graphData => {
-          if (graphData.status === 'success') {
-            renderGraph(graphData.data);
-          }
-        })
-        .catch(error => {
-          console.error('刷新图谱错误:', error);
-        });
-    } else {
-      showNotification('错误', data.message, 'error');
     }
   })
   .catch(error => {
     console.error('提交答案错误:', error);
     showNotification('错误', '提交答案时发生错误，请重试。', 'error');
   });
-})
+});
 
-// 获取下一个问题
+// 获取下一个问题（保留以备扩展）
 nextQuestion.addEventListener('click', function() {
   if (!currentTopologyId || !selectedNodeId) return;
   
@@ -507,6 +568,7 @@ function resetUpload() {
   quizContainer.classList.add('hidden');
   fileInput.value = '';
   selectedFile = null;
+  currentQuizSession = null; // 重置会话
 }
 
 // 显示通知
@@ -636,4 +698,3 @@ document.addEventListener('DOMContentLoaded', function() {
   `;
   document.head.appendChild(style);
 });
-
