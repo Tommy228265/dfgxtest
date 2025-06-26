@@ -75,25 +75,21 @@
         <div class="graph-header">
           <h3>知识图谱</h3>
           <div class="graph-controls">
+            <!-- 搜索框 -->
             <div class="search-box">
               <i class="fa fa-search"></i>
               <input type="text" id="searchNode" placeholder="搜索知识点...">
             </div>
             
-            <div class="action-buttons">
-              <button id="regenerateBtn" class="action-btn">
-                <i class="fa fa-refresh"></i> 重新生成
-              </button>
-              <button id="ignoreNodeBtn" class="action-btn">
-                <i class="fa fa-eye-slash"></i> 忽略节点
-              </button>
-              <button id="resetIgnoredBtn" class="action-btn">
-                <i class="fa fa-eye"></i> 重置忽略
-              </button>
+            <!-- 节点数量设置 -->
+            <div class="node-count-input">
+              <label for="graphNodeCountInput">节点数量:</label>
+              <input type="number" id="graphNodeCountInput" min="0" placeholder="0表示不限制">
             </div>
             
-            <button id="refreshGraph" class="icon-btn">
-              <i class="fa fa-refresh"></i>
+            <!-- 重新生成按钮 -->
+            <button id="regenerateBtn" class="action-btn">
+              <i class="fa fa-refresh"></i> 重新生成
             </button>
           </div>
         </div>
@@ -179,5 +175,28 @@
       <div class="modal-body" id="contextContent"></div>
     </div>
   </div>
+  
+
+
+  <div id="nodeActionModal" class="context-modal hidden">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h3 class="modal-title">节点操作</h3>
+         <button id="closeNodeActionModal" class="close-modal">&times;</button>
+       </div>
+       <div class="modal-body">
+         <p>请选择操作：</p >
+         <div class="action-buttons">
+           <button id="startQuizBtn" class="action-btn">
+             <i class="fa fa-question-circle"></i> 进入问答模式
+           </button>
+           <button id="deleteNodeBtn" class="action-btn">
+             <i class="fa fa-trash"></i> 删除节点
+           </button>
+         </div>
+       </div>
+     </div>
+-  </div>
++  </div>
 </body>
 </html>

@@ -37,7 +37,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# DeepSeek API配置
+# DeepSeek API配置（示例密钥，需替换为实际密钥）
 OPENAI_API_KEY = "sk-ba9cc9a26b8c4859ba5c9bad33785093"
 MAX_RETRIES = 3
 BACKOFF_FACTOR = 2
@@ -120,7 +120,7 @@ def init_db():
                     FOREIGN KEY (topology_id, node_id) REFERENCES nodes (topology_id, id)
                 );
 
-                -- 新增：问答会话表
+                -- 问答会话表
                 CREATE TABLE IF NOT EXISTS quiz_sessions (
                     id TEXT PRIMARY KEY,
                     topology_id TEXT,
@@ -377,8 +377,8 @@ def extract_content_snippet(content: str, topic: str) -> str:
     
     return snippet
 
-def build_tree_structure(knowledge_edges, topology_id, content: str):
-    """构建树形知识图数据结构，保存原文片段"""
+def build_tree_structure(knowledge_edges, topology_id, content: str, max_nodes: int = 0):
+    """构建树形知识图数据结构，保存原文片段并恢复掌握状态"""
     nodes = {}
     edges = []
     all_node_ids = set()
@@ -454,9 +454,23 @@ def build_tree_structure(knowledge_edges, topology_id, content: str):
         in_connections = sum(1 for edge in edges if edge["to"] == node_id)
         out_connections = sum(1 for edge in edges if edge["from"] == node_id)
         nodes[node_id]["value"] = max(1, in_connections + out_connections)
+        
+        # 从数据库获取并恢复节点的掌握状态
+        with app.app_context():
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute(
+                "SELECT mastered, mastery_score, consecutive_correct FROM nodes WHERE topology_id = ? AND id = ?",
+                (topology_id, node_id)
+            )
+            node_status = cursor.fetchone()
+            if node_status:
+                nodes[node_id]["mastered"] = bool(node_status["mastered"])
+                nodes[node_id]["mastery_score"] = node_status["mastery_score"]
+                nodes[node_id]["consecutive_correct"] = node_status["consecutive_correct"]
     
     # 保存节点和边到数据库
-    save_to_database(topology_id, list(nodes.values()), edges, content)
+    save_to_database(topology_id, list(nodes.values()), edges, content, max_nodes)
     
     # 转换为节点列表
     tree_nodes = list(nodes.values())
@@ -467,8 +481,8 @@ def build_tree_structure(knowledge_edges, topology_id, content: str):
         "root": root
     }
 
-def save_to_database(topology_id, nodes, edges, content: str):
-    """将知识图谱数据保存到数据库（保存原文内容）"""
+def save_to_database(topology_id, nodes, edges, content: str, max_nodes=0):
+    """将知识图谱数据保存到数据库（保存原文内容和节点数量限制）"""
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
@@ -476,7 +490,7 @@ def save_to_database(topology_id, nodes, edges, content: str):
         # 保存拓扑图信息（包含原文内容和节点数量限制）
         cursor.execute(
             "INSERT OR REPLACE INTO topologies (id, content, max_nodes, created_at) VALUES (?, ?, ?, ?)",
-            (topology_id, content, 0, time.strftime('%Y-%m-%d %H:%M:%S'))
+            (topology_id, content, max_nodes, time.strftime('%Y-%m-%d %H:%M:%S'))
         )
         
         # 保存节点
@@ -486,7 +500,8 @@ def save_to_database(topology_id, nodes, edges, content: str):
                 (topology_id, id, label, level, value, mastered, mastery_score, consecutive_correct, content_snippet) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (topology_id, node["id"], node["label"], node["level"], node["value"], 
-                 0, 0, 0, node.get("content_snippet", ""))
+                 int(node["mastered"]), node["mastery_score"], node["consecutive_correct"], 
+                 node.get("content_snippet", ""))
             )
         
         # 保存边
@@ -542,7 +557,7 @@ def process_document(file_path, topology_id, max_nodes=0):
             logger.info(f"成功提取{len(knowledge_edges)}条知识层级关系")
             
             update_progress(topology_id, 80, "构建树形知识图并提取原文片段...")
-            knowledge_graph = build_tree_structure(knowledge_edges, topology_id, text)
+            knowledge_graph = build_tree_structure(knowledge_edges, topology_id, text, max_nodes)
             
             processing_time = time.time() - start_time
             logger.info(f"树形知识图生成完成，耗时: {processing_time:.2f} 秒")
@@ -595,7 +610,7 @@ def generate_knowledge_graph():
         logger.error("文件上传错误: 未选择文件")
         return jsonify({'status': 'error', 'message': '未选择文件'}), 400
     
-    # 获取节点数量
+    # 获取节点数量 - 确保从表单获取
     max_nodes = request.form.get('max_nodes', 0, type=int)
     
     # 检查文件大小
@@ -621,7 +636,8 @@ def generate_knowledge_graph():
     return jsonify({
         'status': 'success',
         'topology_id': topology_id,
-        'message': '文档上传成功，正在生成知识图谱'
+        'message': '文档上传成功，正在生成知识图谱',
+        'max_nodes': max_nodes  # 返回节点数量限制
     })
 
 def with_app_context(func, *args, **kwargs):
@@ -703,20 +719,53 @@ def get_topology(topology_id):
         'max_nodes': topology.get('max_nodes', 0)  # 返回节点数量限制
     })
 
-@app.route('/api/topology/<topology_id>/regenerate', methods=['POST'])
-def regenerate_topology(topology_id):
-    """重新生成知识图谱（指定节点数量）"""
+@app.route('/api/topology/<topology_id>/set_max_nodes', methods=['POST'])
+def set_topology_max_nodes(topology_id):
+    """更新拓扑图的节点数量设置"""
     try:
-        # 获取请求参数
         data = request.json
         max_nodes = data.get('max_nodes', 0)
         
-        # 从数据库获取原文内容和之前的节点限制
         with app.app_context():
             db = get_db()
             cursor = db.cursor()
+            
+            # 更新拓扑图的节点数量设置
             cursor.execute(
-                "SELECT content, max_nodes FROM topologies WHERE id = ?",
+                "UPDATE topologies SET max_nodes = ? WHERE id = ?",
+                (max_nodes, topology_id)
+            )
+            
+            db.commit()
+            
+            return jsonify({
+                'status': 'success',
+                'message': '节点数量设置已更新',
+                'max_nodes': max_nodes
+            })
+            
+    except Exception as e:
+        logger.error(f"设置节点数量错误: {str(e)}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f"设置节点数量时出错: {str(e)}"
+        }), 500
+
+@app.route('/api/topology/<topology_id>/regenerate', methods=['POST'])
+def regenerate_topology(topology_id):
+    """重新生成知识图谱，使用用户输入的新节点数量"""
+    try:
+        with app.app_context():
+            db = get_db()
+            cursor = db.cursor()
+            
+            # 从请求中获取新的节点数量
+            data = request.json
+            max_nodes = data.get('max_nodes', 0)  # 从请求中获取新的节点数量
+            
+            # 从数据库获取原文内容
+            cursor.execute(
+                "SELECT content FROM topologies WHERE id = ?",
                 (topology_id,)
             )
             topology = cursor.fetchone()
@@ -728,18 +777,44 @@ def regenerate_topology(topology_id):
                 }), 404
             
             content = topology["content"]
-            previous_max_nodes = topology["max_nodes"]
             
-            # 如果用户没有指定新的节点数量，使用之前的设置
-            if max_nodes == 0:
-                max_nodes = previous_max_nodes
-                
             update_progress(topology_id, 30, "重新提取知识层级...")
-            knowledge_edges = extract_knowledge_from_text(content, max_nodes)
+            knowledge_edges = extract_knowledge_from_text(content, max_nodes)  # 使用新的节点数量
             logger.info(f"重新生成成功提取{len(knowledge_edges)}条知识层级关系")
             
+            # 保存当前节点的掌握状态
+            cursor.execute(
+                "SELECT id, mastered, mastery_score, consecutive_correct FROM nodes WHERE topology_id = ?",
+                (topology_id,)
+            )
+            mastery_states = {row["id"]: dict(row) for row in cursor.fetchall()}
+            
             update_progress(topology_id, 70, "重新构建树形知识图...")
-            knowledge_graph = build_tree_structure(knowledge_edges, topology_id, content)
+            knowledge_graph = build_tree_structure(knowledge_edges, topology_id, content, max_nodes)  # 使用新的节点数量
+            
+            # 恢复节点的掌握状态
+            for node in knowledge_graph["nodes"]:
+                node_id = node["id"]
+                if node_id in mastery_states:
+                    state = mastery_states[node_id]
+                    node["mastered"] = bool(state["mastered"])
+                    node["mastery_score"] = state["mastery_score"]
+                    node["consecutive_correct"] = state["consecutive_correct"]
+                    
+                    # 更新数据库中的节点状态
+                    cursor.execute(
+                        """UPDATE nodes SET 
+                        mastered = ?, mastery_score = ?, consecutive_correct = ?
+                        WHERE topology_id = ? AND id = ?""",
+                        (int(state["mastered"]), state["mastery_score"], 
+                         state["consecutive_correct"], topology_id, node_id)
+                    )
+            
+            # 更新拓扑图的节点数量设置到数据库
+            cursor.execute(
+                "UPDATE topologies SET max_nodes = ? WHERE id = ?",
+                (max_nodes, topology_id)
+            )
             
             # 更新处理结果
             topology_results[topology_id] = {
@@ -752,6 +827,8 @@ def regenerate_topology(topology_id):
                 "text_length": len(content),
                 "max_nodes": max_nodes  # 保存新的节点数量限制
             }
+            
+            db.commit()
             
             return jsonify({
                 'status': 'success',
@@ -767,6 +844,7 @@ def regenerate_topology(topology_id):
             'status': 'error',
             'message': f"重新生成知识图谱时出错: {str(e)}"
         }), 500
+
 
 @app.route('/api/topology/<topology_id>/node/<node_id>/question', methods=['GET'])
 def get_question(topology_id, node_id):
@@ -891,7 +969,7 @@ def generate_question(topic, context, consecutive_correct=0):
 
 @app.route('/api/topology/<topology_id>/question/<question_id>/answer', methods=['POST'])
 def answer_question(topology_id, question_id):
-    """处理用户对问题的回答（支持会话状态管理）"""
+    """处理用户对问题的回答（支持会话状态管理）并更新节点状态"""
     try:
         with app.app_context():
             data = request.json
@@ -940,7 +1018,7 @@ def answer_question(topology_id, question_id):
                 return jsonify({
                     'status': 'error',
                     'message': '节点不存在'
-                }), 404
+                }), 400
             
             node_label = node["label"]
             content_snippet = node["content_snippet"]
@@ -986,7 +1064,7 @@ def answer_question(topology_id, question_id):
                 (new_consecutive, new_mastered, session_id)
             )
             
-            # 更新节点的掌握状态（与原有逻辑保持一致）
+            # 更新节点的掌握状态
             cursor.execute(
                 "SELECT mastery_score, consecutive_correct FROM nodes WHERE topology_id = ? AND id = ?",
                 (topology_id, node_id)
@@ -1001,8 +1079,15 @@ def answer_question(topology_id, question_id):
             
             cursor.execute(
                 "UPDATE nodes SET mastery_score = ?, consecutive_correct = ?, mastered = ? WHERE topology_id = ? AND id = ?",
-                (node_new_score, node_new_consecutive, node_new_mastered, topology_id, node_id)
+                (node_new_score, node_new_consecutive, int(node_new_mastered), topology_id, node_id)
             )
+            
+            # 确保掌握状态正确更新（显式处理）
+            if node_new_mastered:
+                cursor.execute(
+                    "UPDATE nodes SET mastered = 1 WHERE topology_id = ? AND id = ?",
+                    (topology_id, node_id)
+                )
             
             # 如果未掌握，生成下一个问题
             next_question = None
@@ -1176,7 +1261,7 @@ if __name__ == '__main__':
         logger.error(f"数据库初始化异常: {str(e)}", exc_info=True)
         logger.info("尝试继续运行，但可能会出现数据库相关错误")
     
-    # 拓扑图处理结果存储
+    # 拓扑图处理结果存储（使用全局变量）
     topology_results = {}
     
     logger.info("知识图谱生成系统启动中...")
