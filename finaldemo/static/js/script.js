@@ -36,6 +36,10 @@ const refreshGraph = document.getElementById('refreshGraph');
 const generateBtn = document.getElementById('generateBtn');
 const regenerateBtn = document.getElementById('regenerateBtn');
 const nodeCountInput = document.getElementById('nodeCountInput');
+const questionGenerating = document.getElementById('questionGenerating'); // 问题生成提示容器
+
+// 对话历史记录
+let chatHistory = [];
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -125,92 +129,169 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /* 模态框样式 */
-    .context-modal {
-      display: none; /* 初始隐藏 */
+    .nodeActionModal {
       position: fixed;
-      z-index: 1000;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 10000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .nodeActionModal.show {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    
+    /* 问答模式样式 */
+    .quiz-section {
+      margin-top: 40px;
+    }
+    
+    .chat-history {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .chat-message {
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      position: relative;
+    }
+    
+    .chat-message::before {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 100%;
       left: 0;
       top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-      transition: opacity 0.3s ease; /* 添加过渡动画 */
+      border-radius: 8px 0 0 8px;
     }
     
-    .context-modal.show {
-      display: flex; /* 显示时使用flex布局 */
-      opacity: 1;
+    .user-message {
+      background: #f0f7ff;
+      margin-left: 30px;
     }
     
-    .modal-content {
-      background-color: #fefefe;
-      margin: 10% auto;
+    .user-message::before {
+      background: #3498db;
+    }
+    
+    .assistant-message {
+      background: #f9f9f9;
+      margin-right: 30px;
+    }
+    
+    .assistant-message::before {
+      background: #95a5a6;
+    }
+    
+    .question-card {
+      background: white;
+      border-radius: 12px;
       padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 500px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease; /* 添加过渡动画 */
-      transform: translateY(0);
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     
-    .modal-header {
+    .question-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
+      margin-bottom: 15px;
     }
     
-    .modal-title {
+    .question-header h4 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 18px;
+      color: #2c3e50;
     }
     
-    .close-modal {
-      font-size: 1.5rem;
-      font-weight: bold;
-      cursor: pointer;
-      background: none;
-      border: none;
+    .question-header i {
+      margin-right: 10px;
+      font-size: 20px;
+      color: #3498db;
     }
     
-    .modal-body {
-      padding: 20px 0;
+    .answer-area {
+      margin-top: 20px;
     }
     
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
+    .answer-area h4 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #7f8c8d;
     }
     
-    .action-btn {
-      flex: 1;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    /* 问题生成提示样式 */
+    #questionGenerating {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10000;
+      display: none;
+    }
+    
+    .question-generating-notification {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
-      font-size: 0.9rem;
+      gap: 15px;
     }
     
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 5px;
-      border-radius: 4px;
-      transition: background-color 0.2s;
+    .question-generating-notification i {
+      font-size: 24px;
+      animation: spin 1s linear infinite;
     }
     
-    .icon-btn:hover {
-      background-color: rgba(0,0,0,0.05);
+    /* 历史记录消息样式 */
+    .history-question {
+      border-left: 4px solid #3498db;
+      background-color: rgba(52, 152, 219, 0.05);
+    }
+    
+    .history-answer {
+      border-left: 4px solid #2ecc71;
+      background-color: rgba(46, 204, 113, 0.05);
+    }
+    
+    .history-feedback {
+      border-left: 4px solid #f39c12;
+      background-color: rgba(243, 156, 18, 0.05);
     }
   `;
   document.head.appendChild(style);
@@ -562,29 +643,6 @@ document.addEventListener('DOMContentLoaded', function() {
           // 移除隐藏类并添加显示类
           nodeActionModal.classList.remove('hidden');
           nodeActionModal.classList.add('show');
-          
-          // 设置模态框位置（防止屏幕边缘）
-          const rect = network.getBoundingBox(selectedNodeId);
-          const pos = network.getPosition(selectedNodeId);
-          
-          const networkRect = networkContainer.getBoundingClientRect();
-          const modalWidth = 300;
-          const modalHeight = 150;
-          
-          let modalLeft = pos.x + networkRect.left;
-          let modalTop = pos.y + networkRect.top;
-          
-          // 确保模态框在可视区域内
-          if (modalLeft + modalWidth > window.innerWidth) {
-            modalLeft = window.innerWidth - modalWidth - 20;
-          }
-          if (modalTop + modalHeight > window.innerHeight) {
-            modalTop = window.innerHeight - modalHeight - 20;
-          }
-          
-          // 应用位置
-          nodeActionModal.style.left = `${modalLeft}px`;
-          nodeActionModal.style.top = `${modalTop}px`;
         }
       }
     });
@@ -682,9 +740,63 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
+  // 新增：渲染对话历史
+  function renderChatHistory() {
+    const chatHistoryEl = document.getElementById('chatHistory');
+    if (!chatHistoryEl) return;
+    
+    chatHistoryEl.innerHTML = '';
+    
+    chatHistory.forEach(msg => {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `chat-message chat-history-message ${msg.type}-message`;
+      
+      msgDiv.innerHTML = `
+        <div class="history-header">
+          <strong>${msg.role}</strong>
+        </div>
+        <div class="history-content">
+          <p>${msg.content}</p>
+        </div>
+        ${msg.feedback ? `<div class="history-feedback">${msg.feedback}</div>` : ''}
+      `;
+      
+      chatHistoryEl.appendChild(msgDiv);
+    });
+    
+    // 滚动到底部
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+  }
+
+  // 新增：添加到对话历史
+  function addToHistory(type, content, role = '系统', feedback = '') {
+    // 创建唯一的ID确保新问题出现在下方
+    const uniqueId = Date.now().toString();
+    
+    chatHistory.push({
+      id: uniqueId,
+      type,
+      role,
+      content,
+      feedback
+    });
+    
+    renderChatHistory();
+    
+    // 滚动到底部
+    const chatHistoryEl = document.getElementById('chatHistory');
+    if (chatHistoryEl) {
+      chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+    }
+  }
+
   // 新增：开始问答会话
   function startQuizSession(nodeId) {
     console.log(`开始节点 ${nodeId} 的问答会话`); // 调试信息
+    
+    // 清空历史记录
+    chatHistory = [];
+    addToHistory('system', `已开始关于"${getSelectedNodeLabel(nodeId)}"的问答测试`);
     
     // 重置UI
     if (noQuestion) noQuestion.classList.add('hidden');
@@ -703,6 +815,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     getQuestion(nodeId);
   }
+  
+  // 新增：获取选中节点的标签
+  function getSelectedNodeLabel(nodeId) {
+    if (network && network.body && network.body.data) {
+      const nodes = network.body.data.nodes;
+      const node = nodes.get(nodeId);
+      return node ? node.label : '未知节点';
+    }
+    return '未知节点';
+  }
 
   // 获取问题（更新以支持会话）
   function getQuestion(nodeId) {
@@ -711,6 +833,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (noQuestion) noQuestion.classList.add('hidden');
     if (questionCard) questionCard.classList.remove('hidden');
     if (answerFeedback) answerFeedback.classList.add('hidden');
+    
+    // 显示问题生成提示
+    if (questionGenerating) {
+      questionGenerating.classList.remove('hidden');
+    }
     
     // 携带会话ID获取问题
     const sessionParam = currentQuizSession && currentQuizSession.sessionId 
@@ -722,6 +849,11 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch(`/api/topology/${currentTopologyId}/node/${nodeId}/question${sessionParam}`)
       .then(response => response.json())
       .then(data => {
+        // 隐藏问题生成提示
+        if (questionGenerating) {
+          questionGenerating.classList.add('hidden');
+        }
+        
         if (data.status === 'success') {
           // 处理已掌握的情况
           if (data.mastered) {
@@ -751,6 +883,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       })
       .catch(error => {
+        // 隐藏问题生成提示
+        if (questionGenerating) {
+          questionGenerating.classList.add('hidden');
+        }
+        
         console.error('获取问题错误:', error);
         showNotification('错误', '获取问题时发生错误，请重试。', 'error');
         if (noQuestion) noQuestion.classList.remove('hidden');
@@ -759,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
-  // 提交答案（更新以支持会话）
+  // 提交答案（更新以支持会话和反馈提示）
   submitAnswer.addEventListener('click', function() {
     if (!currentTopologyId || !selectedNodeId || !currentQuestionId || !currentQuizSession) return;
     
@@ -768,6 +905,14 @@ document.addEventListener('DOMContentLoaded', function() {
       showNotification('提示', '请输入你的答案。', 'info');
       return;
     }
+    
+    // 禁用按钮并显示加载状态
+    submitAnswer.disabled = true;
+    const submitText = document.getElementById('submitText');
+    submitText.innerHTML = '<span class="loading-spinner"></span>正在判断回答...';
+    
+    // 保存原始文本
+    const originalText = submitText.innerHTML;
     
     console.log(`提交问题 ${currentQuestionId} 的答案，节点ID: ${selectedNodeId}, 会话ID: ${currentQuizSession.sessionId}`); // 调试信息
     
@@ -816,6 +961,11 @@ document.addEventListener('DOMContentLoaded', function() {
           feedbackText.appendChild(nextStep);
         }
         
+        // 添加到历史记录
+        addToHistory('question', currentQuestion.textContent, '系统');
+        addToHistory('answer', answer, '用户');
+        addToHistory('feedback', data.data.feedback, '系统', `正确性: ${data.data.correct ? '✓' : '✗'}`);
+        
         // 更新UI
         if (questionCard) questionCard.classList.add('hidden');
         if (answerFeedback) answerFeedback.classList.remove('hidden');
@@ -824,16 +974,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.data.mastered) {
           console.log(`知识点 ${selectedNodeId} 已掌握，准备刷新图谱...`); // 调试信息
           
-          // 使用备选方法刷新图谱
-          fetchAndUpdateGraph();
+          const nodes = network.body.data.nodes;
+          const node = nodes.get(selectedNodeId);
+          if (node) {
+              node.mastered = true;
+              node.mastery_score = 10; // 满分
+              node.consecutive_correct = 3;
+
+              const updatedStyle = updateNodeColor(node);
+              nodes.update({
+                  id: selectedNodeId,
+                  ...updatedStyle
+              });
+          }
           
           setTimeout(() => {
             if (answerFeedback) answerFeedback.classList.add('hidden');
             if (noQuestion) noQuestion.classList.remove('hidden');
             currentQuizSession = null;
-            console.log('问答会话已重置'); // 调试信息
+            console.log('问答会话已重置');
           }, 3000);
         } 
+        
         // 如果有下一个问题，自动加载
         else if (data.data.next_question) {
           currentQuestionId = data.data.next_question.id;
@@ -852,6 +1014,11 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(error => {
       console.error('提交答案错误:', error);
       showNotification('错误', '提交答案时发生错误，请重试。', 'error');
+    })
+    .finally(() => {
+      // 恢复按钮状态
+      submitAnswer.disabled = false;
+      submitText.innerHTML = '提交答案';
     });
   })
 
@@ -863,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', function() {
     getQuestion(selectedNodeId);
   });
 
-  // 重新生成按钮事件处理
+  // 重新生成按钮事件处理（修复进度条显示）
   if (regenerateBtn) {
     regenerateBtn.addEventListener('click', function() {
         if (!currentTopologyId) {
@@ -882,6 +1049,18 @@ document.addEventListener('DOMContentLoaded', function() {
             progressPercentage.textContent = '0%';
             progressMessage.textContent = '开始重新生成...';
         }
+        
+        // 模拟进度
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            progressBar.style.width = `${progress}%`;
+            progressPercentage.textContent = `${progress}%`;
+            
+            if (progress >= 90) {
+                clearInterval(interval);
+            }
+        }, 500);
         
         // 调用重新生成API，传递新的节点数量
         fetch(`/api/topology/${currentTopologyId}/regenerate`, {
@@ -912,7 +1091,10 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('错误', '重新生成图谱时发生错误，请重试。', 'error');
         })
         .finally(() => {
-            if (progressContainer) progressContainer.classList.add('hidden');
+            // 模拟API调用完成后关闭进度条
+            setTimeout(() => {
+                if (progressContainer) progressContainer.classList.add('hidden');
+            }, 3000);
         });
     });
   }
@@ -1028,6 +1210,236 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.error('节点数量输入框未找到');
   }
+
+
+  const headerNavLinks = document.querySelectorAll('.header-nav a');
+  headerNavLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+  
+  // 新增：手风琴组件
+  const faqQuestions = document.querySelectorAll('.faq-question');
+  faqQuestions.forEach(question => {
+    question.addEventListener('click', function() {
+      const faqItem = this.closest('.faq-item');
+      faqItem.classList.toggle('active');
+    });
+  });
+  
+  // 新增：视图模式切换
+  const viewButtons = document.querySelectorAll('.view-btn');
+  viewButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // 移除所有按钮的活跃状态
+      viewButtons.forEach(btn => btn.classList.remove('active'));
+      // 添加当前按钮的活跃状态
+      this.classList.add('active');
+      
+      const viewMode = this.getAttribute('data-view');
+      updateGraphView(viewMode);
+    });
+  });
+  
+  // 新增：掌握程度筛选
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // 移除所有按钮的活跃状态
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      // 添加当前按钮的活跃状态
+      this.classList.add('active');
+      
+      const status = this.getAttribute('data-status');
+      filterNodesByStatus(status);
+    });
+  });
+  
+  // 新增：节点数量输入框事件
+  const graphNodeCountInput = document.getElementById('graphNodeCountInput');
+  if (graphNodeCountInput) {
+    graphNodeCountInput.addEventListener('change', function() {
+      const nodeCount = this.value.trim();
+      if (nodeCount && !isNaN(parseInt(nodeCount)) && parseInt(nodeCount) >= 0) {
+        regenerateGraphWithNodeCount(parseInt(nodeCount));
+      }
+    });
+  }
+  
+  // 新增：标记节点掌握状态按钮
+  const markNodeBtn = document.getElementById('markNodeBtn');
+  if (markNodeBtn) {
+    markNodeBtn.addEventListener('click', function() {
+      if (!selectedNodeId) return;
+      
+      // 添加淡出动画
+      if (nodeActionModal) {
+        nodeActionModal.classList.remove('show');
+        setTimeout(() => {
+          nodeActionModal.classList.add('hidden');
+          markNodeAsMastered(selectedNodeId);
+        }, 300);
+      }
+    });
+  }
+  
+  // 新增：刷新图谱时保留当前选中节点
+  const originalRefreshGraph = refreshGraph?.addEventListener;
+  if (refreshGraph) {
+    refreshGraph.addEventListener('click', function() {
+      const originalSelectedNode = selectedNodeId;
+      originalRefreshGraph.call(this, 'click', function() {
+        // 刷新后重新选中节点
+        if (originalSelectedNode && network) {
+          network.selectNodes([originalSelectedNode]);
+        }
+      });
+    });
+  }
+});
+
+// 新增：更新图谱视图模式
+function updateGraphView(viewMode) {
+  if (!network) return;
+  
+  let options = network.options;
+  options.layout = {};
+  
+  switch(viewMode) {
+    case 'force':
+      options.layout.force = {};
+      options.physics.enabled = true;
+      break;
+    case 'hierarchical':
+      options.layout.hierarchical = {
+        enabled: true,
+        direction: 'UD',
+        sortMethod: 'directed',
+        nodeSpacing: 150,
+        levelSeparation: 200
+      };
+      options.physics.enabled = false;
+      break;
+    case 'circular':
+      options.layout.circular = {
+        enabled: true
+      };
+      options.physics.enabled = false;
+      break;
+  }
+  
+  network.setOptions(options);
+}
+
+// 新增：按掌握程度筛选节点
+function filterNodesByStatus(status) {
+  if (!network) return;
+  
+  const nodes = network.body.data.nodes;
+  const edges = network.body.data.edges;
+  
+  nodes.forEach(node => {
+    let shouldShow = true;
+    
+    if (status !== 'all') {
+      if (status === 'mastered' && !node.mastered) shouldShow = false;
+      if (status === 'partial' && (node.mastered || node.mastery_score === 0)) shouldShow = false;
+      if (status === 'unmastered' && node.mastery_score > 0) shouldShow = false;
+    }
+    
+    node.hidden = !shouldShow;
+  });
+  
+  edges.forEach(edge => {
+    const fromNode = nodes.get(edge.from);
+    const toNode = nodes.get(edge.to);
+    
+    edge.hidden = fromNode.hidden || toNode.hidden;
+  });
+  
+  network.redraw();
+}
+
+// 新增：使用指定节点数量重新生成图谱
+function regenerateGraphWithNodeCount(nodeCount) {
+  if (!currentTopologyId) return;
+  
+  showNotification('提示', `正在使用${nodeCount}个节点重新生成图谱...`, 'info');
+  
+  fetch(`/api/topology/${currentTopologyId}/regenerate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      max_nodes: nodeCount
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      renderGraph(data.data);
+      if (nodeCount) nodeCount.textContent = data.node_count;
+      if (edgeCount) edgeCount.textContent = data.edge_count;
+      showNotification('成功', '知识图谱已重新生成', 'success');
+    } else {
+      showNotification('错误', data.message, 'error');
+    }
+  })
+  .catch(error => {
+    console.error('重新生成图谱错误:', error);
+    showNotification('错误', '重新生成图谱时发生错误，请重试。', 'error');
+  });
+}
+
+// 新增：标记节点为已掌握
+function markNodeAsMastered(nodeId) {
+  if (!network || !nodeId) return;
+  
+  const nodes = network.body.data.nodes;
+  const node = nodes.get(nodeId);
+  
+  if (node) {
+    node.mastered = true;
+    node.mastery_score = 10;
+    node.consecutive_correct = 3;
+    
+    const updatedStyle = updateNodeColor(node);
+    nodes.update({
+      id: nodeId,
+      ...updatedStyle
+    });
+    
+    showNotification('成功', `已将"${node.label}"标记为已掌握`, 'success');
+  }
+}
+
+// 新增：平滑滚动到锚点
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    const targetId = this.getAttribute('href');
+    if (targetId === '#') return;
+    
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
 });
 
 // 在全局添加关闭模态框的事件
