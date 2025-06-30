@@ -8110,3 +8110,91 @@ openai.APIConnectionError: Connection error.
 2025-06-27 13:45:47,641 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 13:45:47] "GET / HTTP/1.1" 200 -
 2025-06-27 13:45:47,925 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 13:45:47] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
 2025-06-27 13:45:47,972 - werkzeug - INFO - 127.0.0.1 - - [27/Jun/2025 13:45:47] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-06-30 10:35:44,345 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-30 10:35:44,347 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\Users\qym\Desktop\BONC_Intern\Smart_Teaching_Assistant\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-30 10:35:44,347 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-30 10:35:44,347 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-30 10:35:44,347 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-30 10:35:44,388 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-30 10:35:44,389 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-30 10:35:44,404 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2025-06-30 10:35:45,500 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-06-30 10:35:45,500 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\Users\qym\Desktop\BONC_Intern\Smart_Teaching_Assistant\dfgxtest\finaldemo\knowledge_graph.db
+2025-06-30 10:35:45,500 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-06-30 10:35:45,500 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-06-30 10:35:45,501 - KnowledgeGraphGenerator - INFO - ÖªÊ¶Í¼Æ×Éú³ÉÏµÍ³Æô¶¯ÖÐ...
+2025-06-30 10:35:45,513 - werkzeug - WARNING -  * Debugger is active!
+2025-06-30 10:35:45,522 - werkzeug - INFO -  * Debugger PIN: 964-953-773
+2025-06-30 10:35:58,281 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:35:58] "GET / HTTP/1.1" 200 -
+2025-06-30 10:35:58,423 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:35:58] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-06-30 10:35:58,424 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:35:58] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-06-30 10:36:07,088 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:07] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-06-30 10:36:14,398 - KnowledgeGraphGenerator - INFO - ÎÄ¼þÉÏ´«³É¹¦: uploads\3c6751ad-c1ee-4917-a7f8-5aef361a28dc_AIM_Report.pdf, ´óÐ¡: 0.06 MB, ×î´ó½ÚµãÊý: 0
+2025-06-30 10:36:14,399 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼´¦ÀíÎÄµµ: uploads\3c6751ad-c1ee-4917-a7f8-5aef361a28dc_AIM_Report.pdf, ÍØÆËID: 3c6751ad-c1ee-4917-a7f8-5aef361a28dc, ×î´ó½ÚµãÊý: 0
+2025-06-30 10:36:14,400 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:14] "POST /api/generate HTTP/1.1" 200 -
+2025-06-30 10:36:14,400 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c6751ad-c1ee-4917-a7f8-5aef361a28dc, ½ø¶È: 10%, ÏûÏ¢: ½âÎöÎÄµµÄÚÈÝ...
+2025-06-30 10:36:14,401 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼½âÎöÎÄµµ: uploads\3c6751ad-c1ee-4917-a7f8-5aef361a28dc_AIM_Report.pdf, ÀàÐÍ: .pdf
+2025-06-30 10:36:14,435 - KnowledgeGraphGenerator - INFO - ÒÑ½âÎöPDFµÚ 0 Ò³
+2025-06-30 10:36:14,454 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c6751ad-c1ee-4917-a7f8-5aef361a28dc, ½ø¶È: 20%, ÏûÏ¢: ×¼±¸ÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-30 10:36:14,454 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c6751ad-c1ee-4917-a7f8-5aef361a28dc, ½ø¶È: 60%, ÏûÏ¢: µ÷ÓÃDeepSeek APIÌáÈ¡ÖªÊ¶²ã¼¶...
+2025-06-30 10:36:15,410 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:15] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:16,161 - KnowledgeGraphGenerator - INFO - µÚ1´Î³¢ÊÔµ÷ÓÃDeepSeek API...
+2025-06-30 10:36:16,406 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:16] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:16,849 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-30 10:36:17,405 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:17] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:18,405 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:18] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:19,406 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:19] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:20,406 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:20] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:21,404 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:21] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:22,411 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:22] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:23,406 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:23] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:24,404 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:24] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:25,406 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:25] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:26,410 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:26] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:27,408 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:27] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:28,407 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:28] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:29,410 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:29] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:30,409 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:30] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:31,409 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:31] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:32,409 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:32] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:33,407 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:33] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:34,409 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:34] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:35,407 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:35] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:35,741 - KnowledgeGraphGenerator - INFO - API·µ»ØÖªÊ¶¹ØÏµ: [
+    ["Optimizing Inventory Management with 1DBin Packing", "°üº¬", "Introduction and Background"],
+    ["Optimizing Inventory Management with 1DBin Packing", "°üº¬", "Methodology"],
+    ["Optimizing Inv...
+2025-06-30 10:36:35,742 - KnowledgeGraphGenerator - INFO - Ô­Ê¼JSONÄÚÈÝ: [
+    ["Optimizing Inventory Management with 1DBin Packing", "°üº¬", "Introduction and Background"],
+    ["Optimizing Inventory Management with 1DBin Packing", "°üº¬", "Methodology"],
+    ["Optimizing Inv...
+2025-06-30 10:36:35,743 - KnowledgeGraphGenerator - INFO - ³É¹¦½âÎöÖªÊ¶¹ØÏµ£¬¹²26Ìõ
+2025-06-30 10:36:35,743 - KnowledgeGraphGenerator - INFO - ³É¹¦ÌáÈ¡26ÌõÖªÊ¶²ã¼¶¹ØÏµ
+2025-06-30 10:36:35,743 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c6751ad-c1ee-4917-a7f8-5aef361a28dc, ½ø¶È: 80%, ÏûÏ¢: ¹¹½¨Ê÷ÐÎÖªÊ¶Í¼²¢ÌáÈ¡Ô­ÎÄÆ¬¶Î...
+2025-06-30 10:36:35,776 - KnowledgeGraphGenerator - INFO - Ê÷ÐÎÖªÊ¶Í¼Éú³ÉÍê³É£¬ºÄÊ±: 21.38 Ãë
+2025-06-30 10:36:35,777 - KnowledgeGraphGenerator - INFO - ÍØÆËID: 3c6751ad-c1ee-4917-a7f8-5aef361a28dc, ½ø¶È: 100%, ÏûÏ¢: ´¦ÀíÍê³É
+2025-06-30 10:36:36,407 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:36] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:36:37,409 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:36:37] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc HTTP/1.1" 200 -
+2025-06-30 10:37:00,141 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-30 10:37:03,556 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:37:03] "GET /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc/node/implement%20parallel%20or%20distributed%20computing%20technologies/question HTTP/1.1" 200 -
+2025-06-30 10:38:08,681 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-30 10:38:16,960 - KnowledgeGraphGenerator - INFO - ÆÀ¹À»Ø´ðÏìÓ¦: ```json
+{
+  "correct": true,
+  "feedback": "»Ø´ðÕýÈ·¡£ÓÃ»§ÇåÎúµØ½âÊÍÁË²¢ÐÐ¼ÆËãºÍ·Ö²¼Ê½¼ÆËãµÄ»ù±¾¸ÅÄî£¬²¢Ö¸³öÁËÁ½ÕßµÄ¹²Í¬Ä¿±êºÍÖ÷ÒªÇø±ð¡£²¢ÐÐ¼ÆËãÈ·ÊµÉæ¼°Í¬Ê±Ê¹ÓÃ¶à¸ö´¦ÀíÆ÷£¨Í¨³£ÔÚµ¥Ò»ÏµÍ³ÄÚ£©£¬¶ø·Ö²¼Ê½¼ÆËãÔòÒÀÀµÓÚÍ¨¹ýÍøÂçÁ¬½ÓµÄ¶àÌ¨¼ÆËã»úÐ­Í¬¹¤×÷¡£Á½ÕßµÄ¹²Í¬Ä¿±êÊÇÌá¸ß¼ÆËãÐ§ÂÊ¡¢´¦Àí´ó¹æÄ£ÎÊÌâ»òËõ¶Ì¼ÆËãÊ±¼ä£¬Çø±ðÖ÷ÒªÔÚÓÚÓ²¼þ¼Ü¹¹£¨¼¯ÖÐÊ½ vs. ·ÖÉ¢Ê½£©ºÍÍ¨...
+2025-06-30 10:38:17,280 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-30 10:38:26,329 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:38:26] "POST /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc/question/b4710606-b7dc-45fd-b85c-b8dbcaf11f17/answer HTTP/1.1" 200 -
+2025-06-30 10:38:52,176 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-30 10:38:58,086 - KnowledgeGraphGenerator - INFO - ÆÀ¹À»Ø´ðÏìÓ¦: ```json
+{
+  "correct": true,
+  "feedback": "»Ø´ðÕýÈ·¡£ÓÃ»§ÇåÎúµØ½âÊÍÁËÎªÊ²Ã´ÐèÒª·Ö²¼Ê½¼ÆËã¼¼Êõ£¬²¢ÏêÏ¸ÃèÊöÁËÏµÍ³¼Ü¹¹Éè¼Æ¡¢¹Ø¼ü¼¼ÊõÑ¡ÔñÒÔ¼°Êý¾ÝÒ»ÖÂÐÔºÍÈÝ´í»úÖÆ¡£´ËÍâ£¬ÓÃ»§»¹Í¨¹ý¾ßÌåÊµÀýËµÃ÷ÁËÈçºÎÓ¦¶Ô½Úµãå´»úºÍÊµÊ±¸üÐÂ¿â´æÐÅÏ¢µÄ³¡¾°¡£",
+  "next_question": "ÔÚ·Ö²¼Ê½¶©µ¥´¦ÀíÏµÍ³ÖÐ£¬ÈçºÎÈ·±£¶©µ¥´¦ÀíµÄË³ÐòÐÔºÍ±ÜÃâÖØ¸´´¦Àí£¿"
+}
+```...
+2025-06-30 10:38:58,402 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-06-30 10:39:03,516 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:39:03] "POST /api/topology/3c6751ad-c1ee-4917-a7f8-5aef361a28dc/question/752b3d75-4ac7-4265-a994-ae9c6d38266b/answer HTTP/1.1" 200 -
+2025-06-30 10:39:46,753 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:39:46] "GET / HTTP/1.1" 200 -
+2025-06-30 10:39:46,776 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:39:46] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-06-30 10:39:46,779 - werkzeug - INFO - 127.0.0.1 - - [30/Jun/2025 10:39:46] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
