@@ -1265,4 +1265,4 @@ if __name__ == '__main__':
     topology_results = {}
     
     logger.info("知识图谱生成系统启动中...")
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)
