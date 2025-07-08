@@ -382,8 +382,40 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       if (data.status === 'success') {
-        currentTopologyId = data.topology_id;
-        monitorProgress(currentTopologyId);
+        // 单页操作：动态修改URL并直接拉取进度和渲染
+        history.pushState({}, '', '/topology/' + data.topology_id);
+        window.topology_id = data.topology_id;
+        // 启动进度轮询和渲染逻辑（与页面加载时一致）
+        if (typeof progressContainer !== 'undefined' && progressContainer) progressContainer.classList.remove('hidden');
+        if (typeof graphContainer !== 'undefined' && graphContainer) graphContainer.classList.add('hidden');
+        if (typeof chatSendDom !== 'undefined' && chatSendDom) chatSendDom.disabled = true;
+        setTimeout(function() {
+          var target = document.getElementById('progressContainer') || document.getElementById('graphContainer');
+          if (target) target.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }, 300);
+        var interval = setInterval(function() {
+          fetch(`/api/topology/${data.topology_id}`)
+            .then(resp => resp.json())
+            .then(data2 => {
+              if (data2.status === 'processing') {
+                if (typeof progressBar !== 'undefined' && progressBar) progressBar.style.width = (data2.progress || 0) + '%';
+                if (typeof progressPercentage !== 'undefined' && progressPercentage) progressPercentage.textContent = (data2.progress || 0) + '%';
+                if (typeof progressMessage !== 'undefined' && progressMessage) progressMessage.textContent = data2.message || '正在生成知识图谱...';
+              } else if (data2.status === 'success') {
+                clearInterval(interval);
+                if (typeof progressContainer !== 'undefined' && progressContainer) progressContainer.classList.add('hidden');
+                if (typeof graphContainer !== 'undefined' && graphContainer) graphContainer.classList.remove('hidden');
+                console.log('准备渲染知识图谱', data2.data);
+                renderGraph(data2.data);
+                console.log('渲染函数已调用');
+                if (typeof chatSendDom !== 'undefined' && chatSendDom) chatSendDom.disabled = false;
+              } else if (data2.status === 'error') {
+                clearInterval(interval);
+                if (typeof progressContainer !== 'undefined' && progressContainer) progressContainer.classList.add('hidden');
+                showNotification('错误', data2.message, 'error');
+              }
+            });
+        }, 1500);
       } else {
         showNotification('错误', data.message, 'error');
         resetUpload();
@@ -1306,6 +1338,47 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
+
+  // 如果URL中有topology_id，自动拉取并渲染
+  var topology_id = window.topology_id;
+  if (topology_id) {
+    // 页面跳转后自动滚动到进度条或知识图谱区域
+    setTimeout(function() {
+      var target = document.getElementById('progressContainer') || document.getElementById('graphContainer');
+      if (target) target.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }, 300);
+    // 显示进度条，隐藏图谱
+    if (typeof progressContainer !== 'undefined' && progressContainer) progressContainer.classList.remove('hidden');
+    if (typeof graphContainer !== 'undefined' && graphContainer) graphContainer.classList.add('hidden');
+    if (typeof chatSendDom !== 'undefined' && chatSendDom) chatSendDom.disabled = true;
+
+    // 轮询进度
+    var interval = setInterval(function() {
+      fetch(`/api/topology/${topology_id}`)
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 'processing') {
+            // 更新进度条
+            if (typeof progressBar !== 'undefined' && progressBar) progressBar.style.width = (data.progress || 0) + '%';
+            if (typeof progressPercentage !== 'undefined' && progressPercentage) progressPercentage.textContent = (data.progress || 0) + '%';
+            if (typeof progressMessage !== 'undefined' && progressMessage) progressMessage.textContent = data.message || '正在生成知识图谱...';
+          } else if (data.status === 'success') {
+            // 隐藏进度条，显示图谱
+            clearInterval(interval);
+            if (typeof progressContainer !== 'undefined' && progressContainer) progressContainer.classList.add('hidden');
+            if (typeof graphContainer !== 'undefined' && graphContainer) graphContainer.classList.remove('hidden');
+            console.log('准备渲染知识图谱', data.data);
+            renderGraph(data.data);
+            console.log('渲染函数已调用');
+            if (typeof chatSendDom !== 'undefined' && chatSendDom) chatSendDom.disabled = false;
+          } else if (data.status === 'error') {
+            clearInterval(interval);
+            if (typeof progressContainer !== 'undefined' && progressContainer) progressContainer.classList.add('hidden');
+            showNotification('错误', data.message, 'error');
+          }
+        });
+    }, 1500);
+  }
 });
 
 // 新增：更新图谱视图模式
@@ -1507,3 +1580,65 @@ function showNotification(title, message, type = 'info') {
     }, 300);
   }, 5000);
 }
+
+// ===================== 聊天对话窗口逻辑 =====================
+// 假设 topology_id 已在页面 JS 变量中可用
+var topology_id = window.currentTopologyId || window.topology_id || null;
+if (!topology_id) {
+  // 尝试从URL或页面元素获取
+  var match = window.location.pathname.match(/topology\/(\w+)/);
+  if (match) topology_id = match[1];
+}
+
+// 避免与全局chatHistory数组冲突，DOM元素用chatHistoryDom等命名
+var chatHistoryDom = document.getElementById('chat-history');
+var chatInputDom = document.getElementById('chat-input');
+var chatSendDom = document.getElementById('chat-send');
+
+function appendMessage(role, text, source) {
+  const msgDiv = document.createElement('div');
+  msgDiv.style.margin = '8px 0';
+  msgDiv.style.textAlign = role === 'user' ? 'right' : 'left';
+  msgDiv.innerHTML = `
+    <span style="display:inline-block;max-width:80%;padding:8px;border-radius:6px;
+      background:${role === 'user' ? '#4f8cff' : '#f1f3f6'};
+      color:${role === 'user' ? '#fff' : '#333'};">
+      ${text}
+      ${source ? `<span style="font-size:12px;color:#888;margin-left:8px;">[${source === 'local' ? '本地知识' : '本地+网络'}]</span>` : ''}
+    </span>
+  `;
+  chatHistoryDom.appendChild(msgDiv);
+  chatHistoryDom.scrollTop = chatHistoryDom.scrollHeight;
+}
+
+chatSendDom && (chatSendDom.onclick = async function() {
+  const question = chatInputDom.value.trim();
+  if (!question || !topology_id) return;
+  appendMessage('user', question);
+  chatInputDom.value = '';
+  chatSendDom.disabled = true;
+  appendMessage('ai', '正在思考...', null);
+  try {
+    const resp = await fetch(`/api/topology/${topology_id}/qa`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({question})
+    });
+    const data = await resp.json();
+    chatHistoryDom.removeChild(chatHistoryDom.lastChild);
+    if (data.status === 'success') {
+      appendMessage('ai', data.answer, data.source);
+    } else {
+      appendMessage('ai', '出错了：' + data.message, null);
+    }
+  } catch (e) {
+    chatHistoryDom.removeChild(chatHistoryDom.lastChild);
+    appendMessage('ai', '网络错误，请重试', null);
+  }
+  chatSendDom.disabled = false;
+});
+
+chatInputDom && (chatInputDom.onkeydown = function(e) {
+  if (e.key === 'Enter') chatSendDom.onclick();
+});
+// ===================== 聊天对话窗口逻辑 END =====================

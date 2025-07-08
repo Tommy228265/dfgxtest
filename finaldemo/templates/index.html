@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>智能助教系统 - 知识图谱生成与学习平台</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    // 自动从URL中提取topology_id并赋值给window.topology_id
+    (function() {
+      var match = window.location.pathname.match(/topology[\/-]([\w-]+)/);
+      if (match) {
+        window.topology_id = match[1];
+      }
+    })();
+  </script>
 </head>
 <body>
   <header class="header">
@@ -228,7 +237,14 @@
       </div>
     </section>
 
-    
+    <!-- 对话窗口区域，插入在知识图谱下方 -->
+    <div id="chat-container" style="width: 100%; max-width: 600px; margin: 32px auto 0 auto; border: 1px solid #eee; border-radius: 8px; padding: 16px; background: #fafbfc;">
+      <div id="chat-history" style="height: 300px; overflow-y: auto; margin-bottom: 12px; background: #fff; border-radius: 6px; border: 1px solid #e0e0e0; padding: 10px;"></div>
+      <div style="display: flex;">
+        <input id="chat-input" type="text" placeholder="请输入你的问题..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+        <button id="chat-send" style="margin-left: 8px; padding: 8px 16px; border-radius: 4px; background: #4f8cff; color: #fff; border: none;">发送</button>
+      </div>
+    </div>
 
     <section class="quiz-section">
       <div id="quizContainer" class="hidden">
@@ -366,6 +382,8 @@
         });
       }
     });
+
+    console.log('chat dom:', chatHistoryDom, chatInputDom, chatSendDom, 'topology_id:', topology_id);
   </script>
   
   <div id="contextModal" class="context-modal hidden">

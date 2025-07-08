@@ -15,6 +15,7 @@ from flask import Flask, request, jsonify, render_template, g
 from flask_cors import CORS
 from contextlib import closing
 from collections import defaultdict
+from openai import OpenAI
 
 # 配置日志
 logging.basicConfig(
@@ -235,8 +236,6 @@ def sanitize_text(text: str) -> str:
 
 def extract_knowledge_from_text(text: str, max_nodes: int = 0, max_retries: int = MAX_RETRIES) -> list:
     """调用DeepSeek API提取适合树形结构的知识点层级关系"""
-    from openai import OpenAI
-    
     client = OpenAI(
         api_key=OPENAI_API_KEY,
         base_url="https://api.deepseek.com"
@@ -598,6 +597,10 @@ def update_progress(topology_id, progress, message):
 def index():
     return render_template('index.html')
 
+@app.route('/topology/<topology_id>')
+def topology_page(topology_id):
+    return render_template('index.html', topology_id=topology_id)
+
 @app.route('/api/generate', methods=['POST'])
 def generate_knowledge_graph():
     """处理用户点击生成按钮后的请求，支持节点数量控制"""
@@ -930,8 +933,6 @@ def get_question(topology_id, node_id):
 
 def generate_question(topic, context, consecutive_correct=0):
     """根据连续正确次数生成不同难度的问题"""
-    from openai import OpenAI
-    
     client = OpenAI(
         api_key=OPENAI_API_KEY,
         base_url="https://api.deepseek.com"
@@ -1127,8 +1128,6 @@ def answer_question(topology_id, question_id):
 
 def evaluate_answer(question, answer, topic, context):
     """调用DeepSeek评估回答是否正确（包含上下文）"""
-    from openai import OpenAI
-    
     client = OpenAI(
         api_key=OPENAI_API_KEY,
         base_url="https://api.deepseek.com"
@@ -1238,6 +1237,58 @@ def ignore_nodes(topology_id):
             'status': 'error',
             'message': f"忽略节点时出错: {str(e)}"
         }), 500
+
+@app.route('/api/topology/<topology_id>/qa', methods=['POST'])
+def qa_with_local_and_deepseek(topology_id):
+    """交互问答：优先基于本地知识点内容作答，不足时补充联网内容"""
+    try:
+        data = request.json
+        user_question = data.get('question', '').strip()
+        if not user_question:
+            return jsonify({'status': 'error', 'message': '问题不能为空'}), 400
+
+        db = get_db()
+        cursor = db.cursor()
+        # 获取本地全文内容
+        cursor.execute("SELECT content FROM topologies WHERE id = ?", (topology_id,))
+        topo = cursor.fetchone()
+        if not topo:
+            return jsonify({'status': 'error', 'message': '知识图谱不存在'}), 404
+        full_content = topo['content']
+        # 获取所有知识点片段
+        cursor.execute("SELECT label, content_snippet FROM nodes WHERE topology_id = ?", (topology_id,))
+        nodes = cursor.fetchall()
+        # 简单关键词召回：找与问题最相关的知识点片段
+        related_snippets = []
+        for node in nodes:
+            if node['label'] in user_question or node['label'] in full_content:
+                related_snippets.append(f"[{node['label']}] {node['content_snippet']}")
+        # 若无明显相关，则取前5个知识点片段
+        if not related_snippets:
+            related_snippets = [f"[{node['label']}] {node['content_snippet']}" for node in nodes[:5]]
+        # 拼接上下文
+        local_context = '\n'.join(related_snippets)
+        # 构造DeepSeek prompt
+        prompt = f"""你是一个智能学习助手，请优先基于下列本地知识内容回答用户问题，如本地内容不足可补充网络资料：\n{local_context}\n\n用户问题：{user_question}\n请用简明、准确的语言作答。若答案有本地内容和网络内容，请分别标注来源。"""
+        client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
+        messages = [
+            {"role": "system", "content": "你是一个智能学习助手，善于结合本地知识和网络信息为用户答疑。"},
+            {"role": "user", "content": prompt}
+        ]
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=messages,
+            max_tokens=512
+        )
+        answer = response.choices[0].message.content.strip()
+        return jsonify({
+            'status': 'success',
+            'answer': answer,
+            'source': 'local+web' if '网络' in answer else 'local'
+        })
+    except Exception as e:
+        logger.error(f"交互问答出错: {str(e)}", exc_info=True)
+        return jsonify({'status': 'error', 'message': f'问答失败: {str(e)}'}), 500
 
 @app.teardown_appcontext
 def close_db(exception):
