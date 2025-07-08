@@ -19,6 +19,7 @@
           <li><a href="#features">产品功能</a></li>
           <li><a href="#how-it-works">使用指南</a></li>
           <li><a href="#faq">常见问题</a></li>
+          <li><a href="javascript:void(0)" onclick="window.location.href='http://127.0.0.1:5000/dashboard'" class="profile-link">个人中心</a></li>
         </ul>
       </nav>
     </div>
@@ -354,6 +355,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script>
+    // 处理个人中心按钮点击事件
+    document.addEventListener('DOMContentLoaded', function() {
+      const profileLink = document.querySelector('.profile-link');
+      if (profileLink) {
+        profileLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'http://127.0.0.1:5000/dashboard';
+        });
+      }
+    });
+  </script>
   
   <div id="contextModal" class="context-modal hidden">
     <div class="modal-content">
