@@ -9845,3 +9845,21 @@ openai.APIConnectionError: Connection error.
 2025-07-08 14:11:35,517 - werkzeug - INFO - 127.0.0.1 - - [08/Jul/2025 14:11:35] "GET /api/topology/2046b2d2-a2eb-42bd-88f2-b6b7754fa0c9 HTTP/1.1" 200 -
 2025-07-08 14:11:46,960 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
 2025-07-08 14:12:01,912 - werkzeug - INFO - 127.0.0.1 - - [08/Jul/2025 14:12:01] "POST /api/topology/2046b2d2-a2eb-42bd-88f2-b6b7754fa0c9/qa HTTP/1.1" 200 -
+2025-07-08 14:14:04,236 - werkzeug - INFO -  * Detected change in 'C:\\Users\\qym\\Desktop\\BONC_Intern\\Smart_Teaching_Assistant\\dfgxtest\\finaldemo\\app.py', reloading
+2025-07-08 14:14:04,400 - werkzeug - INFO -  * Restarting with stat
+2025-07-08 14:14:05,058 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-08 14:14:05,058 - KnowledgeGraphGenerator - INFO - 数据库文件路径: C:\Users\qym\Desktop\BONC_Intern\Smart_Teaching_Assistant\dfgxtest\finaldemo\knowledge_graph.db
+2025-07-08 14:14:05,058 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-08 14:14:05,058 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-08 14:14:05,058 - KnowledgeGraphGenerator - INFO - 知识图谱生成系统启动中...
+2025-07-08 14:14:05,066 - werkzeug - WARNING -  * Debugger is active!
+2025-07-08 14:14:05,075 - werkzeug - INFO -  * Debugger PIN: 127-399-683
+2025-07-08 14:19:22,731 - werkzeug - INFO -  * Detected change in 'C:\\Users\\qym\\Desktop\\BONC_Intern\\Smart_Teaching_Assistant\\dfgxtest\\finaldemo\\app.py', reloading
+2025-07-08 14:19:22,795 - werkzeug - INFO -  * Restarting with stat
+2025-07-08 14:19:23,898 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-08 14:19:23,898 - KnowledgeGraphGenerator - INFO - 数据库文件路径: C:\Users\qym\Desktop\BONC_Intern\Smart_Teaching_Assistant\dfgxtest\finaldemo\knowledge_graph.db
+2025-07-08 14:19:23,899 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-08 14:19:23,899 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-08 14:19:23,899 - KnowledgeGraphGenerator - INFO - 知识图谱生成系统启动中...
+2025-07-08 14:19:23,904 - werkzeug - WARNING -  * Debugger is active!
+2025-07-08 14:19:23,910 - werkzeug - INFO -  * Debugger PIN: 127-399-683
