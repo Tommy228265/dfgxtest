@@ -251,11 +251,13 @@ def extract_knowledge_from_text(text: str, max_nodes: int = 0, max_retries: int 
     
     messages = [
         {"role": "system", "content": f"""你是一个知识图谱构建专家，能够从文本中提取知识点并构建树形结构。
-请分析文本内容，识别出主要知识点及其层级关系（如父节点-子节点关系），
-以JSON数组形式输出，每个元素格式为 [父知识点, 关系, 子知识点]。
-关系应体现层级结构，如"包含"、"属于"、"是子类"等。确保输出格式正确，仅返回JSON数组。
-{node_limit_prompt}"""},
-        {"role": "user", "content": f"请从下面文本中提取知识点及其层级关系，输出JSON数组，每个元素格式为 [父知识点, 关系, 子知识点]：\n{sanitized_text}"}
+        请优先分析文本中的目录、章节标题、分层标题、架构图说明等结构化信息，将其作为知识图谱的主干节点和层级。
+        在此基础上，结合正文内容补充细节知识点，生成多层级的知识图谱。
+        特别注意：编号不同的标题即使文本相似，也应视为不同的知识点，保持原有层级关系，不要合并或等价化不同编号的节点。
+        输出时以JSON数组形式，每个元素为 [父知识点, 关系, 子知识点]，关系应体现层级结构，如“包含”、“属于”、“是子类”等。
+        确保输出格式正确，仅返回JSON数组。
+        {node_limit_prompt}"""},
+        {"role": "user", "content": f"请从下面文本中提取知识点及其层级关系，优先利用目录、标题、架构图等结构化信息，输出JSON数组，每个元素格式为 [父知识点, 关系, 子知识点]：\n{sanitized_text}"}
     ]
     
     backoff = 2
@@ -429,13 +431,17 @@ def build_tree_structure(knowledge_edges, topology_id, content: str, max_nodes: 
         })
     
     # 计算节点层级
-    def calculate_level(node_id, current_level=0):
-        if node_id in nodes:
-            nodes[node_id]["level"] = max(nodes[node_id]["level"], current_level)
-            # 递归设置子节点层级
-            for edge in edges:
-                if edge["from"] == node_id:
-                    calculate_level(edge["to"], current_level + 1)
+    def calculate_level(node_id, current_level=0, visited=None):
+        if visited is None:
+            visited = set()
+        if node_id in visited:
+            return  # 防止递归死循环
+        visited.add(node_id)
+        nodes[node_id]["level"] = max(nodes[node_id]["level"], current_level)
+        # 递归设置子节点层级
+        for edge in edges:
+            if edge["from"] == node_id:
+                calculate_level(edge["to"], current_level + 1, visited.copy())
     
     # 找到根节点（没有父节点的节点）
     root_candidates = all_node_ids.copy()
@@ -546,10 +552,10 @@ def process_document(file_path, topology_id, max_nodes=0):
                 logger.warning(f"文档内容过短: {file_path}, 长度: {text_length}")
                 return
 
-            MAX_TEXT_LENGTH = 8000
-            if text_length > MAX_TEXT_LENGTH:
-                logger.info(f"文档内容过长，截取前{MAX_TEXT_LENGTH}字符")
-                text = text[:MAX_TEXT_LENGTH]
+            # MAX_TEXT_LENGTH = 8000
+            # if text_length > MAX_TEXT_LENGTH:
+            #     logger.info(f"文档内容过长，截取前{MAX_TEXT_LENGTH}字符")
+            #     text = text[:MAX_TEXT_LENGTH]
             
             update_progress(topology_id, 60, "调用DeepSeek API提取知识层级...")
             knowledge_edges = extract_knowledge_from_text(text, max_nodes)
