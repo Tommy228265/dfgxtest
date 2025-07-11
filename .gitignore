@@ -1,2 +1,42 @@
-# 忽略所有txt文件
-*.txt 
+# Python缓存和虚拟环境
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+venv/
+env/
+
+# 日志文件
+*.log
+
+# 数据库文件（本地数据不上传）
+*.db
+
+# 上传的用户文件
+uploads/
+vector_store/
+
+# 临时文件
+*.tmp
+*.swp
+*.bak
+
+# Office/文档类临时文件
+~$*
+
+# PDF、PPT、Word等测试/上传样例（如只需保留代码和模板，可忽略这些大文件）
+*.pdf
+*.docx
+*.doc
+*.ppt
+*.pptx
+*.xlsx
+
+# 保留 requirements.txt
+!requirements.txt
+
+# 保留前端静态资源和模板
+!static/
+!templates/ 

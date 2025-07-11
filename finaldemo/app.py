@@ -275,8 +275,8 @@ def extract_knowledge_from_text(text: str, max_nodes: int = 0, max_retries: int 
             logger.info(f"API返回知识关系: {cleaned[:200]}...")
             
             # 保存原始响应用于调试
-            with open(f"api_response_{time.time()}.txt", "w", encoding="utf-8") as f:
-                f.write(cleaned)
+            # with open(f"api_response_{time.time()}.txt", "w", encoding="utf-8") as f:
+            #     f.write(cleaned)
             
             # 增强JSON解析
             knowledge_edges = enhance_json_format(cleaned)
