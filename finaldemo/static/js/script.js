@@ -8,6 +8,7 @@ let topologyResults = {};
 let selectedFile = null;
 let maxNodes = 0;
 let nodeActionModal = null; // 在全局声明节点操作模态框变量
+let currentQuestionIndex = 1;
 
 // DOM元素
 const fileInput = document.getElementById('fileInput');
@@ -482,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (answerFeedback) answerFeedback.classList.add('hidden');
           } else if (data.status === 'error') {
             clearInterval(interval);
-            showNotification('错误', data.message, 'error');
+            // showNotification('错误', data.message, 'error'); // 已去除生成失败弹窗
             resetUpload();
           }
         })
@@ -731,12 +732,12 @@ document.addEventListener('DOMContentLoaded', function() {
           if (edgeCount) edgeCount.textContent = data.edge_count;
         } else {
           console.error('获取图谱数据失败:', data.message);
-          showNotification('错误', '刷新图谱时发生错误，请重试。', 'error');
+          // showNotification('错误', '刷新图谱时发生错误，请重试。', 'error'); // 已去除弹窗
         }
       })
       .catch(error => {
         console.error('刷新图谱错误:', error);
-        showNotification('错误', '刷新图谱时发生错误，请重试。', 'error');
+        // showNotification('错误', '刷新图谱时发生错误，请重试。', 'error'); // 已去除弹窗
       });
   }
 
@@ -813,6 +814,9 @@ document.addEventListener('DOMContentLoaded', function() {
       sessionId: null // 会话ID将从API响应中获取
     };
     
+    currentQuestionIndex = 1;
+    const questionNumberElem = document.getElementById('questionNumber');
+    if (questionNumberElem) questionNumberElem.textContent = currentQuestionIndex;
     getQuestion(nodeId);
   }
   
@@ -838,6 +842,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (questionGenerating) {
       questionGenerating.classList.remove('hidden');
     }
+    // 新增：请求前清空并显示加载提示
+    if (currentQuestion) currentQuestion.textContent = '正在生成新问题...';
+    if (questionCard) questionCard.classList.remove('hidden');
+    
+    // 新增：请求前清空回答输入框
+    if (userAnswer) userAnswer.value = '';
+    
+    // 不再自增编号，只负责显示当前编号
+    const questionNumberElem = document.getElementById('questionNumber');
+    if (questionNumberElem) questionNumberElem.textContent = currentQuestionIndex;
     
     // 携带会话ID获取问题
     const sessionParam = currentQuizSession && currentQuizSession.sessionId 
@@ -860,7 +874,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`节点 ${nodeId} 已掌握`); // 调试信息
             if (noQuestion) noQuestion.classList.remove('hidden');
             if (questionCard) questionCard.classList.add('hidden');
-            showNotification('提示', '该知识点已掌握！', 'info');
+            // showNotification('提示', '该知识点已掌握！', 'info'); // 已去除答题弹窗
             currentQuizSession = null;
             return;
           }
@@ -876,7 +890,7 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log(`获取问题成功，问题ID: ${currentQuestionId}, 会话ID: ${currentQuizSession.sessionId}`); // 调试信息
         } else {
           console.error('获取问题失败:', data.message); // 调试信息
-          showNotification('错误', data.message, 'error');
+          // showNotification('错误', data.message, 'error'); // 已去除答题弹窗
           if (noQuestion) noQuestion.classList.remove('hidden');
           if (questionCard) questionCard.classList.add('hidden');
           currentQuizSession = null;
@@ -889,7 +903,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         console.error('获取问题错误:', error);
-        showNotification('错误', '获取问题时发生错误，请重试。', 'error');
+        // showNotification('错误', '获取问题时发生错误，请重试。', 'error'); // 已去除答题弹窗
         if (noQuestion) noQuestion.classList.remove('hidden');
         if (questionCard) questionCard.classList.add('hidden');
         currentQuizSession = null;
@@ -902,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const answer = userAnswer.value.trim();
     if (!answer) {
-      showNotification('提示', '请输入你的答案。', 'info');
+      // showNotification('提示', '请输入你的答案。', 'info'); // 已去除答题弹窗
       return;
     }
     
@@ -947,8 +961,8 @@ document.addEventListener('DOMContentLoaded', function() {
           const feedbackParagraph = document.createElement('p');
           feedbackParagraph.textContent = data.data.feedback;
           feedbackText.appendChild(feedbackParagraph);
-          
-          // 添加下一步提示
+          // 不再添加详细解析内容
+          // 只保留下一步提示
           const nextStep = document.createElement('p');
           if (data.data.mastered) {
             nextStep.textContent = '恭喜！你已掌握该知识点！';
@@ -989,10 +1003,10 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           setTimeout(() => {
-            if (answerFeedback) answerFeedback.classList.add('hidden');
-            if (noQuestion) noQuestion.classList.remove('hidden');
-            currentQuizSession = null;
-            console.log('问答会话已重置');
+            // if (answerFeedback) answerFeedback.classList.add('hidden'); // 已去除自动隐藏
+            // if (noQuestion) noQuestion.classList.remove('hidden');
+            // currentQuizSession = null;
+            // console.log('问答会话已重置');
           }, 3000);
         } 
         
@@ -1000,20 +1014,20 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (data.data.next_question) {
           currentQuestionId = data.data.next_question.id;
           if (currentQuestion) currentQuestion.textContent = data.data.next_question.question;
-          setTimeout(() => {
-            if (answerFeedback) answerFeedback.classList.add('hidden');
-            if (questionCard) questionCard.classList.remove('hidden');
-            if (userAnswer) {
-              userAnswer.value = '';
-              userAnswer.focus();
-            }
-          }, 2000);
+          // setTimeout(() => {
+          //   if (answerFeedback) answerFeedback.classList.add('hidden');
+          //   if (questionCard) questionCard.classList.remove('hidden');
+          //   if (userAnswer) {
+          //     userAnswer.value = '';
+          //     userAnswer.focus();
+          //   }
+          // }, 2000);
         }
       }
     })
     .catch(error => {
       console.error('提交答案错误:', error);
-      showNotification('错误', '提交答案时发生错误，请重试。', 'error');
+      // showNotification('错误', '提交答案时发生错误，请重试。', 'error'); // 已去除答题弹窗
     })
     .finally(() => {
       // 恢复按钮状态
@@ -1027,6 +1041,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!currentTopologyId || !selectedNodeId) return;
     
     if (answerFeedback) answerFeedback.classList.add('hidden');
+    currentQuestionIndex++;
     getQuestion(selectedNodeId);
   });
 
@@ -1083,12 +1098,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 fetchAndUpdateGraph();
                 showNotification('成功', '知识图谱重新生成成功', 'success');
             } else {
-                showNotification('错误', data.message, 'error');
+                // showNotification('错误', data.message, 'error'); // 已去除弹窗
             }
         })
         .catch(error => {
             console.error('重新生成图谱错误:', error);
-            showNotification('错误', '重新生成图谱时发生错误，请重试。', 'error');
+            // showNotification('错误', '重新生成图谱时发生错误，请重试。', 'error'); // 已去除弹窗
         })
         .finally(() => {
             // 模拟API调用完成后关闭进度条
@@ -1393,12 +1408,12 @@ function regenerateGraphWithNodeCount(nodeCount) {
       if (edgeCount) edgeCount.textContent = data.edge_count;
       showNotification('成功', '知识图谱已重新生成', 'success');
     } else {
-      showNotification('错误', data.message, 'error');
+      // showNotification('错误', data.message, 'error'); // 已去除弹窗
     }
   })
   .catch(error => {
     console.error('重新生成图谱错误:', error);
-    showNotification('错误', '重新生成图谱时发生错误，请重试。', 'error');
+    // showNotification('错误', '重新生成图谱时发生错误，请重试。', 'error'); // 已去除弹窗
   });
 }
 

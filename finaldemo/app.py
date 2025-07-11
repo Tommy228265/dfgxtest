@@ -429,13 +429,18 @@ def build_tree_structure(knowledge_edges, topology_id, content: str, max_nodes: 
         })
     
     # 计算节点层级
-    def calculate_level(node_id, current_level=0):
+    def calculate_level(node_id, current_level=0, visited=None):
+        if visited is None:
+            visited = set()
+        if node_id in visited:
+            return
+        visited.add(node_id)
         if node_id in nodes:
             nodes[node_id]["level"] = max(nodes[node_id]["level"], current_level)
             # 递归设置子节点层级
             for edge in edges:
                 if edge["from"] == node_id:
-                    calculate_level(edge["to"], current_level + 1)
+                    calculate_level(edge["to"], current_level + 1, visited)
     
     # 找到根节点（没有父节点的节点）
     root_candidates = all_node_ids.copy()
@@ -560,11 +565,6 @@ def process_document(file_path, topology_id, max_nodes=0):
                 logger.warning(f"文档内容过短: {file_path}, 长度: {text_length}")
                 return
 
-            MAX_TEXT_LENGTH = 8000
-            if text_length > MAX_TEXT_LENGTH:
-                logger.info(f"文档内容过长，截取前{MAX_TEXT_LENGTH}字符")
-                text = text[:MAX_TEXT_LENGTH]
-            
             update_progress(topology_id, 60, "调用DeepSeek API提取知识层级...")
             knowledge_edges = extract_knowledge_from_text(text, max_nodes)
             logger.info(f"成功提取{len(knowledge_edges)}条知识层级关系")
@@ -853,10 +853,29 @@ def regenerate_topology(topology_id):
             
     except Exception as e:
         logger.error(f"重新生成知识图谱错误: {str(e)}", exc_info=True)
+        # 新增：检查数据库中是否已生成新图谱
+        try:
+            with app.app_context():
+                db = get_db()
+                cursor = db.cursor()
+                cursor.execute(
+                    "SELECT id FROM topologies WHERE id = ?",
+                    (topology_id,)
+                )
+                topology = cursor.fetchone()
+                if topology:
+                    # 图谱已存在，返回成功
+                    return jsonify({
+                        'status': 'success',
+                        'message': '知识图谱已生成（部分异常）',
+                        'topology_id': topology_id
+                    }), 200
+        except Exception as e2:
+            logger.error(f"异常处理时再次出错: {str(e2)}", exc_info=True)
         return jsonify({
             'status': 'error',
             'message': f"重新生成知识图谱时出错: {str(e)}"
-        }), 500
+        }), 200
 
 
 @app.route('/api/topology/<topology_id>/node/<node_id>/question', methods=['GET'])
@@ -1051,7 +1070,7 @@ def answer_question(topology_id, question_id):
             
             # 更新会话状态
             cursor.execute(
-                "SELECT consecutive_correct FROM quiz_sessions WHERE id = ?",
+                "SELECT consecutive_correct, mastered FROM quiz_sessions WHERE id = ?",
                 (session_id,)
             )
             session = cursor.fetchone()
@@ -1066,7 +1085,7 @@ def answer_question(topology_id, question_id):
             
             # 更新连续正确计数
             new_consecutive = current_consecutive + 1 if is_correct else 0
-            new_mastered = 1 if new_consecutive >= 3 else 0
+            new_mastered = 1 if new_consecutive >= 1 else 0  # 只需答对1次即可掌握
             
             cursor.execute(
                 """UPDATE quiz_sessions SET 
@@ -1322,27 +1341,44 @@ def chat_with_knowledge():
             row = cursor.fetchone()
             document_text = row["content"] if row else ""
         
-        # 先基于文档内容进行语义匹配（示例：简单文本包含检测，生产应使用语义向量匹配）
-        matched_snippet = semantic_search(document_text, user_question)
+        # 直接用DeepSeek API在文档内容中查找相关内容
+        doc_search_prompt = (
+            "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
+            "并直接用文档原文文本回答，回答时对文本进行排版优化，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
+            "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
+        )
+        messages = [
+            {"role": "system", "content": "你是一个文档检索助手。"},
+            {"role": "user", "content": doc_search_prompt}
+        ]
+        try:
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=messages,
+                max_tokens=512
+            )
+            doc_answer = response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.error(f"DeepSeek文档检索API错误: {str(e)}", exc_info=True)
+            doc_answer = ""
         
-        # 日志调试
-        logger.info(f"topology_id: {topology_id}, 文档长度: {len(document_text)}, 匹配片段: {matched_snippet[:100] if matched_snippet else '无'}")
-        
-        # 如果匹配度高（示例判断），则用文档内容回答
-        if matched_snippet:
-            # 调用模型基于文档回答
-            answer = generate_answer_from_context(user_question, matched_snippet)
-            
-            # 资源推荐基于文档内容（示例：提取关键词生成学习资源）
-            resources = recommend_resources_based_on_question(user_question)
+        # 判断是否在文档中找到相关内容（更健壮，支持多种否定表达）
+        deny_phrases = ["未找到", "没有相关内容", "查无相关", "未检索到", "未能找到", "未能检索到", "没有找到"]
+        deny_matched = [deny for deny in deny_phrases if deny in doc_answer] if doc_answer else []
+        logger.info(f"[问答调试] doc_answer: {doc_answer}")
+        logger.info(f"[问答调试] deny_matched: {deny_matched}")
+        if doc_answer and not deny_matched:
+            answer = clean_answer(doc_answer)
             source = "document"
         else:
-            # 否则调用智能网络问答接口（这里调用DeepSeek）
-            answer = generate_answer_from_web(user_question)
-            
-            # 资源推荐基于网络回答内容
-            resources = recommend_resources_based_on_question(user_question)
+            # 文档中查不到，调用智能网络问答接口
+            answer = clean_answer(generate_answer_from_web(user_question))
             source = "web"
+        # 新增：用大模型美化排版
+        answer = beautify_answer_with_ai(answer)
+        
+        # 推荐学习资源
+        resources = recommend_resources_based_on_question(user_question)
         
         return jsonify({
             'status': 'success',
@@ -1421,6 +1457,52 @@ def generate_answer_from_web(question):
         logger.error(f"生成网络回答错误: {str(e)}", exc_info=True)
         return "抱歉，网络问答服务不可用。"
 
+def clean_answer(text):
+    """去除乱码、无关特殊字符，并美观化排版（保留段落，每句单独成行）"""
+    import re
+    # 去除控制字符和明显乱码（保留常用中英文、数字、标点、换行、空格）
+    text = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9，。！？、；：“”‘’（）()\[\]{}《》<>…—\-\s\n·\/:；,.?!%&@#\'\"]', '', text)
+    # 合理化多余空行
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    # 去除行首尾多余空格
+    text = '\n'.join(line.strip() for line in text.splitlines())
+    # 先按双换行或空行分段
+    paragraphs = re.split(r'\n\s*\n', text)
+    new_paragraphs = []
+    for para in paragraphs:
+        para = para.strip()
+        if not para:
+            continue
+        # 对每段内部按句号、问号、感叹号断句
+        sentences = re.split(r'([。！？!?.])', para)
+        lines = []
+        for i in range(0, len(sentences)-1, 2):
+            line = sentences[i].strip() + sentences[i+1].strip()
+            if line:
+                lines.append(line)
+        if len(sentences) % 2 == 1 and sentences[-1].strip():
+            lines.append(sentences[-1].strip())
+        new_paragraphs.append('\n'.join(lines))
+    return '\n\n'.join(new_paragraphs).strip()
+
+def beautify_answer_with_ai(answer):
+    """调用大模型对答案进行中文段落和句子排版优化"""
+    from openai import OpenAI
+    try:
+        client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
+        messages = [
+            {"role": "system", "content": "你是一个中文文本排版专家。请对下方内容进行段落和句子排版优化，使其更美观易读。只返回优化后的文本，不要多余解释。"},
+            {"role": "user", "content": answer}
+        ]
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=messages,
+            max_tokens=1024
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"AI排版优化失败: {str(e)}", exc_info=True)
+        return answer
 
 @app.teardown_appcontext
 def close_db(exception):

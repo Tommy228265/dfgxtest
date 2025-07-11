@@ -292,14 +292,14 @@
             </div>
             <div class="feedback-body">
               <p id="feedbackText">你的回答准确覆盖了OSI七层模型的核心功能，特别是对网络层和传输层的区分描述清晰。</p>
-              <div class="feedback-explanation">
+              <!-- 删除详细解析部分 -->
+              <!-- <div class="feedback-explanation">
                 <h5>详细解析</h5>
                 <p>OSI七层模型从下至上分别为：物理层（传输比特流）、数据链路层（帧传输与错误检测）、网络层（路由与寻址）...（完整解析内容）</p>
-              </div>
+              </div> -->
             </div>
             <div class="feedback-actions">
               <button id="nextQuestion" class="action-btn">下一个问题</button>
-              <button id="markMastered" class="action-btn">标记为已掌握</button>
             </div>
           </div>
           
@@ -365,9 +365,16 @@
         thinkingMsg.remove();
         thinkingMsg = null;
       }
+
       if (data.status === 'success') {
-        // 显示 AI 回答来源（文档 or 网络），去除首行空行
-        const aiMsg = `<div class='msg ai-msg'><strong>智能助手（来自${data.source === 'document' ? '文档' : '网络'}）：</strong> ${data.answer}</div>`;
+        // 显示AI回答，后跟来源
+        let sourceText = '';
+        if (data.source === 'document') {
+          sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：文档</span>`;
+        } else if (data.source === 'web') {
+          sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
+        }
+        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br>${data.answer}${sourceText}</div>`;
         qaHistory.innerHTML += aiMsg;
 
         if (data.resources && data.resources.length > 0) {
