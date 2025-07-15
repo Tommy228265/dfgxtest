@@ -40,3 +40,4 @@ vector_store/
 # 保留前端静态资源和模板
 !static/
 !templates/ 
+/.idea
