@@ -316,7 +316,14 @@
   <div class="container">
     <h2 class="section-title">智能助手</h2>
     <div class="chat-box">
-      <div class="chat-history" id="qaHistory"></div>
+      <div class="chat-history" id="qaHistory">
+        <div id="greetingMsg" class="msg ai-msg">
+          您好！我是院校智能助手，可以为您解答关于学校、专业、招生等方面的问题。<br>
+          您可以：<br>
+          • 点击上方知识图谱探索感兴趣的主题<br>
+          • 直接提问您关心的问题
+        </div>
+      </div>
       <div class="chat-input">
         <textarea id="qaInput" placeholder="请输入您的问题，如：图神经网络的核心思想是？"></textarea>
         <button id="qaSubmitBtn">发送</button>
@@ -330,6 +337,20 @@
   const qaInput = document.getElementById('qaInput');
   const qaHistory = document.getElementById('qaHistory');
   const resourceRecommend = document.getElementById('resourceRecommend');
+  const greetingMsg = document.getElementById('greetingMsg'); // 新增：问候语div
+  let hasAsked = false; // 新增：是否已提问标志
+
+  // 新增：首次提问时隐藏问候语
+  if (qaSubmitBtn) {
+    qaSubmitBtn.addEventListener('click', () => {
+      const question = qaInput.value.trim();
+      if (!question) return;
+      if (!hasAsked && greetingMsg) {
+        greetingMsg.style.display = 'none';
+        hasAsked = true;
+      }
+    });
+  }
 
   // 新增：思考中提示元素
   let thinkingMsg = null;
@@ -374,11 +395,16 @@
         } else if (data.source === 'web') {
           sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
         }
-        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br>${data.answer}${sourceText}</div>`;
+        // 使用marked库将Markdown转为HTML
+        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br><div class='markdown-body'>${marked.parse(data.answer)}</div>${sourceText}</div>`;
         qaHistory.innerHTML += aiMsg;
+        // 渲染MathJax公式
+        if (window.MathJax) {
+          MathJax.typesetPromise && MathJax.typesetPromise();
+        }
 
         if (data.resources && data.resources.length > 0) {
-          let links = `<div class="resource-list"><h4>📚 推荐学习资源：</h4><ul>`;
+          let links = `<div class="resource-list"><h4>📚 相关学习资源推荐：</h4><ul>`;
           for (const res of data.resources) {
             links += `<li><a href='${res.url}' target='_blank'>${res.title}</a> - ${res.snippet}</li>`;
           }
@@ -579,6 +605,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <!-- 集成MathJax用于渲染LaTeX公式 -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   
   <div id="contextModal" class="context-modal hidden">
     <div class="modal-content">

@@ -1344,7 +1344,7 @@ def chat_with_knowledge():
         # 直接用DeepSeek API在文档内容中查找相关内容
         doc_search_prompt = (
             "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
-            "并直接用文档原文文本回答，回答时对文本进行排版优化，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
+            "并直接用文档原文文本回答，回答时可用Markdown格式排版，回答时可用Markdown格式排版，**所有数学公式请用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块包裹公式**，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
             "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
         )
         messages = [
@@ -1362,24 +1362,19 @@ def chat_with_knowledge():
             logger.error(f"DeepSeek文档检索API错误: {str(e)}", exc_info=True)
             doc_answer = ""
         
-        # 判断是否在文档中找到相关内容（更健壮，支持多种否定表达）
         deny_phrases = ["未找到", "没有相关内容", "查无相关", "未检索到", "未能找到", "未能检索到", "没有找到"]
         deny_matched = [deny for deny in deny_phrases if deny in doc_answer] if doc_answer else []
         logger.info(f"[问答调试] doc_answer: {doc_answer}")
         logger.info(f"[问答调试] deny_matched: {deny_matched}")
         if doc_answer and not deny_matched:
-            answer = clean_answer(doc_answer)
+            answer = doc_answer  # 直接返回原始AI回答，保留Markdown
             source = "document"
         else:
             # 文档中查不到，调用智能网络问答接口
-            answer = clean_answer(generate_answer_from_web(user_question))
+            answer = generate_answer_from_web(user_question)  # 直接返回原始AI回答，保留Markdown
             source = "web"
-        # 新增：用大模型美化排版
-        answer = beautify_answer_with_ai(answer)
-        
         # 推荐学习资源
         resources = recommend_resources_based_on_question(user_question)
-        
         return jsonify({
             'status': 'success',
             'answer': answer,
