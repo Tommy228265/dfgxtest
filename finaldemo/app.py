@@ -1289,7 +1289,7 @@ def recommend_resources_based_on_question(question):
     from openai import OpenAI
     client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
     messages = [
-        {"role": "system", "content": "你是一个学习资源推荐专家，能够根据用户的问题推荐最相关的高质量学习资料。请根据用户的问题，推荐5个高质量的学习资源，每个资源包含title、url、snippet，要求以JSON数组格式输出。只返回JSON数组，不要有多余解释。"},
+        {"role": "system", "content": "你是一个学习资源推荐专家，能够根据用户的问题推荐最相关的高质量中文学习资料。请根据用户的问题，推荐5个高质量的可访问的中文学习资源，每个资源包含title、url、snippet，要求以JSON数组格式输出。只返回JSON数组，不要有多余解释。"},
         {"role": "user", "content": f"问题：{question}\n请推荐5个相关学习资源。"}
     ]
     try:
