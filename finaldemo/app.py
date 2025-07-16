@@ -1271,6 +1271,8 @@ def ignore_nodes(topology_id):
             'message': f"忽略节点时出错: {str(e)}"
         }), 500
 
+
+###智能助手模块
 from openai import OpenAI
 
 client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
@@ -1344,7 +1346,8 @@ def chat_with_knowledge():
         # 直接用DeepSeek API在文档内容中查找相关内容
         doc_search_prompt = (
             "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
-            "并直接用文档原文文本回答，回答时可用Markdown格式排版，回答时可用Markdown格式排版，**所有数学公式请用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块包裹公式**，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
+            "并直接用文档原文文本回答。回答时可用Markdown格式排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
+            "**所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式**，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
             "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
         )
         messages = [
@@ -1386,59 +1389,12 @@ def chat_with_knowledge():
         logger.error(f"交互问答错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': f"交互问答出错: {str(e)}"}), 500
 
-def semantic_search(document_text, question):
-    """
-    增强分段和命中能力：先按换行和标点分段，长段再每100字切片兜底。
-    命中不到时返回首段内容用于调试。
-    """
-    if not document_text:
-        return None
-    import re
-    # 先按换行和标点分段
-    raw_paragraphs = re.split(r'[\n。！？!?.,，]', document_text)
-    paragraphs = []
-    for para in raw_paragraphs:
-        para = para.strip()
-        if len(para) > 120:
-            # 长段落再切片
-            for i in range(0, len(para), 100):
-                paragraphs.append(para[i:i+100])
-        elif para:
-            paragraphs.append(para)
-    keywords = re.findall(r'\w+', question.lower())
-    for para in paragraphs:
-        if any(kw in para.lower() for kw in keywords):
-            return para
-    # 命中不到时返回首段内容用于调试
-    if paragraphs:
-        return paragraphs[0]
-    return None
-
-def generate_answer_from_context(question, context):
-    """
-    使用 DeepSeek 模型基于上下文生成回答
-    """
-    messages = [
-        {"role": "system", "content": "你是一个知识专家，基于给出的文档内容回答用户的问题，回答要准确且简洁。"},
-        {"role": "user", "content": f"文档内容: {context}\n问题: {question}\n请给出回答。"}
-    ]
-    try:
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=messages,
-            max_tokens=1024  # 增大输出长度
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        logger.error(f"生成文档上下文回答错误: {str(e)}", exc_info=True)
-        return "抱歉，基于文档的回答生成失败。"
-
 def generate_answer_from_web(question):
     """
     调用网络智能问答接口（DeepSeek）
     """
     messages = [
-        {"role": "system", "content": "你是一个智能助理，能够基于互联网资源回答各种问题。"},
+        {"role": "system", "content": "你是一个智能助理，能够基于互联网资源回答各种问题。回答时用Markdown格式排版，所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式。只返回直接的答案内容，不要多余解释。"},
         {"role": "user", "content": question}
     ]
     try:
@@ -1451,53 +1407,6 @@ def generate_answer_from_web(question):
     except Exception as e:
         logger.error(f"生成网络回答错误: {str(e)}", exc_info=True)
         return "抱歉，网络问答服务不可用。"
-
-def clean_answer(text):
-    """去除乱码、无关特殊字符，并美观化排版（保留段落，每句单独成行）"""
-    import re
-    # 去除控制字符和明显乱码（保留常用中英文、数字、标点、换行、空格）
-    text = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9，。！？、；：“”‘’（）()\[\]{}《》<>…—\-\s\n·\/:；,.?!%&@#\'\"]', '', text)
-    # 合理化多余空行
-    text = re.sub(r'\n{3,}', '\n\n', text)
-    # 去除行首尾多余空格
-    text = '\n'.join(line.strip() for line in text.splitlines())
-    # 先按双换行或空行分段
-    paragraphs = re.split(r'\n\s*\n', text)
-    new_paragraphs = []
-    for para in paragraphs:
-        para = para.strip()
-        if not para:
-            continue
-        # 对每段内部按句号、问号、感叹号断句
-        sentences = re.split(r'([。！？!?.])', para)
-        lines = []
-        for i in range(0, len(sentences)-1, 2):
-            line = sentences[i].strip() + sentences[i+1].strip()
-            if line:
-                lines.append(line)
-        if len(sentences) % 2 == 1 and sentences[-1].strip():
-            lines.append(sentences[-1].strip())
-        new_paragraphs.append('\n'.join(lines))
-    return '\n\n'.join(new_paragraphs).strip()
-
-def beautify_answer_with_ai(answer):
-    """调用大模型对答案进行中文段落和句子排版优化"""
-    from openai import OpenAI
-    try:
-        client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
-        messages = [
-            {"role": "system", "content": "你是一个中文文本排版专家。请对下方内容进行段落和句子排版优化，使其更美观易读。只返回优化后的文本，不要多余解释。"},
-            {"role": "user", "content": answer}
-        ]
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=messages,
-            max_tokens=1024
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        logger.error(f"AI排版优化失败: {str(e)}", exc_info=True)
-        return answer
 
 @app.teardown_appcontext
 def close_db(exception):

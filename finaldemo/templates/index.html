@@ -395,11 +395,30 @@
         } else if (data.source === 'web') {
           sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
         }
-        // 使用marked库将Markdown转为HTML
-        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br><div class='markdown-body'>${marked.parse(data.answer)}</div>${sourceText}</div>`;
+        // 渲染前修正中括号公式为$$...$$
+        let fixedAnswer = fixLatexBrackets(data.answer);
+        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br><div class='markdown-body'>${marked.parse(fixedAnswer)}</div>${sourceText}</div>`;
         qaHistory.innerHTML += aiMsg;
-        // 渲染MathJax公式
+        // 关键：将<p>$$...$$</p>替换为独立div，防止被<p>包裹
+        qaHistory.querySelectorAll('p').forEach(p => {
+          const text = p.textContent.trim();
+          if (/^\$\$[\s\S]*\$\$$/.test(text)) {
+            const latexDiv = document.createElement('div');
+            latexDiv.innerHTML = text;
+            p.replaceWith(latexDiv);
+          }
+        });
+        // 延迟调用MathJax渲染，确保公式100%被渲染
+        setTimeout(() => {
+          if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+          }
+        }, 0);
+        // 调试：输出渲染后HTML结构
+        console.log('AI回答渲染后HTML:', qaHistory.innerHTML);
+        // 强制MathJax重新渲染所有公式
         if (window.MathJax) {
+          if (MathJax.typesetClear) MathJax.typesetClear();
           MathJax.typesetPromise && MathJax.typesetPromise();
         }
 
@@ -608,6 +627,32 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
   <!-- 集成MathJax用于渲染LaTeX公式 -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    // 修正AI输出的中括号公式为MathJax可识别的$$...$$格式，并去除每行前的多余空格防止被识别为代码块，确保$$公式单独成段，去除空公式和多余空行
+    function fixLatexBrackets(md) {
+      // 1. 去除每行前的多余空格
+      md = md.replace(/^[ \t]+/gm, '');
+      // 2. 替换独占一行的 [ ... ] 为 $$ ... $$
+      md = md.replace(/(^|\n)\s*\[\s*([\s\S]*?)\s*\]\s*(?=\n|$)/g, function(match, p1, p2) {
+        return `${p1}$$\n${p2.trim()}\n$$`;
+      });
+      // 3. 补全裸的独占一行LaTeX公式为块级公式
+      md = md.replace(/(^|\n)\s*(\\[a-zA-Z]+[\s\S]*?=.+)\s*(?=\n|$)/g, function(match, p1, p2) {
+        // 如果本行已经有$$则不处理
+        if (/^\s*\$\$/.test(p2)) return match;
+        return `${p1}$$\n${p2.trim()}\n$$`;
+      });
+      // 4. 确保所有 $$...$$ 公式单独成段，前后都有换行
+      md = md.replace(/([^\n])(\$\$[\s\S]*?\$\$)/g, '$1\n$2');
+      md = md.replace(/(\$\$[\s\S]*?\$\$)([^\n])/g, '$1\n$2');
+      // 5. 去除空公式
+      md = md.replace(/^\s*\$\$\s*$/gm, '');
+      // 6. 去除$$与内容之间的多余空行
+      md = md.replace(/\$\$\n{2,}/g, '$$\n');
+      md = md.replace(/\n{2,}\$\$/g, '\n$$');
+      return md;
+    }
+  </script>
   
   <div id="contextModal" class="context-modal hidden">
     <div class="modal-content">
