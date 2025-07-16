@@ -316,7 +316,14 @@
   <div class="container">
     <h2 class="section-title">智能助手</h2>
     <div class="chat-box">
-      <div class="chat-history" id="qaHistory"></div>
+      <div class="chat-history" id="qaHistory">
+        <div id="greetingMsg" class="msg ai-msg">
+          您好！我是院校智能助手，可以为您解答关于学校、专业、招生等方面的问题。<br>
+          您可以：<br>
+          • 点击上方知识图谱探索感兴趣的主题<br>
+          • 直接提问您关心的问题
+        </div>
+      </div>
       <div class="chat-input">
         <textarea id="qaInput" placeholder="请输入您的问题，如：图神经网络的核心思想是？"></textarea>
         <button id="qaSubmitBtn">发送</button>
@@ -330,6 +337,20 @@
   const qaInput = document.getElementById('qaInput');
   const qaHistory = document.getElementById('qaHistory');
   const resourceRecommend = document.getElementById('resourceRecommend');
+  const greetingMsg = document.getElementById('greetingMsg'); // 新增：问候语div
+  let hasAsked = false; // 新增：是否已提问标志
+
+  // 新增：首次提问时隐藏问候语
+  if (qaSubmitBtn) {
+    qaSubmitBtn.addEventListener('click', () => {
+      const question = qaInput.value.trim();
+      if (!question) return;
+      if (!hasAsked && greetingMsg) {
+        greetingMsg.style.display = 'none';
+        hasAsked = true;
+      }
+    });
+  }
 
   // 新增：思考中提示元素
   let thinkingMsg = null;
@@ -374,11 +395,35 @@
         } else if (data.source === 'web') {
           sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
         }
-        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br>${data.answer}${sourceText}</div>`;
+        // 渲染前修正中括号公式为$$...$$
+        let fixedAnswer = fixLatexBrackets(data.answer);
+        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br><div class='markdown-body'>${marked.parse(fixedAnswer)}</div>${sourceText}</div>`;
         qaHistory.innerHTML += aiMsg;
+        // 关键：将<p>$$...$$</p>替换为独立div，防止被<p>包裹
+        qaHistory.querySelectorAll('p').forEach(p => {
+          const text = p.textContent.trim();
+          if (/^\$\$[\s\S]*\$\$$/.test(text)) {
+            const latexDiv = document.createElement('div');
+            latexDiv.innerHTML = text;
+            p.replaceWith(latexDiv);
+          }
+        });
+        // 延迟调用MathJax渲染，确保公式100%被渲染
+        setTimeout(() => {
+          if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+          }
+        }, 0);
+        // 调试：输出渲染后HTML结构
+        console.log('AI回答渲染后HTML:', qaHistory.innerHTML);
+        // 强制MathJax重新渲染所有公式
+        if (window.MathJax) {
+          if (MathJax.typesetClear) MathJax.typesetClear();
+          MathJax.typesetPromise && MathJax.typesetPromise();
+        }
 
         if (data.resources && data.resources.length > 0) {
-          let links = `<div class="resource-list"><h4>📚 推荐学习资源：</h4><ul>`;
+          let links = `<div class="resource-list"><h4>📚 相关学习资源推荐：</h4><ul>`;
           for (const res of data.resources) {
             links += `<li><a href='${res.url}' target='_blank'>${res.title}</a> - ${res.snippet}</li>`;
           }
@@ -579,6 +624,35 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <!-- 集成MathJax用于渲染LaTeX公式 -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    // 修正AI输出的中括号公式为MathJax可识别的$$...$$格式，并去除每行前的多余空格防止被识别为代码块，确保$$公式单独成段，去除空公式和多余空行
+    function fixLatexBrackets(md) {
+      // 1. 去除每行前的多余空格
+      md = md.replace(/^[ \t]+/gm, '');
+      // 2. 替换独占一行的 [ ... ] 为 $$ ... $$
+      md = md.replace(/(^|\n)\s*\[\s*([\s\S]*?)\s*\]\s*(?=\n|$)/g, function(match, p1, p2) {
+        return `${p1}$$\n${p2.trim()}\n$$`;
+      });
+      // 3. 补全裸的独占一行LaTeX公式为块级公式
+      md = md.replace(/(^|\n)\s*(\\[a-zA-Z]+[\s\S]*?=.+)\s*(?=\n|$)/g, function(match, p1, p2) {
+        // 如果本行已经有$$则不处理
+        if (/^\s*\$\$/.test(p2)) return match;
+        return `${p1}$$\n${p2.trim()}\n$$`;
+      });
+      // 4. 确保所有 $$...$$ 公式单独成段，前后都有换行
+      md = md.replace(/([^\n])(\$\$[\s\S]*?\$\$)/g, '$1\n$2');
+      md = md.replace(/(\$\$[\s\S]*?\$\$)([^\n])/g, '$1\n$2');
+      // 5. 去除空公式
+      md = md.replace(/^\s*\$\$\s*$/gm, '');
+      // 6. 去除$$与内容之间的多余空行
+      md = md.replace(/\$\$\n{2,}/g, '$$\n');
+      md = md.replace(/\n{2,}\$\$/g, '\n$$');
+      return md;
+    }
+  </script>
   
   <div id="contextModal" class="context-modal hidden">
     <div class="modal-content">
