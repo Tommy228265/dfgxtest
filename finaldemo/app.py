@@ -10,10 +10,14 @@ from PyPDF2 import PdfReader
 from docx import Document
 from bs4 import BeautifulSoup
 from pptx import Presentation
-from flask import Flask, request, jsonify, render_template, g
+from flask import Flask, request, jsonify, render_template, g, send_file
 from flask_cors import CORS
 from contextlib import closing
 from collections import defaultdict
+from pathlib import Path
+from collections import defaultdict
+from flask import send_file, make_response
+from mimetypes import guess_type
 
 # 配置日志
 logging.basicConfig(
@@ -31,10 +35,26 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app, resources={r"/*": {"origins": "*"}})  # 增强CORS配置
 
 # 配置上传文件夹
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'Uploads')  # 使用绝对路径
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+
+@app.route('/Uploads/<path:filename>')
+def serve_uploaded_file(filename):
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename.replace('/', os.sep))
+    if not os.path.exists(file_path):
+        logger.error(f"文件不存在: {file_path}")
+        return jsonify({'status': 'error', 'message': '文件不存在'}), 404
+
+    # 获取文件 MIME 类型
+    mime_type, _ = guess_type(file_path)
+    if not mime_type:
+        mime_type = 'application/octet-stream'  # 默认 MIME 类型
+
+    # 避免强制下载，设置 inline 显示
+    response = make_response(send_file(file_path, mimetype=mime_type))
+    response.headers['Content-Disposition'] = 'inline'
+    return response
 
 # DeepSeek API配置（示例密钥，需替换为实际密钥）
 OPENAI_API_KEY = "sk-ba9cc9a26b8c4859ba5c9bad33785093"
@@ -611,46 +631,62 @@ def update_progress(topology_id, progress, message):
 def index():
     return render_template('index.html')
 
+
 @app.route('/api/generate', methods=['POST'])
 def generate_knowledge_graph():
     """处理用户点击生成按钮后的请求，支持节点数量控制"""
     if 'file' not in request.files:
         logger.error("文件上传错误: 没有文件")
         return jsonify({'status': 'error', 'message': '没有文件上传'}), 400
-    
+
     file = request.files['file']
     if file.filename == '':
         logger.error("文件上传错误: 未选择文件")
         return jsonify({'status': 'error', 'message': '未选择文件'}), 400
-    
-    # 获取节点数量 - 确保从表单获取
+
+    # 获取文件扩展名
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext not in ['.pdf', '.docx', '.doc', '.ppt', '.pptx', '.txt']:
+        logger.error(f"不支持的文件格式: {file_ext}")
+        return jsonify({'status': 'error', 'message': '不支持的文件格式'}), 400
+
+    # 获取节点数量
     max_nodes = request.form.get('max_nodes', 0, type=int)
-    
+
     # 检查文件大小
     file.seek(0, os.SEEK_END)
     file_size = file.tell()
     file.seek(0)
-    
+
     if file_size > 50 * 1024 * 1024:  # 50MB限制
-        logger.error(f"文件上传错误: 文件过大 ({file_size/1024/1024:.2f} MB)")
+        logger.error(f"文件上传错误: 文件过大 ({file_size / 1024 / 1024:.2f} MB)")
         return jsonify({'status': 'error', 'message': '文件大小超过50MB限制'}), 400
-    
+
+    # 生成 topology_id 并保存文件
     topology_id = str(uuid.uuid4())
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{topology_id}_{file.filename}")
+    filename = f"{topology_id}{file_ext}"
+    upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], topology_id)
+    os.makedirs(upload_dir, exist_ok=True)
+    file_path = os.path.join(upload_dir, filename)
     file.save(file_path)
-    
-    logger.info(f"文件上传成功: {file_path}, 大小: {file_size/1024/1024:.2f} MB, 最大节点数: {max_nodes}")
-    
+
+    # 验证文件是否保存成功
+    if not os.path.exists(file_path):
+        logger.error(f"文件保存失败: {file_path}")
+        return jsonify({'status': 'error', 'message': '文件保存失败'}), 500
+
+    logger.info(f"文件上传成功: {file_path}, 大小: {file_size / 1024 / 1024:.2f} MB, 最大节点数: {max_nodes}")
+
     # 启动处理线程，并在应用上下文中执行
     threading.Thread(
         target=lambda: with_app_context(process_document, file_path, topology_id, max_nodes)
     ).start()
-    
+
     return jsonify({
         'status': 'success',
         'topology_id': topology_id,
         'message': '文档上传成功，正在生成知识图谱',
-        'max_nodes': max_nodes  # 返回节点数量限制
+        'max_nodes': max_nodes
     })
 
 def with_app_context(func, *args, **kwargs):
@@ -1318,21 +1354,126 @@ def recommend_resources_based_on_question(question):
         logger.error(f"学习资源推荐API错误: {str(e)}", exc_info=True)
         return []
 
+
+@app.route('/api/source/<topology_id>/<source_id>', methods=['GET'])
+def get_source_content(topology_id, source_id):
+    try:
+        with app.app_context():
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute("SELECT content FROM topologies WHERE id = ?", (topology_id,))
+            row = cursor.fetchone()
+            if not row:
+                logger.error(f"拓扑图不存在: {topology_id}")
+                return jsonify({'status': 'error', 'message': '拓扑图不存在'}), 404
+
+            document_text = row["content"]
+            segment_start = int(source_id)
+
+            # 提取上下文（前后各 200 字符）
+            start = max(0, segment_start - 200)
+            end = min(len(document_text), segment_start + 400)
+            context = document_text[start:end]
+            matched_segment = document_text[segment_start:segment_start + 200].strip()
+
+            # 从 uploads 目录推断文件名
+            upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], topology_id)
+            if not os.path.exists(upload_dir):
+                logger.error(f"上传目录不存在: {upload_dir}")
+                return jsonify({'status': 'error', 'message': '上传的文件不存在'}), 404
+
+            # 查找以 topology_id 开头的文件
+            files = [f for f in os.listdir(upload_dir) if f.startswith(topology_id)]
+            if not files:
+                logger.error(f"未找到与拓扑ID {topology_id} 相关的文件")
+                return jsonify({'status': 'error', 'message': '未找到上传的文件'}), 404
+
+            # 使用第一个匹配的文件
+            filename = files[0]
+            file_path = os.path.join(upload_dir, filename)
+            file_url = f"/Uploads/{topology_id}/{filename.replace(os.sep, '/')}"
+
+            # 验证文件存在
+            if not os.path.exists(file_path):
+                logger.error(f"文件不存在: {file_path}")
+                return jsonify({'status': 'error', 'message': '文件不存在'}), 404
+
+            # 计算页码
+            file_ext = os.path.splitext(filename)[1].lower()
+            page_number = 1  # 默认页码
+            try:
+                if file_ext == '.pdf':
+                    with open(file_path, 'rb') as file:
+                        pdf = PdfReader(file)
+                        char_count = 0
+                        for page_num, page in enumerate(pdf.pages, 1):
+                            page_text = page.extract_text() or ""
+                            char_count += len(page_text)
+                            if char_count > segment_start:
+                                page_number = page_num
+                                break
+                elif file_ext in ['.ppt', '.pptx']:
+                    from pptx import Presentation
+                    prs = Presentation(file_path)
+                    char_count = 0
+                    for page_num, slide in enumerate(prs.slides, 1):
+                        slide_text = ""
+                        for shape in slide.shapes:
+                            if hasattr(shape, "text"):
+                                slide_text += shape.text + "\n"
+                        char_count += len(slide_text)
+                        if char_count > segment_start:
+                            page_number = page_num
+                            break
+                elif file_ext in ['.docx', '.doc']:
+                    from docx import Document
+                    doc = Document(file_path)
+                    char_count = 0
+                    page_num = 1
+                    for para in doc.paragraphs:
+                        para_text = para.text.strip()
+                        if para_text:
+                            char_count += len(para_text)
+                            if char_count > segment_start:
+                                page_number = page_num
+                                break
+                            page_num += 1  # 每段落视为可能的新页面
+                elif file_ext == '.txt':
+                    page_number = 1  # TXT 无页码
+                else:
+                    logger.warning(f"不支持的文件格式: {file_ext}")
+                    page_number = 1
+            except Exception as e:
+                logger.error(f"解析文件页码错误: {str(e)}")
+                page_number = max(1, (segment_start // 1000) + 1)  # 回退到估算
+
+            if start > 0:
+                context = "..." + context
+            if end < len(document_text):
+                context = context + "..."
+
+            return jsonify({
+                'status': 'success',
+                'file_url': file_url,
+                'file_type': file_ext,  # 添加文件类型
+                'page_number': page_number,
+                'matched_segment': matched_segment,
+                'content': context
+            })
+
+    except Exception as e:
+        logger.error(f"获取原文内容错误: {str(e)}", exc_info=True)
+        return jsonify({'status': 'error', 'message': f"获取原文内容时出错: {str(e)}"}), 500
 @app.route('/api/chat', methods=['POST'])
 def chat_with_knowledge():
-    """
-    用户交互问答接口：
-    优先基于上传文档内容回答，若文档匹配度低，则调用网络智能问答。
-    同时进行相关学习资源推荐，返回相关链接和内容片段。
-    """
     try:
         data = request.json
         topology_id = data.get('topology_id', '')
         user_question = data.get('question', '').strip()
-        
+
         if not user_question:
             return jsonify({'status': 'error', 'message': '问题不能为空'}), 400
-        
+
         # 获取上传文档全文内容
         with app.app_context():
             db = get_db()
@@ -1340,7 +1481,7 @@ def chat_with_knowledge():
             cursor.execute("SELECT content FROM topologies WHERE id = ?", (topology_id,))
             row = cursor.fetchone()
             document_text = row["content"] if row else ""
-        
+
         # 直接用DeepSeek API在文档内容中查找相关内容
         doc_search_prompt = (
             "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
@@ -1351,6 +1492,11 @@ def chat_with_knowledge():
             {"role": "system", "content": "你是一个文档检索助手。"},
             {"role": "user", "content": doc_search_prompt}
         ]
+        answer = ""
+        source = "web"
+        matched_segment = ""
+        segment_start = -1
+        source_id = None  # 新增 source_id
         try:
             response = client.chat.completions.create(
                 model="deepseek-chat",
@@ -1358,35 +1504,55 @@ def chat_with_knowledge():
                 max_tokens=512
             )
             doc_answer = response.choices[0].message.content.strip()
+            # 查找匹配片段的起始位置
+            if doc_answer and doc_answer not in ["未找到", "没有相关内容", "查无相关", "未检索到", "未能找到",
+                                                "未能检索到", "没有找到"]:
+                answer = clean_answer(doc_answer)
+                source = "document"
+                # 查找文档中匹配片段的精确位置
+                matched_segment = doc_answer
+                segment_start = document_text.find(matched_segment)
+                source_id = str(segment_start)  # 使用 segment_start 作为 source_id
+                if segment_start == -1:
+                    # 如果精确匹配失败，尝试模糊匹配
+                    keywords = re.findall(r'\w+', user_question.lower())
+                    for para in re.split(r'[\n。！？!?.,，]', document_text):
+                        if any(kw in para.lower() for kw in keywords):
+                            matched_segment = para.strip()
+                            segment_start = document_text.find(matched_segment)
+                            source_id = str(segment_start)
+                            break
         except Exception as e:
             logger.error(f"DeepSeek文档检索API错误: {str(e)}", exc_info=True)
             doc_answer = ""
-        
-        # 判断是否在文档中找到相关内容（更健壮，支持多种否定表达）
+
+        # 判断是否在文档中找到相关内容
         deny_phrases = ["未找到", "没有相关内容", "查无相关", "未检索到", "未能找到", "未能检索到", "没有找到"]
         deny_matched = [deny for deny in deny_phrases if deny in doc_answer] if doc_answer else []
-        logger.info(f"[问答调试] doc_answer: {doc_answer}")
-        logger.info(f"[问答调试] deny_matched: {deny_matched}")
-        if doc_answer and not deny_matched:
-            answer = clean_answer(doc_answer)
-            source = "document"
-        else:
+        if not answer or deny_matched:
             # 文档中查不到，调用智能网络问答接口
             answer = clean_answer(generate_answer_from_web(user_question))
             source = "web"
+            matched_segment = ""
+            segment_start = -1
+            source_id = None
+
         # 新增：用大模型美化排版
         answer = beautify_answer_with_ai(answer)
-        
+
         # 推荐学习资源
         resources = recommend_resources_based_on_question(user_question)
-        
+
         return jsonify({
             'status': 'success',
             'answer': answer,
             'resources': resources,
-            'source': source
+            'source': source,
+            'source_id': source_id,  # 返回 source_id
+            'segment_start': segment_start,
+            'matched_segment': matched_segment
         })
-        
+
     except Exception as e:
         logger.error(f"交互问答错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': f"交互问答出错: {str(e)}"}), 500

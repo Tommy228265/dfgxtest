@@ -294,6 +294,52 @@ document.addEventListener('DOMContentLoaded', function() {
       border-left: 4px solid #f39c12;
       background-color: rgba(243, 156, 18, 0.05);
     }
+    
+    /* 原文内容显示模态框 */
+    .modal.fade {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+  }
+  .modal.fade.show {
+    display: flex;
+  }
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  #sourceContent {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 5px;
+  }
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .highlight {
+      background-color: #ffeb3b;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
   `;
   document.head.appendChild(style);
   
@@ -1521,4 +1567,191 @@ function showNotification(title, message, type = 'info') {
       notification.remove();
     }, 300);
   }, 5000);
+}
+
+  const qaSubmitBtn = document.getElementById('qaSubmitBtn');
+  const qaInput = document.getElementById('qaInput');
+  const qaHistory = document.getElementById('qaHistory');
+  const resourceRecommend = document.getElementById('resourceRecommend');
+
+  /* 关闭原文模态框 */
+  const closeSourceModal = document.getElementById('closeSourceModal');
+  if (closeSourceModal) {
+    closeSourceModal.addEventListener('click', () => {
+      const sourceModal = document.getElementById('sourceModal');
+      if (sourceModal) {
+        sourceModal.classList.remove('show');
+      }
+    });
+  } else {
+    console.error('关闭原文模态框按钮未找到');
+}
+
+  // 新增：思考中提示元素
+  let thinkingMsg = null;
+
+  qaSubmitBtn.addEventListener('click', () => {
+  const question = qaInput.value.trim();
+  if (!question) return;
+
+  // 显示用户问题
+  const userMsg = `<div class='msg user-msg'><strong>你：</strong> ${question}</div>`;
+  qaHistory.innerHTML += userMsg;
+  qaInput.value = '';
+
+  // 显示“正在思考中……”
+  thinkingMsg = document.createElement('div');
+  thinkingMsg.className = 'msg thinking-msg';
+  thinkingMsg.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 正在思考中……`;
+  qaHistory.appendChild(thinkingMsg);
+  qaHistory.scrollTop = qaHistory.scrollHeight;
+
+  // 判断是否上传文档
+  const requestData = {
+    question: question,
+    topology_id: currentTopologyId || '',
+  };
+
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestData),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      // 隐藏“正在思考中……”
+      if (thinkingMsg) {
+        thinkingMsg.remove();
+        thinkingMsg = null;
+      }
+
+      if (data.status === 'success') {
+        // 显示AI回答，并为来源添加可点击链接
+        let sourceText = '';
+        if (data.source === 'document' && data.source_id) {
+          sourceText = `<br><span class="source-link" style="color:#888;font-size:13px;font-style:italic;cursor:pointer;" data-source-id="${data.source_id}">来源：文档</span>`;
+        } else if (data.source === 'web') {
+          sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
+        }
+        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br>${data.answer}${sourceText}</div>`;
+        qaHistory.innerHTML += aiMsg;
+
+        // 为文档来源添加点击事件
+        if (data.source === 'document' && data.source_id) {
+          const sourceLinks = document.querySelectorAll('.source-link');
+          sourceLinks[sourceLinks.length - 1].addEventListener('click', () => {
+            showSourceContent(data.source_id);
+          });
+        }
+
+        // 显示推荐资源
+        if (data.resources && data.resources.length > 0) {
+          let links = `<div class="resource-list"><h4>📚 推荐学习资源：</h4><ul>`;
+          for (const res of data.resources) {
+            links += `<li><a href='${res.url}' target='_blank'>${res.title}</a> - ${res.snippet}</li>`;
+          }
+          links += `</ul></div>`;
+          resourceRecommend.innerHTML = links;
+        } else {
+          resourceRecommend.innerHTML = '';
+        }
+      } else {
+        qaHistory.innerHTML += `<div class='msg error-msg'>⚠️ 出错：${data.message}</div>`;
+      }
+
+      // 滚动到底部
+      qaHistory.scrollTop = qaHistory.scrollHeight;
+    })
+    .catch((error) => {
+      console.error('获取回答错误:', error);
+      if (thinkingMsg) {
+        thinkingMsg.remove();
+        thinkingMsg = null;
+      }
+      qaHistory.innerHTML += `<div class='msg error-msg'>⚠️ 出错：获取回答时发生错误，请重试。</div>`;
+      qaHistory.scrollTop = qaHistory.scrollHeight;
+    });
+});
+
+function showSourceContent(sourceId) {
+    fetch(`/api/source/${currentTopologyId}/${sourceId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.status === 'success' && data.file_url) {
+                // 防止 XSS 攻击，清理 matched_segment
+                const escapeHTML = (str) => {
+                    return str.replace(/&/g, '&amp;')
+                             .replace(/</g, '&lt;')
+                             .replace(/>/g, '&gt;')
+                             .replace(/"/g, '&quot;')
+                             .replace(/'/g, '&#39;');
+                };
+                const matchedSegment = data.matched_segment ? escapeHTML(data.matched_segment) : '';
+
+                // 构造文档 URL，带上页码（如果适用）
+                let fileUrl = data.file_url;
+                let notificationMessage = '';
+                const fileExt = data.file_type ? data.file_type.toLowerCase().replace('.', '') : fileUrl.toLowerCase().split('.').pop();
+
+                if (fileExt === 'pdf' && data.page_number) {
+                    fileUrl += `#page=${data.page_number}`;
+                    notificationMessage = `正在打开PDF文档到第 ${data.page_number} 页`;
+                } else if (fileExt === 'txt') {
+                    notificationMessage = '正在打开TXT文档，相关内容已高亮';
+                } else if (['ppt', 'pptx', 'doc', 'docx'].includes(fileExt)) {
+                    notificationMessage = `正在打开${fileExt.toUpperCase()}文档，请手动跳转到第 ${data.page_number} 页（可能需要本地应用打开）`;
+                    // 尝试通过 iframe 或 object 嵌入 DOCX/PPTX
+                    fileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(window.location.origin + fileUrl)}`;
+                } else {
+                    notificationMessage = '正在打开文档，当前格式不支持高亮或页面跳转';
+                }
+
+                // 显示加载提示
+                showNotification('提示', notificationMessage, 'info');
+
+                // 打开文档在新窗口
+                const newWindow = window.open(fileUrl, '_blank');
+                if (!newWindow) {
+                    showNotification('错误', '无法打开文档，请检查浏览器设置是否阻止了弹出窗口', 'error');
+                    return;
+                }
+
+                // TXT 文件高亮
+                if (matchedSegment && fileExt === 'txt') {
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                                <style>
+                                    .highlight {
+                                        background-color: #ffeb3b;
+                                        padding: 2px 4px;
+                                        border-radius: 3px;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <pre>${data.content.replace(
+                                    new RegExp(matchedSegment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+                                    `<span class="highlight">${matchedSegment}</span>`
+                                )}</pre>
+                            </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                } else if (matchedSegment && fileExt === 'pdf') {
+                    showNotification('提示', 'PDF 高亮功能需要额外配置 pdf.js', 'info');
+                } else if (matchedSegment && ['ppt', 'pptx', 'doc', 'docx'].includes(fileExt)) {
+                    showNotification('提示', `${fileExt.toUpperCase()} 格式不支持高亮显示`, 'info');
+                }
+            } else {
+                showNotification('错误', `无法加载文档：${data.message || '未知错误'}`, 'error');
+            }
+        })
+        .catch((error) => {
+            console.error('加载文档错误:', error);
+            showNotification('错误', '加载文档时发生错误，请重试。', 'error');
+        });
 }

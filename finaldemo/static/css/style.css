@@ -1486,6 +1486,148 @@ body {
   margin-top: 10px;
 }
 
+  .chat-box {
+    background: #f8fafc;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.08);
+    padding: 24px 20px 16px 20px;
+    margin-bottom: 32px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .chat-history {
+    min-height: 120px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding-bottom: 8px;
+  }
+  .msg {
+    margin: 18px 0 10px 0;
+    padding: 12px 18px 16px 18px; /* 上内边距减小，去除首行空白 */
+    border-radius: 10px;
+    font-size: 16px;
+    line-height: 1.8;
+    word-break: break-all;
+    white-space: pre-line;
+    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
+    transition: background 0.2s;
+  }
+  .user-msg {
+    background: #f3f4f6;
+    color: #222;
+    border-left: 5px solid #3498db;
+    font-weight: 500;
+    font-size: 16px;
+  }
+  .ai-msg {
+    background: #eaf6ff;
+    color: #1a355b;
+    border-left: 5px solid #2ecc71;
+    font-weight: 500;
+    position: relative;
+    font-size: 16px;
+  }
+  .ai-msg strong {
+    color: #2176ae;
+    font-weight: bold;
+    font-size: 17px;
+  }
+  .ai-msg em, .user-msg em {
+    color: #e67e22;
+    font-style: normal;
+    font-weight: bold;
+    background: #fffbe6;
+    padding: 0 4px;
+    border-radius: 3px;
+  }
+  .ai-msg code, .user-msg code {
+    background: #f4f4f4;
+    color: #c7254e;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 15px;
+  }
+  .ai-msg pre, .user-msg pre {
+    background: #f4f4f4;
+    color: #333;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 15px;
+    overflow-x: auto;
+  }
+  .ai-msg blockquote, .user-msg blockquote {
+    background: #f0f7ff;
+    border-left: 4px solid #3498db;
+    margin: 10px 0;
+    padding: 10px 16px;
+    color: #555;
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 15px;
+  }
+  .thinking-msg {
+    color: #888;
+    font-style: italic;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    background: #f8fafc;
+    border-left: 4px solid #95a5a6;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+  .thinking-msg i {
+    color: #3498db;
+    margin-right: 6px;
+  }
+  .resource-list {
+    background: #f6fafd;
+    border-radius: 8px;
+    padding: 14px 18px 10px 18px;
+    margin: 18px 0 0 0;
+    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
+  }
+  .resource-list h4 {
+    color: #2176ae;
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .resource-list ul {
+    padding-left: 18px;
+    margin: 0;
+  }
+  .resource-list li {
+    margin-bottom: 7px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1a355b;
+  }
+  .resource-list a {
+    color: #2980b9;
+    text-decoration: underline;
+    font-weight: 500;
+    margin-right: 4px;
+  }
+  .resource-list a:hover {
+    color: #e67e22;
+  }
+  .error-msg {
+    background: #fff0f0;
+    color: #e74c3c;
+    border-left: 5px solid #e74c3c;
+    font-size: 15px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+  }
+
 /* 响应式设计调整 */
 @media (max-width: 768px) {
   .header {
