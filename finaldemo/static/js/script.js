@@ -40,11 +40,57 @@ const nodeCountInput = document.getElementById('nodeCountInput');
 const questionGenerating = document.getElementById('questionGenerating'); // 问题生成提示容器
 
 // 对话历史记录
-let chatHistory = [];
+
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
   console.log('页面加载完成，初始化完成'); // 调试信息
+  
+  // 检查URL中是否已有拓扑ID，如果有，则直接加载
+  const pathParts = window.location.pathname.split('/');
+  if (pathParts.length >= 3 && pathParts[pathParts.length - 2] === 'topology') {
+      const topologyIdFromUrl = pathParts[pathParts.length - 1];
+      if (topologyIdFromUrl) {
+          currentTopologyId = topologyIdFromUrl;
+          console.log(`从URL中检测到拓扑ID: ${currentTopologyId}`);
+          
+          const uploadArea = document.getElementById('uploadArea');
+          const progressCard = document.getElementById('progressCard');
+          const progressMessage = document.getElementById('progressMessage');
+          const progressBar = document.getElementById('progressBar');
+          const progressPercentage = document.getElementById('progressPercentage');
+          const graphContainer = document.getElementById('graphContainer');
+
+          if (uploadArea) uploadArea.classList.add('hidden');
+          if (progressCard) progressCard.classList.remove('hidden');
+          if (progressMessage) progressMessage.textContent = '正在加载已有的知识图谱...';
+          if (progressBar) progressBar.style.width = '50%';
+          if (progressPercentage) progressPercentage.textContent = '50%';
+          
+          fetch(`/api/topology/${currentTopologyId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (progressMessage) progressMessage.textContent = '加载完成';
+                    if (progressBar) progressBar.style.width = '100%';
+                    if (progressPercentage) progressPercentage.textContent = '100%';
+                    setTimeout(() => {
+                        if (progressCard) progressCard.classList.add('hidden');
+                        if (graphContainer) graphContainer.classList.remove('hidden');
+                    }, 500);
+                    renderGraph(data.data); // 关键修复：加载数据后调用renderGraph
+                } else {
+                    if (progressMessage) progressMessage.textContent = `加载失败: ${data.message}`;
+                    if (progressBar) progressBar.style.backgroundColor = '#e74c3c';
+                }
+            })
+            .catch(error => {
+                console.error('加载图谱时出错:', error);
+                if (progressMessage) progressMessage.textContent = '加载图谱时发生网络错误';
+                if (progressBar) progressBar.style.backgroundColor = '#e74c3c';
+            });
+      }
+  }
   
   // 添加通知样式
   const style = document.createElement('style');
@@ -305,7 +351,39 @@ document.addEventListener('DOMContentLoaded', function() {
   nodeActionModal = document.getElementById('nodeActionModal'); // 节点操作模态框
   const closeNodeActionModal = document.getElementById('closeNodeActionModal');
   const startQuizBtn = document.getElementById('startQuizBtn');
+  const markNodeBtn = document.getElementById('markNodeBtn');
   const deleteNodeBtn = document.getElementById('deleteNodeBtn');
+  const modalNodeName = document.getElementById('modalNodeName');
+  const modalNodeDesc = document.getElementById('modalNodeDesc');
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  const navLinks = document.getElementById('nav-links');
+
+  // Navbar toggler for mobile
+  if (navbarToggler && navLinks) {
+    console.log('导航栏事件绑定成功'); // 调试信息
+    navbarToggler.addEventListener('click', () => {
+      console.log('汉堡菜单被点击'); // 调试信息
+      navLinks.classList.toggle('show');
+      console.log('导航菜单显示状态:', navLinks.classList.contains('show')); // 调试信息
+    });
+    
+    // 点击导航链接后自动关闭菜单
+    const navItems = navLinks.querySelectorAll('a');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navLinks.classList.remove('show');
+      });
+    });
+    
+    // 点击页面其他区域关闭菜单
+    document.addEventListener('click', (e) => {
+      if (!navbarToggler.contains(e.target) && !navLinks.contains(e.target)) {
+        navLinks.classList.remove('show');
+      }
+    });
+  } else {
+    console.log('导航栏元素未找到:', { navbarToggler, navLinks }); // 调试信息
+  }
 
   // 文件选择事件
   fileInput.addEventListener('change', (e) => {
@@ -543,32 +621,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 渲染知识图谱
   function renderGraph(graphData) {
-    console.log('开始渲染图谱，节点数:', graphData.nodes.length); // 调试信息
+    console.log('开始渲染图谱，节点数:', graphData.nodes.length);
     
-    // 销毁现有网络
     if (network !== null) {
       network.destroy();
     }
     
-    // 创建节点和边
     const nodes = new vis.DataSet(graphData.nodes);
     const edges = new vis.DataSet(graphData.edges);
     
-    // 设置节点样式
-    nodes.update(graphData.nodes.map(node => {
-      return {
-        ...node,
-        ...updateNodeColor(node)
-      };
-    }));
+    nodes.update(graphData.nodes.map(node => ({ ...node, ...updateNodeColor(node) })));
     
-    // 数据
-    const data = {
-      nodes: nodes,
-      edges: edges
-    };
+    const data = { nodes, edges };
     
-    // 配置选项
     const options = {
       layout: {
         hierarchical: {
@@ -579,76 +644,38 @@ document.addEventListener('DOMContentLoaded', function() {
           levelSeparation: 200
         }
       },
-      interaction: {
-        hover: true,
-        tooltipDelay: 200
-      },
-      physics: {
-        enabled: false
-      },
-      nodes: {
-        shape: 'circle',
-        font: {
-          size: 14,
-          face: 'Inter'
-        }
-      },
+      interaction: { hover: true, tooltipDelay: 200 },
+      physics: { enabled: false },
+      nodes: { shape: 'circle', font: { size: 14, face: 'Inter' } },
       edges: {
-        color: {
-          color: '#95a5a6',
-          highlight: '#7f8c8d'
-        },
+        color: { color: '#95a5a6', highlight: '#7f8c8d' },
         width: 1,
-        arrows: {
-          to: {
-            enabled: true,
-            scaleFactor: 0.8
-          }
-        },
-        font: {
-          size: 12,
-          face: 'Inter',
-          align: 'middle'
-        }
+        arrows: { to: { enabled: true, scaleFactor: 0.8 } },
+        font: { size: 12, face: 'Inter', align: 'middle' }
       }
     };
     
-    // 创建网络
-    if (networkContainer) {
-      network = new vis.Network(networkContainer, data, options);
-    } else {
-      console.error('网络容器元素未找到');
-      return;
-    }
-    
-    // 添加网络渲染完成事件监听
-    network.once('afterDrawing', () => {
-      console.log('图谱渲染完成');
-      
-      // 验证特定节点状态
-      if (selectedNodeId) {
-        const node = nodes.get(selectedNodeId);
-        if (node) {
-          console.log(`渲染后节点 ${selectedNodeId} 颜色:`, node.color);
-        }
-      }
-    });
+    network = new vis.Network(networkContainer, data, options);
     
     // 节点点击事件 - 修复弹窗显示问题
     network.on('click', function(params) {
       if (params.nodes.length > 0) {
         selectedNodeId = params.nodes[0];
+        const node = nodes.get(selectedNodeId);
         
-        // 显示节点操作模态框（修复后的逻辑）
+        if (modalNodeName) modalNodeName.textContent = node.label;
+        if (modalNodeDesc) modalNodeDesc.textContent = node.content_snippet || '暂无详细描述';
+
         if (nodeActionModal) {
-          // 移除隐藏类并添加显示类
-          nodeActionModal.classList.remove('hidden');
           nodeActionModal.classList.add('show');
+        }
+      } else {
+        if (nodeActionModal) {
+          nodeActionModal.classList.remove('show');
         }
       }
     });
     
-    // 节点悬停事件
     network.on('hoverNode', function(params) {
       const node = nodes.get(params.node);
       network.setOptions({
@@ -663,14 +690,10 @@ document.addEventListener('DOMContentLoaded', function() {
       searchNode.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
         if (query === '') {
-          nodes.update(nodes.get().map(node => ({
-            ...node,
-            color: {
-              ...node.color,
-              background: node.color.background,
-              border: node.color.border
-            }
-          })));
+          // 重新应用原始颜色
+          nodes.update(nodes.get().map(node => {
+            return {...node, ...updateNodeColor(node)};
+          }));
           return;
         }
         
@@ -692,16 +715,59 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       console.error('搜索节点输入框未找到');
     }
-    
-    // 刷新图谱 - 添加空值检查
-    if (refreshGraph) {
-      refreshGraph.addEventListener('click', function() {
-        console.log('手动刷新图谱...');
-        fetchAndUpdateGraph();
+  }
+
+  // 为关闭按钮添加事件监听器
+  if(closeNodeActionModal) {
+      closeNodeActionModal.addEventListener('click', () => {
+          nodeActionModal.classList.remove('show');
       });
-    } else {
-      console.error('刷新按钮未找到');
-    }
+  }
+
+  // 事件：开始问答
+  if(startQuizBtn) {
+      startQuizBtn.addEventListener('click', () => {
+          nodeActionModal.classList.remove('show');
+          startQuizSession(selectedNodeId);
+      });
+  }
+
+  // 事件：标记节点
+  if(markNodeBtn) {
+      markNodeBtn.addEventListener('click', () => {
+          if (selectedNodeId) {
+              markNodeAsMastered(selectedNodeId);
+              nodeActionModal.classList.remove('show');
+          }
+      });
+  }
+
+  // 事件：删除节点
+  if(deleteNodeBtn) {
+      deleteNodeBtn.addEventListener('click', () => {
+          if (!selectedNodeId) return;
+          nodeActionModal.classList.remove('show');
+          
+          const nodes = network.body.data.nodes;
+          const edges = network.body.data.edges;
+          const nodesToDelete = new Set([selectedNodeId]);
+
+          function findChildren(nodeId) {
+            edges.get({ filter: edge => edge.from === nodeId })
+                 .forEach(edge => {
+                    if (!nodesToDelete.has(edge.to)) {
+                      nodesToDelete.add(edge.to);
+                      findChildren(edge.to);
+                    }
+                 });
+          }
+          findChildren(selectedNodeId);
+          
+          nodes.remove(Array.from(nodesToDelete));
+          
+          if (nodeCount) nodeCount.textContent = nodes.length;
+          if (edgeCount) edgeCount.textContent = edges.length;
+      });
   }
 
   // 新增：备选的图谱刷新方法
@@ -1114,106 +1180,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // 节点操作 - 进入问答模式 - 添加空值检查
-  if (startQuizBtn) {
-    startQuizBtn.addEventListener('click', function() {
-      // 添加淡出动画
-      if (nodeActionModal) {
-        nodeActionModal.classList.remove('show');
-        setTimeout(() => {
-          nodeActionModal.classList.add('hidden');
-          startQuizSession(selectedNodeId);
-        }, 300);
-      }
-    });
-  } else {
-    console.error('开始问答按钮未找到');
-  }
-
-  // 节点操作 - 删除节点 - 添加空值检查
-  if (deleteNodeBtn) {
-    deleteNodeBtn.addEventListener('click', function() {
-      if (!selectedNodeId) return;
-      
-      // 添加淡出动画
-      if (nodeActionModal) {
-        nodeActionModal.classList.remove('show');
-        setTimeout(() => {
-          nodeActionModal.classList.add('hidden');
-          
-          // 获取当前网络的数据
-          if (network && network.body && network.body.data) {
-            const nodes = network.body.data.nodes;
-            const edges = network.body.data.edges;
-            
-            // 1. 找到所有需要删除的节点（选中的节点及其所有子节点）
-            const nodesToDelete = new Set();
-            nodesToDelete.add(selectedNodeId);
-            
-            // 递归查找子节点
-            function findChildren(nodeId) {
-              edges.get().forEach(edge => {
-                if (edge.from === nodeId) {
-                  nodesToDelete.add(edge.to);
-                  findChildren(edge.to);
-                }
-              });
-            }
-            findChildren(selectedNodeId);
-            
-            // 2. 过滤节点和边
-            const filteredNodes = nodes.get().filter(node => !nodesToDelete.has(node.id));
-            const filteredEdges = edges.get().filter(edge => 
-              !nodesToDelete.has(edge.from) && !nodesToDelete.has(edge.to)
-            );
-            
-            // 3. 更新网络
-            nodes.clear();
-            nodes.add(filteredNodes);
-            
-            edges.clear();
-            edges.add(filteredEdges);
-            
-            // 更新节点和边计数
-            if (nodeCount) nodeCount.textContent = filteredNodes.length;
-            if (edgeCount) edgeCount.textContent = filteredEdges.length;
-          }
-        }, 300);
-      }
-    });
-  } else {
-    console.error('删除节点按钮未找到');
-  }
-
-  // 关闭节点操作模态框 - 添加空值检查
-  if (closeNodeActionModal) {
-    closeNodeActionModal.addEventListener('click', function() {
-      // 添加淡出动画
-      if (nodeActionModal) {
-        nodeActionModal.classList.remove('show');
-        setTimeout(() => {
-          nodeActionModal.classList.add('hidden');
-        }, 300);
-      }
-    });
-  } else {
-    console.error('关闭模态框按钮未找到');
-  }
-  
-  // 点击模态框背景关闭 - 添加空值检查
-  if (nodeActionModal) {
-    nodeActionModal.addEventListener('click', function(e) {
-      if (e.target === this) { // 点击背景时关闭
-        this.classList.remove('show');
-        setTimeout(() => {
-          this.classList.add('hidden');
-        }, 300);
-      }
-    });
-  } else {
-    console.error('节点操作模态框未找到');
-  }
-  
   // 节点数量输入验证 - 添加空值检查
   if (nodeCountInput) {
     nodeCountInput.addEventListener('input', function() {
@@ -1224,6 +1190,98 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   } else {
     console.error('节点数量输入框未找到');
+  }
+
+  // 对话历史记录
+  let chatHistory = [];
+
+  // 新增：思考中提示元素
+  let thinkingMsg = null;
+
+  const qaSubmitBtn = document.getElementById('qaSubmitBtn');
+  const qaInput = document.getElementById('qaInput');
+  const qaHistory = document.getElementById('qaHistory');
+  const resourceRecommend = document.getElementById('resourceRecommend');
+
+  if (qaSubmitBtn) {
+    qaSubmitBtn.addEventListener('click', () => {
+      const question = qaInput.value.trim();
+      if (!question) return;
+      // 显示用户问题（去除首行空行）
+      const userMsg = `<div class='msg user-msg'><strong>你：</strong> ${question}</div>`;
+      qaHistory.innerHTML += userMsg;
+      qaInput.value = '';
+      // 显示“正在思考中……”
+      thinkingMsg = document.createElement('div');
+      thinkingMsg.className = 'msg thinking-msg';
+      thinkingMsg.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 正在思考中……`;
+      qaHistory.appendChild(thinkingMsg);
+      qaHistory.scrollTop = qaHistory.scrollHeight;
+      // 判断是否上传文档
+      const requestData = {
+          question: question,
+          topology_id: currentTopologyId || '',  // 若无则为 ""
+      };
+
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        // 隐藏“正在思考中……”
+        if (thinkingMsg) {
+          thinkingMsg.remove();
+          thinkingMsg = null;
+        }
+
+        if (data.status === 'success') {
+          // 显示AI回答，后跟来源
+          let sourceText = '';
+          if (data.source === 'document') {
+            sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：文档</span>`;
+          } else if (data.source === 'web') {
+            sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
+          }
+          const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br>${data.answer}${sourceText}</div>`;
+          qaHistory.innerHTML += aiMsg;
+
+          if (data.resources && data.resources.length > 0) {
+            let links = `<div class="resource-list"><h4>📚 推荐学习资源：</h4><ul>`;
+            for (const res of data.resources) {
+              links += `<li><a href='${res.url}' target='_blank'>${res.title}</a> - ${res.snippet}</li>`;
+            }
+            links += `</ul></div>`;
+            resourceRecommend.innerHTML = links;
+          } else {
+            resourceRecommend.innerHTML = '';
+          }
+        } else {
+          qaHistory.innerHTML += `<div class='msg error-msg'>⚠️ 出错：${data.message}</div>`;
+        }
+        qaHistory.scrollTop = qaHistory.scrollHeight;
+      })
+      .catch(error => {
+        console.error('聊天请求失败:', error);
+        if (thinkingMsg) {
+          thinkingMsg.remove();
+          thinkingMsg = null;
+        }
+        qaHistory.innerHTML += `<div class='msg error-msg'>⚠️ 网络错误或服务器无响应。</div>`;
+        qaHistory.scrollTop = qaHistory.scrollHeight;
+      });
+    });
+  }
+
+  // 允许回车发送消息
+  if (qaInput) {
+    qaInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // 阻止默认回车换行行为
+        qaSubmitBtn.click(); // 触发发送按钮点击事件
+      }
+    });
   }
 
 
@@ -1291,23 +1349,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // 新增：标记节点掌握状态按钮
-  const markNodeBtn = document.getElementById('markNodeBtn');
-  if (markNodeBtn) {
-    markNodeBtn.addEventListener('click', function() {
-      if (!selectedNodeId) return;
-      
-      // 添加淡出动画
-      if (nodeActionModal) {
-        nodeActionModal.classList.remove('show');
-        setTimeout(() => {
-          nodeActionModal.classList.add('hidden');
-          markNodeAsMastered(selectedNodeId);
-        }, 300);
-      }
-    });
-  }
-  
   // 新增：刷新图谱时保留当前选中节点
   const originalRefreshGraph = refreshGraph?.addEventListener;
   if (refreshGraph) {
@@ -1321,6 +1362,8 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
+  
+
 });
 
 // 新增：更新图谱视图模式
@@ -1419,24 +1462,68 @@ function regenerateGraphWithNodeCount(nodeCount) {
 
 // 新增：标记节点为已掌握
 function markNodeAsMastered(nodeId) {
-  if (!network || !nodeId) return;
+  if (!currentTopologyId || !nodeId) return;
   
+  // 检查当前节点的掌握状态
   const nodes = network.body.data.nodes;
   const node = nodes.get(nodeId);
   
+  // 根据节点颜色判断掌握状态
   if (node) {
-    node.mastered = true;
-    node.mastery_score = 10;
-    node.consecutive_correct = 3;
+    const nodeColor = node.color;
+    const nodeLabel = node.label || '该节点';
     
-    const updatedStyle = updateNodeColor(node);
-    nodes.update({
-      id: nodeId,
-      ...updatedStyle
-    });
+    // 如果节点是绿色（已掌握），显示已掌握消息
+    if (nodeColor && (nodeColor.background === '#2ecc71' || nodeColor.background === 'green' || 
+        nodeColor === '#2ecc71' || nodeColor === 'green')) {
+      showNotification('成功', `您已掌握该节点`, 'success');
+      return;
+    }
     
-    showNotification('成功', `已将"${node.label}"标记为已掌握`, 'success');
+    // 如果节点是红色（未掌握），显示未掌握消息
+    if (nodeColor && (nodeColor.background === '#e74c3c' || nodeColor.background === 'red' || 
+        nodeColor === '#e74c3c' || nodeColor === 'red')) {
+      showNotification('错误', '您还未掌握该节点', 'error');
+      return;
+    }
+    
+    // 如果节点有mastered属性，使用该属性
+    if (node.mastered === true) {
+      showNotification('成功', `您已掌握该节点`, 'success');
+      return;
+    }
+    
+    if (node.mastered === false) {
+      showNotification('错误', '您还未掌握该节点', 'error');
+      return;
+    }
   }
+  
+  // 如果无法确定状态，调用API
+  fetch(`/api/topology/${currentTopologyId}/node/${nodeId}/master`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mastered: true })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      showNotification('成功', `您已掌握该节点`, 'success');
+      const nodes = network.body.data.nodes;
+      const node = nodes.get(nodeId);
+      if (node) {
+        node.mastered = true;
+        nodes.update({ id: nodeId, ...updateNodeColor(node) });
+      }
+    } else {
+      // 如果API返回错误，显示未掌握提示
+      showNotification('错误', '您还未掌握该节点', 'error');
+    }
+  }).catch(err => {
+    // 如果网络错误，显示未掌握提示
+    showNotification('错误', '您还未掌握该节点', 'error');
+    console.error(err);
+  });
 }
 
 // 新增：平滑滚动到锚点

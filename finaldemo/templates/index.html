@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>智能助教系统 - 知识图谱生成与学习平台</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.2">
 </head>
 <body>
   <header class="header">
@@ -15,12 +15,16 @@
         <p class="subtitle">AI驱动的知识管理与学习辅助平台</p>
       </div>
       <nav class="header-nav">
-        <ul>
+        <ul id="nav-links" class="nav-links">
           <li><a href="#features">产品功能</a></li>
           <li><a href="#how-it-works">使用指南</a></li>
           <li><a href="#faq">常见问题</a></li>
+          <li><a href="javascript:void(0)" onclick="window.location.href='http://127.0.0.1:5000/dashboard'" class="profile-link">个人中心</a></li>
         </ul>
       </nav>
+      <button class="navbar-toggler" id="navbarToggler" aria-label="菜单">
+        <i class="fa fa-bars"></i>
+      </button>
     </div>
   </header>
 
@@ -60,9 +64,9 @@
             <h3>多格式文档支持</h3>
             <p>支持PPT、PDF、Word、TXT等常见文档格式，一键上传自动解析</p>
             <ul class="feature-list">
-              <li>• 智能识别文档章节结构</li>
-              <li>• 自动过滤无关内容</li>
-              <li>• 保留文档原始排版信息</li>
+              <li>智能识别文档章节结构</li>
+              <li>自动过滤无关内容</li>
+              <li>保留文档原始排版信息</li>
             </ul>
           </div>
           
@@ -73,9 +77,9 @@
             <h3>动态知识图谱生成</h3>
             <p>基于文档内容生成节点与关联边，支持自定义节点数量</p>
             <ul class="feature-list">
-              <li>• 节点重要性智能排序</li>
-              <li>• 关联强度可视化展示</li>
-              <li>• 支持节点层级展开/折叠</li>
+              <li>节点重要性智能排序</li>
+              <li>关联强度可视化展示</li>
+              <li>支持节点层级展开/折叠</li>
             </ul>
           </div>
           
@@ -86,9 +90,9 @@
             <h3>智能问答系统</h3>
             <p>基于知识图谱生成相关问题，支持知识点专项测试</p>
             <ul class="feature-list">
-              <li>• 问题难度自适应调节</li>
-              <li>• 实时答案反馈与解析</li>
-              <li>• 学习薄弱点智能标记</li>
+              <li>问题难度自适应调节</li>
+              <li>实时答案反馈与解析</li>
+              <li>学习薄弱点智能标记</li>
             </ul>
           </div>
         </div>
@@ -127,8 +131,7 @@
           </div>
           
           <button id="generateBtn" class="generate-btn">
-            <i class="fa fa-cogs"></i>开始生成
-            <div class="btn-tooltip">点击后系统将分析文档并生成知识图谱</div>
+            开始生成
           </button>
         </div>
 
@@ -312,6 +315,7 @@
         </div>
       </div>
     </section>
+
     <section class="chat-section">
   <div class="container">
     <h2 class="section-title">智能助手</h2>
@@ -332,301 +336,47 @@
     </div>
   </div>
 </section>
-<script>
-  const qaSubmitBtn = document.getElementById('qaSubmitBtn');
-  const qaInput = document.getElementById('qaInput');
-  const qaHistory = document.getElementById('qaHistory');
-  const resourceRecommend = document.getElementById('resourceRecommend');
-  const greetingMsg = document.getElementById('greetingMsg'); // 新增：问候语div
-  let hasAsked = false; // 新增：是否已提问标志
-
-  // 新增：首次提问时隐藏问候语
-  if (qaSubmitBtn) {
-    qaSubmitBtn.addEventListener('click', () => {
-      const question = qaInput.value.trim();
-      if (!question) return;
-      if (!hasAsked && greetingMsg) {
-        greetingMsg.style.display = 'none';
-        hasAsked = true;
-      }
-    });
-  }
-
-  // 新增：思考中提示元素
-  let thinkingMsg = null;
-
-  qaSubmitBtn.addEventListener('click', () => {
-    const question = qaInput.value.trim();
-    if (!question) return;
-    // 显示用户问题（去除首行空行）
-    const userMsg = `<div class='msg user-msg'><strong>你：</strong> ${question}</div>`;
-    qaHistory.innerHTML += userMsg;
-    qaInput.value = '';
-    // 显示“正在思考中……”
-    thinkingMsg = document.createElement('div');
-    thinkingMsg.className = 'msg thinking-msg';
-    thinkingMsg.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 正在思考中……`;
-    qaHistory.appendChild(thinkingMsg);
-    qaHistory.scrollTop = qaHistory.scrollHeight;
-    // 判断是否上传文档
-    const requestData = {
-        question: question,
-        topology_id: currentTopologyId || '',  // 若无则为 ""
-    };
-
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestData)
-    })
-    .then(res => res.json())
-    .then(data => {
-      // 隐藏“正在思考中……”
-      if (thinkingMsg) {
-        thinkingMsg.remove();
-        thinkingMsg = null;
-      }
-
-      if (data.status === 'success') {
-        // 显示AI回答，后跟来源
-        let sourceText = '';
-        if (data.source === 'document') {
-          sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：文档</span>`;
-        } else if (data.source === 'web') {
-          sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
-        }
-        // 渲染前修正中括号公式为$$...$$
-        let fixedAnswer = fixLatexBrackets(data.answer);
-        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br><div class='markdown-body'>${marked.parse(fixedAnswer)}</div>${sourceText}</div>`;
-        qaHistory.innerHTML += aiMsg;
-        // 关键：将<p>$$...$$</p>替换为独立div，防止被<p>包裹
-        qaHistory.querySelectorAll('p').forEach(p => {
-          const text = p.textContent.trim();
-          if (/^\$\$[\s\S]*\$\$$/.test(text)) {
-            const latexDiv = document.createElement('div');
-            latexDiv.innerHTML = text;
-            p.replaceWith(latexDiv);
-          }
-        });
-        // 延迟调用MathJax渲染，确保公式100%被渲染
-        setTimeout(() => {
-          if (window.MathJax && MathJax.typesetPromise) {
-            MathJax.typesetPromise();
-          }
-        }, 0);
-        // 调试：输出渲染后HTML结构
-        console.log('AI回答渲染后HTML:', qaHistory.innerHTML);
-        // 强制MathJax重新渲染所有公式
-        if (window.MathJax) {
-          if (MathJax.typesetClear) MathJax.typesetClear();
-          MathJax.typesetPromise && MathJax.typesetPromise();
-        }
-
-        if (data.resources && data.resources.length > 0) {
-          let links = `<div class="resource-list"><h4>📚 相关学习资源推荐：</h4><ul>`;
-          for (const res of data.resources) {
-            links += `<li><a href='${res.url}' target='_blank'>${res.title}</a> - ${res.snippet}</li>`;
-          }
-          links += `</ul></div>`;
-          resourceRecommend.innerHTML = links;
-        } else {
-          resourceRecommend.innerHTML = '';
-        }
-      } else {
-        qaHistory.innerHTML += `<div class='msg error-msg'>⚠️ 出错：${data.message}</div>`;
-      }
-    });
-  });
-</script>
-<style>
-  .chat-box {
-    background: #f8fafc;
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(52,152,219,0.08);
-    padding: 24px 20px 16px 20px;
-    margin-bottom: 32px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .chat-history {
-    min-height: 120px;
-    max-height: 350px;
-    overflow-y: auto;
-    padding-bottom: 8px;
-  }
-  .msg {
-    margin: 18px 0 10px 0;
-    padding: 12px 18px 16px 18px; /* 上内边距减小，去除首行空白 */
-    border-radius: 10px;
-    font-size: 16px;
-    line-height: 1.8;
-    word-break: break-all;
-    white-space: pre-line;
-    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
-    transition: background 0.2s;
-  }
-  .user-msg {
-    background: #f3f4f6;
-    color: #222;
-    border-left: 5px solid #3498db;
-    font-weight: 500;
-    font-size: 16px;
-  }
-  .ai-msg {
-    background: #eaf6ff;
-    color: #1a355b;
-    border-left: 5px solid #2ecc71;
-    font-weight: 500;
-    position: relative;
-    font-size: 16px;
-  }
-  .ai-msg strong {
-    color: #2176ae;
-    font-weight: bold;
-    font-size: 17px;
-  }
-  .ai-msg em, .user-msg em {
-    color: #e67e22;
-    font-style: normal;
-    font-weight: bold;
-    background: #fffbe6;
-    padding: 0 4px;
-    border-radius: 3px;
-  }
-  .ai-msg code, .user-msg code {
-    background: #f4f4f4;
-    color: #c7254e;
-    font-family: 'Fira Mono', 'Consolas', monospace;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 15px;
-  }
-  .ai-msg pre, .user-msg pre {
-    background: #f4f4f4;
-    color: #333;
-    font-family: 'Fira Mono', 'Consolas', monospace;
-    padding: 12px;
-    border-radius: 6px;
-    margin: 10px 0;
-    font-size: 15px;
-    overflow-x: auto;
-  }
-  .ai-msg blockquote, .user-msg blockquote {
-    background: #f0f7ff;
-    border-left: 4px solid #3498db;
-    margin: 10px 0;
-    padding: 10px 16px;
-    color: #555;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 15px;
-  }
-  .thinking-msg {
-    color: #888;
-    font-style: italic;
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    background: #f8fafc;
-    border-left: 4px solid #95a5a6;
-    padding: 10px 14px;
-    border-radius: 8px;
-  }
-  .thinking-msg i {
-    color: #3498db;
-    margin-right: 6px;
-  }
-  .resource-list {
-    background: #f6fafd;
-    border-radius: 8px;
-    padding: 14px 18px 10px 18px;
-    margin: 18px 0 0 0;
-    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
-  }
-  .resource-list h4 {
-    color: #2176ae;
-    font-size: 16px;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  .resource-list ul {
-    padding-left: 18px;
-    margin: 0;
-  }
-  .resource-list li {
-    margin-bottom: 7px;
-    font-size: 15px;
-    line-height: 1.7;
-    color: #1a355b;
-  }
-  .resource-list a {
-    color: #2980b9;
-    text-decoration: underline;
-    font-weight: 500;
-    margin-right: 4px;
-  }
-  .resource-list a:hover {
-    color: #e67e22;
-  }
-  .error-msg {
-    background: #fff0f0;
-    color: #e74c3c;
-    border-left: 5px solid #e74c3c;
-    font-size: 15px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin: 12px 0;
-  }
-</style>
-
-  </main>
 
   <footer class="footer">
     <div class="container">
-      <div class="footer-content">
-        <div class="footer-info">
-          <h3>智能助教系统</h3>
-          <p>AI驱动的知识管理平台，帮助用户高效学习与知识梳理</p>
-          <div class="social-links">
-            <a href="#"><i class="fa fa-weixin"></i></a>
-            <a href="#"><i class="fa fa-weibo"></i></a>
-            <a href="#"><i class="fa fa-github"></i></a>
-          </div>
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h5>AI驱动的知识管理平台，帮助用户高效学习与知识梳理</h5>
+            </div>
+
+            <div class="footer-section links">
+                <h5>快速链接</h5>
+                <ul>
+                    <li><a href="#">产品功能</a></li>
+                    <li><a href="#">使用指南</a></li>
+                    <li><a href="#">常见问题</a></li>
+                    <li><a href="#">更新日志</a></li>
+                </ul>
+            </div>
+            <div class="footer-section links">
+                <h5>支持中心</h5>
+                <ul>
+                    <li><a href="#">帮助文档</a></li>
+                    <li><a href="#">联系我们</a></li>
+                    <li><a href="#">隐私政策</a></li>
+                    <li><a href="#">服务条款</a></li>
+                </ul>
+            </div>
         </div>
-        
-        <div class="footer-links">
-          <h4>快速链接</h4>
-          <ul>
-            <li><a href="#features">产品功能</a></li>
-            <li><a href="#how-it-works">使用指南</a></li>
-            <li><a href="#faq">常见问题</a></li>
-            <li><a href="#">更新日志</a></li>
-          </ul>
+        <div class="footer-bottom">
+            &copy;  2025 智能助教系统  |  知识图谱学习平台  |  技术支持：AI知识工程实验室
         </div>
-        
-        <div class="footer-links">
-          <h4>支持中心</h4>
-          <ul>
-            <li><a href="#">帮助文档</a></li>
-            <li><a href="#">联系我们</a></li>
-            <li><a href="#">隐私政策</a></li>
-            <li><a href="#">服务条款</a></li>
-          </ul>
-        </div>
-      </div>
-      <p>© 2025 智能助教系统 | 知识图谱学习平台 | 技术支持：AI知识工程实验室</p>
     </div>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}?v=1.2"></script>
   <!-- 集成MathJax用于渲染LaTeX公式 -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <script>
     // 修正AI输出的中括号公式为MathJax可识别的$$...$$格式，并去除每行前的多余空格防止被识别为代码块，确保$$公式单独成段，去除空公式和多余空行
     function fixLatexBrackets(md) {
@@ -654,6 +404,8 @@
     }
   </script>
   
+
+  
   <div id="contextModal" class="context-modal hidden">
     <div class="modal-content">
       <div class="modal-header">
@@ -669,31 +421,33 @@
     </div>
   </div>
 
-  <div id="nodeActionModal" class="modal-dialog hidden">
+  <div id="nodeActionModal" class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">节点操作</h3>
+        <h3 id="modalNodeName" class="modal-title">节点名称：知识点名称</h3>
         <button id="closeNodeActionModal" class="close-modal">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="node-info">
-          <h4 id="modalNodeName">知识点名称</h4>
-          <p id="modalNodeDesc">知识点描述信息将显示在这里</p>
-        </div>
-        <p>请选择操作：</p>
-        <div class="action-buttons">
-          <button id="startQuizBtn" class="action-btn">
-            <i class="fa fa-question-circle"></i> 进入问答模式
-          </button>
-          <button id="markNodeBtn" class="action-btn">
-            <i class="fa fa-clipboard-check"></i> 标记掌握状态
-          </button>
-          <button id="deleteNodeBtn" class="action-btn danger">
-            <i class="fa fa-trash"></i> 删除节点
-          </button>
+        <div class="actions-wrapper">
+          <span class="action-label">节点操作:</span>
+          <div class="action-buttons">
+            <button id="startQuizBtn" class="action-btn">
+              <i class="fa fa-question-circle"></i> 进入问答模式
+            </button>
+            <button id="markNodeBtn" class="action-btn">
+              <i class="fa fa-clipboard-check"></i> 标记掌握状态
+            </button>
+            <button id="deleteNodeBtn" class="action-btn danger">
+              <i class="fa fa-trash"></i> 删除节点
+            </button>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <!-- This toast is for notifications, initially hidden -->
   </div>
 </body>
 </html>
