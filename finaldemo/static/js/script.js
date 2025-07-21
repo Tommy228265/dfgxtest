@@ -650,12 +650,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 节点悬停事件
     network.on('hoverNode', function(params) {
-      const node = nodes.get(params.node);
-      network.setOptions({
-        nodes: {
-          title: `<div class="tooltip"><b>${node.label}</b><br>掌握程度: ${node.mastery_score || 0}/10<br>连续正确: ${node.consecutive_correct}</div>`
-        }
-      });
+        const node = nodes.get(params.node);
+        
+        // 1. 创建一个容器 div
+        const tooltipElement = document.createElement('div');
+        tooltipElement.className = 'custom-tooltip'; // 可以为它添加自定义样式
+
+        // 2. 使用 innerHTML 来构建内容，并为所有可能不存在的值提供默认值
+        tooltipElement.innerHTML = `
+            <b>${node.label}</b>
+            <br>
+            掌握程度: ${node.mastery_score || 0}/10
+            <br>
+            连续正确: ${node.consecutive_correct || 0}
+        `;
+        // 3. 将创建的 DOM 元素直接赋值给节点的 title 属性
+        nodes.update({
+            id: node.id,
+            title: tooltipElement
+        });
     });
     
     // 搜索节点 - 添加空值检查
