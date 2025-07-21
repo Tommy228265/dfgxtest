@@ -145,8 +145,6 @@ def clean_json_string(s: str) -> str:
 
 def enhance_json_format(json_str: str) -> str:
     """增强JSON格式，处理各种复杂格式问题"""
-    import json
-    import re
     
     logger.info(f"原始JSON内容: {json_str[:200]}...")
     
@@ -1274,7 +1272,6 @@ def ignore_nodes(topology_id):
 
 ###智能助手模块
 from openai import OpenAI
-
 client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
 
 # 全局变量缓存上传文档内容，方便检索（示例，生产应用用数据库或向量数据库）
@@ -1288,8 +1285,6 @@ def recommend_resources_based_on_question(question):
       ...
     ]
     """
-    from openai import OpenAI
-    client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
     messages = [
         {"role": "system", "content": "你是一个学习资源推荐专家，能够根据用户的问题推荐最相关的高质量中文学习资料。请根据用户的问题，推荐5个高质量的可访问的中文学习资源，每个资源包含title、url、snippet，要求以JSON数组格式输出。只返回JSON数组，不要有多余解释。"},
         {"role": "user", "content": f"问题：{question}\n请推荐5个相关学习资源。"}
@@ -1300,7 +1295,6 @@ def recommend_resources_based_on_question(question):
             messages=messages,
             max_tokens=800
         )
-        import json
         raw = response.choices[0].message.content.strip()
         # 尝试解析JSON
         try:
@@ -1324,7 +1318,7 @@ def recommend_resources_based_on_question(question):
 def chat_with_knowledge():
     """
     用户交互问答接口：
-    优先基于上传文档内容回答，若文档匹配度低，则调用网络智能问答。
+    优先基于上传文档内容回答，若文档中没有相关内容，则调用网络智能问答。
     同时进行相关学习资源推荐，返回相关链接和内容片段。
     """
     try:
@@ -1394,7 +1388,13 @@ def generate_answer_from_web(question):
     调用网络智能问答接口（DeepSeek）
     """
     messages = [
-        {"role": "system", "content": "你是一个智能助理，能够基于互联网资源回答各种问题。回答时用Markdown格式排版，所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式。只返回直接的答案内容，不要多余解释。"},
+        {"role": "system", "content": (
+            "你是一个智能助理，能够基于互联网资源回答各种问题。"
+            "回答时用Markdown格式排版，不要添加不合理的换行，去除空白段落，所有数学公式必须用LaTeX语法。"
+            "**行内公式请用$...$包裹，且必须与文字同行；独占一行或需要居中显示的公式必须与文字同行用$$...$$包裹。**"
+            "禁止用markdown代码块（```）、中括号[]或其他符号包裹公式。"
+            "只返回直接的答案内容，不要多余解释。"
+        )},
         {"role": "user", "content": question}
     ]
     try:
@@ -1403,7 +1403,9 @@ def generate_answer_from_web(question):
             messages=messages,
             max_tokens=1024  # 增大输出长度
         )
-        return response.choices[0].message.content.strip()
+        answer = response.choices[0].message.content.strip()
+        logger.info(f"[问答调试] 网络AI原始返回内容: {repr(answer)}")
+        return answer
     except Exception as e:
         logger.error(f"生成网络回答错误: {str(e)}", exc_info=True)
         return "抱歉，网络问答服务不可用。"
@@ -1421,7 +1423,6 @@ if __name__ == '__main__':
     for folder in folders:
         if not os.path.exists(folder):
             os.makedirs(folder)
-    
     # 初始化数据库
     try:
         init_db()
@@ -1429,10 +1430,9 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(f"数据库初始化异常: {str(e)}", exc_info=True)
         logger.info("尝试继续运行，但可能会出现数据库相关错误")
-    
     # 拓扑图处理结果存储（使用全局变量）
     topology_results = {}
     uploaded_documents = {}
     
-    logger.info("知识图谱生成系统启动中...")
+    logger.info("智能助教系统启动中...")
     app.run(debug=True, port=5000)

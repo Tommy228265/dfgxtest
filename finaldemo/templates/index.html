@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>智能助教系统 - 知识图谱生成与学习平台</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
 </head>
 <body>
   <header class="header">
@@ -313,274 +324,130 @@
       </div>
     </section>
     <section class="chat-section">
-  <div class="container">
-    <h2 class="section-title">智能助手</h2>
-    <div class="chat-box">
-      <div class="chat-history" id="qaHistory">
-        <div id="greetingMsg" class="msg ai-msg">
-          您好！我是院校智能助手，可以为您解答关于学校、专业、招生等方面的问题。<br>
-          您可以：<br>
-          • 点击上方知识图谱探索感兴趣的主题<br>
-          • 直接提问您关心的问题
+      <div class="container">
+        <h2 class="section-title">智能助手</h2>
+        <div class="chat-box">
+          <div class="chat-history" id="qaHistory">
+            <div id="greetingMsg" class="msg-row ai">
+              <div class="msg-avatar">
+                <i class="fa fa-robot"></i>
+              </div>
+              <div class="msg ai-msg">您好！我是<strong>院校智能助手</strong>，可以为您解答关于学校、专业、招生等方面的问题。
+                您可以：
+                <p style="text-indent: 2em;">• 点击上方知识图谱探索感兴趣的主题
+                <p style="text-indent: 2em;">• 直接提问您关心的问题
+              </div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <textarea id="qaInput" placeholder="请输入您的问题，如：图神经网络的核心思想是？"></textarea>
+            <button id="qaSubmitBtn"><i class="fa fa-paper-plane"></i> 发送</button>
+          </div>
+          <div class="chat-feedback" id="resourceRecommend"></div>
         </div>
       </div>
-      <div class="chat-input">
-        <textarea id="qaInput" placeholder="请输入您的问题，如：图神经网络的核心思想是？"></textarea>
-        <button id="qaSubmitBtn">发送</button>
-      </div>
-      <div class="chat-feedback" id="resourceRecommend"></div>
-    </div>
-  </div>
-</section>
+    </section>
 <script>
   const qaSubmitBtn = document.getElementById('qaSubmitBtn');
   const qaInput = document.getElementById('qaInput');
   const qaHistory = document.getElementById('qaHistory');
   const resourceRecommend = document.getElementById('resourceRecommend');
-  const greetingMsg = document.getElementById('greetingMsg'); // 新增：问候语div
-  let hasAsked = false; // 新增：是否已提问标志
+  const greetingMsg = document.getElementById('greetingMsg'); // 问候语div
+  let hasAsked = false; // 是否已提问标志
 
-  // 新增：首次提问时隐藏问候语
+  // qaSubmitBtn点击事件监听
   if (qaSubmitBtn) {
     qaSubmitBtn.addEventListener('click', () => {
       const question = qaInput.value.trim();
       if (!question) return;
+      // 首次提问时隐藏问候语
       if (!hasAsked && greetingMsg) {
         greetingMsg.style.display = 'none';
         hasAsked = true;
       }
-    });
-  }
+      // --- 以下为原主逻辑 ---
+      // 用户气泡（右侧）
+      const userMsg = `<div class='msg-row user'><div class='msg user-msg'>${question}</div><div class='msg-avatar'><i class='fa fa-user'></i></div></div>`;
+      qaHistory.innerHTML += userMsg;
+      qaInput.value = '';
+      // 显示"正在思考中……（居中）
+      thinkingMsg = document.createElement('div');
+      thinkingMsg.className = 'msg thinking-msg';
+      thinkingMsg.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 正在思考中……`;
+      qaHistory.appendChild(thinkingMsg);
+      qaHistory.scrollTop = qaHistory.scrollHeight;
+      // 判断是否上传文档
+      const requestData = {
+          question: question,
+          topology_id: currentTopologyId || '',  // 若无则为 ""
+      };
 
-  // 新增：思考中提示元素
-  let thinkingMsg = null;
-
-  qaSubmitBtn.addEventListener('click', () => {
-    const question = qaInput.value.trim();
-    if (!question) return;
-    // 显示用户问题（去除首行空行）
-    const userMsg = `<div class='msg user-msg'><strong>你：</strong> ${question}</div>`;
-    qaHistory.innerHTML += userMsg;
-    qaInput.value = '';
-    // 显示“正在思考中……”
-    thinkingMsg = document.createElement('div');
-    thinkingMsg.className = 'msg thinking-msg';
-    thinkingMsg.innerHTML = `<i class="fa fa-spinner fa-spin"></i> 正在思考中……`;
-    qaHistory.appendChild(thinkingMsg);
-    qaHistory.scrollTop = qaHistory.scrollHeight;
-    // 判断是否上传文档
-    const requestData = {
-        question: question,
-        topology_id: currentTopologyId || '',  // 若无则为 ""
-    };
-
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestData)
-    })
-    .then(res => res.json())
-    .then(data => {
-      // 隐藏“正在思考中……”
-      if (thinkingMsg) {
-        thinkingMsg.remove();
-        thinkingMsg = null;
-      }
-
-      if (data.status === 'success') {
-        // 显示AI回答，后跟来源
-        let sourceText = '';
-        if (data.source === 'document') {
-          sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：文档</span>`;
-        } else if (data.source === 'web') {
-          sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
-        }
-        // 渲染前修正中括号公式为$$...$$
-        let fixedAnswer = fixLatexBrackets(data.answer);
-        const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br><div class='markdown-body'>${marked.parse(fixedAnswer)}</div>${sourceText}</div>`;
-        qaHistory.innerHTML += aiMsg;
-        // 关键：将<p>$$...$$</p>替换为独立div，防止被<p>包裹
-        qaHistory.querySelectorAll('p').forEach(p => {
-          const text = p.textContent.trim();
-          if (/^\$\$[\s\S]*\$\$$/.test(text)) {
-            const latexDiv = document.createElement('div');
-            latexDiv.innerHTML = text;
-            p.replaceWith(latexDiv);
-          }
-        });
-        // 延迟调用MathJax渲染，确保公式100%被渲染
-        setTimeout(() => {
-          if (window.MathJax && MathJax.typesetPromise) {
-            MathJax.typesetPromise();
-          }
-        }, 0);
-        // 调试：输出渲染后HTML结构
-        console.log('AI回答渲染后HTML:', qaHistory.innerHTML);
-        // 强制MathJax重新渲染所有公式
-        if (window.MathJax) {
-          if (MathJax.typesetClear) MathJax.typesetClear();
-          MathJax.typesetPromise && MathJax.typesetPromise();
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        // 隐藏"正在思考中……"
+        if (thinkingMsg) {
+          thinkingMsg.remove();
+          thinkingMsg = null;
         }
 
-        if (data.resources && data.resources.length > 0) {
-          let links = `<div class="resource-list"><h4>📚 相关学习资源推荐：</h4><ul>`;
-          for (const res of data.resources) {
-            links += `<li><a href='${res.url}' target='_blank'>${res.title}</a> - ${res.snippet}</li>`;
+        if (data.status === 'success') {
+          // 显示AI回答，后跟来源
+          let sourceText = '';
+          if (data.source === 'document') {
+            sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：文档</span>`;
+          } else if (data.source === 'web') {
+            sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
           }
-          links += `</ul></div>`;
-          resourceRecommend.innerHTML = links;
+          // 渲染前修正中括号公式为$$...$$
+          let fixedAnswer = fixLatexBrackets(data.answer);
+          // AI气泡（左侧）
+          const aiMsg = `<div class='msg-row ai'><div class='msg-avatar'><i class='fa fa-robot'></i></div><div class='msg ai-msg'><div class='markdown-body'>${marked.parse(fixedAnswer)}</div>${sourceText}</div></div>`;
+          qaHistory.innerHTML += aiMsg;
+          // 关键：将<p>$$...$$</p>替换为独立div，防止被<p>包裹
+          qaHistory.querySelectorAll('p').forEach(p => {
+            const text = p.textContent.trim();
+            if (/^\$\$[\s\S]*\$\$$/.test(text)) {
+              const latexDiv = document.createElement('div');
+              latexDiv.innerHTML = text;
+              p.replaceWith(latexDiv);
+            }
+          });
+          // 延迟调用MathJax渲染，确保公式100%被渲染
+          setTimeout(() => {
+            if (window.MathJax && MathJax.typesetPromise) {
+              MathJax.typesetPromise();
+            }
+          }, 0);
+          // 调试：输出渲染后HTML结构
+          console.log('AI回答渲染后HTML:', qaHistory.innerHTML);
+          // 强制MathJax重新渲染所有公式
+          if (window.MathJax) {
+            if (MathJax.typesetClear) MathJax.typesetClear();
+            MathJax.typesetPromise && MathJax.typesetPromise();
+          }
+
+          if (data.resources && data.resources.length > 0) {
+            let links = `<div class="resource-list"><h4>📚 相关学习资源推荐：</h4><ul>`;
+            for (const res of data.resources) {
+              links += `<li><a href='${res.url}' target='_blank'>${res.title}</a> - ${res.snippet}</li>`;
+            }
+            links += `</ul></div>`;
+            resourceRecommend.innerHTML = links;
+          } else {
+            resourceRecommend.innerHTML = '';
+          }
         } else {
-          resourceRecommend.innerHTML = '';
+          qaHistory.innerHTML += `<div class='msg error-msg'>⚠️ 出错：${data.message}</div>`;
         }
-      } else {
-        qaHistory.innerHTML += `<div class='msg error-msg'>⚠️ 出错：${data.message}</div>`;
-      }
+      });
     });
-  });
+  }
 </script>
-<style>
-  .chat-box {
-    background: #f8fafc;
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(52,152,219,0.08);
-    padding: 24px 20px 16px 20px;
-    margin-bottom: 32px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .chat-history {
-    min-height: 120px;
-    max-height: 350px;
-    overflow-y: auto;
-    padding-bottom: 8px;
-  }
-  .msg {
-    margin: 18px 0 10px 0;
-    padding: 12px 18px 16px 18px; /* 上内边距减小，去除首行空白 */
-    border-radius: 10px;
-    font-size: 16px;
-    line-height: 1.8;
-    word-break: break-all;
-    white-space: pre-line;
-    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
-    transition: background 0.2s;
-  }
-  .user-msg {
-    background: #f3f4f6;
-    color: #222;
-    border-left: 5px solid #3498db;
-    font-weight: 500;
-    font-size: 16px;
-  }
-  .ai-msg {
-    background: #eaf6ff;
-    color: #1a355b;
-    border-left: 5px solid #2ecc71;
-    font-weight: 500;
-    position: relative;
-    font-size: 16px;
-  }
-  .ai-msg strong {
-    color: #2176ae;
-    font-weight: bold;
-    font-size: 17px;
-  }
-  .ai-msg em, .user-msg em {
-    color: #e67e22;
-    font-style: normal;
-    font-weight: bold;
-    background: #fffbe6;
-    padding: 0 4px;
-    border-radius: 3px;
-  }
-  .ai-msg code, .user-msg code {
-    background: #f4f4f4;
-    color: #c7254e;
-    font-family: 'Fira Mono', 'Consolas', monospace;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 15px;
-  }
-  .ai-msg pre, .user-msg pre {
-    background: #f4f4f4;
-    color: #333;
-    font-family: 'Fira Mono', 'Consolas', monospace;
-    padding: 12px;
-    border-radius: 6px;
-    margin: 10px 0;
-    font-size: 15px;
-    overflow-x: auto;
-  }
-  .ai-msg blockquote, .user-msg blockquote {
-    background: #f0f7ff;
-    border-left: 4px solid #3498db;
-    margin: 10px 0;
-    padding: 10px 16px;
-    color: #555;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 15px;
-  }
-  .thinking-msg {
-    color: #888;
-    font-style: italic;
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    background: #f8fafc;
-    border-left: 4px solid #95a5a6;
-    padding: 10px 14px;
-    border-radius: 8px;
-  }
-  .thinking-msg i {
-    color: #3498db;
-    margin-right: 6px;
-  }
-  .resource-list {
-    background: #f6fafd;
-    border-radius: 8px;
-    padding: 14px 18px 10px 18px;
-    margin: 18px 0 0 0;
-    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
-  }
-  .resource-list h4 {
-    color: #2176ae;
-    font-size: 16px;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  .resource-list ul {
-    padding-left: 18px;
-    margin: 0;
-  }
-  .resource-list li {
-    margin-bottom: 7px;
-    font-size: 15px;
-    line-height: 1.7;
-    color: #1a355b;
-  }
-  .resource-list a {
-    color: #2980b9;
-    text-decoration: underline;
-    font-weight: 500;
-    margin-right: 4px;
-  }
-  .resource-list a:hover {
-    color: #e67e22;
-  }
-  .error-msg {
-    background: #fff0f0;
-    color: #e74c3c;
-    border-left: 5px solid #e74c3c;
-    font-size: 15px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin: 12px 0;
-  }
-</style>
 
   </main>
 
@@ -630,26 +497,6 @@
   <script>
     // 修正AI输出的中括号公式为MathJax可识别的$$...$$格式，并去除每行前的多余空格防止被识别为代码块，确保$$公式单独成段，去除空公式和多余空行
     function fixLatexBrackets(md) {
-      // 1. 去除每行前的多余空格
-      md = md.replace(/^[ \t]+/gm, '');
-      // 2. 替换独占一行的 [ ... ] 为 $$ ... $$
-      md = md.replace(/(^|\n)\s*\[\s*([\s\S]*?)\s*\]\s*(?=\n|$)/g, function(match, p1, p2) {
-        return `${p1}$$\n${p2.trim()}\n$$`;
-      });
-      // 3. 补全裸的独占一行LaTeX公式为块级公式
-      md = md.replace(/(^|\n)\s*(\\[a-zA-Z]+[\s\S]*?=.+)\s*(?=\n|$)/g, function(match, p1, p2) {
-        // 如果本行已经有$$则不处理
-        if (/^\s*\$\$/.test(p2)) return match;
-        return `${p1}$$\n${p2.trim()}\n$$`;
-      });
-      // 4. 确保所有 $$...$$ 公式单独成段，前后都有换行
-      md = md.replace(/([^\n])(\$\$[\s\S]*?\$\$)/g, '$1\n$2');
-      md = md.replace(/(\$\$[\s\S]*?\$\$)([^\n])/g, '$1\n$2');
-      // 5. 去除空公式
-      md = md.replace(/^\s*\$\$\s*$/gm, '');
-      // 6. 去除$$与内容之间的多余空行
-      md = md.replace(/\$\$\n{2,}/g, '$$\n');
-      md = md.replace(/\n{2,}\$\$/g, '\n$$');
       return md;
     }
   </script>
