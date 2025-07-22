@@ -403,21 +403,38 @@
           } else if (data.source === 'web') {
             sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
           }
-          // 渲染前修正中括号公式为$$...$$
-          let fixedAnswer = fixLatexBrackets(data.answer);
-          // AI气泡（左侧）
-          const aiMsg = `<div class='msg-row ai'><div class='msg-avatar'><i class='fa fa-robot'></i></div><div class='msg ai-msg'><div class='markdown-body'>${marked.parse(fixedAnswer)}</div>${sourceText}</div></div>`;
-          qaHistory.innerHTML += aiMsg;
-          // 关键：将<p>$$...$$</p>替换为独立div，防止被<p>包裹
-          qaHistory.querySelectorAll('p').forEach(p => {
-            const text = p.textContent.trim();
-            if (/^\$\$[\s\S]*\$\$$/.test(text)) {
-              const latexDiv = document.createElement('div');
-              latexDiv.innerHTML = text;
-              p.replaceWith(latexDiv);
-            }
-          });
-          // 延迟调用MathJax渲染，确保公式100%被渲染
+          // 保护所有LaTeX公式，防止被marked破坏
+          function protectLatexBlocks(md) {
+            let blocks = [];
+            md = md.replace(/\$\$([\s\S]*?)\$\$/g, function(match, p1) {
+              blocks.push(p1);
+              return `@@LATEX_BLOCK_${blocks.length - 1}@@`;
+            });
+            let inlines = [];
+            md = md.replace(/\$([^\$\n]+?)\$/g, function(match, p1) {
+              inlines.push(p1);
+              return `@@LATEX_INLINE_${inlines.length - 1}@@`;
+            });
+            return {md, blocks, inlines};
+          }
+          function restoreLatexBlocks(html, blocks, inlines) {
+            html = html.replace(/@@LATEX_BLOCK_(\d+)@@/g, function(match, idx) {
+              return `$$${blocks[parseInt(idx)]}$$`;
+            });
+            html = html.replace(/@@LATEX_INLINE_(\d+)@@/g, function(match, idx) {
+              return `$${inlines[parseInt(idx)]}$`;
+            });
+            return html;
+          }
+          // 保护公式
+          const {md, blocks, inlines} = protectLatexBlocks(data.answer);
+          // 只对非公式部分做 marked 解析
+          let html = marked.parse(md);
+          // 还原公式
+          html = restoreLatexBlocks(html, blocks, inlines);
+          // 用insertAdjacentHTML插入，避免innerHTML+=带来的重解析
+          qaHistory.insertAdjacentHTML('beforeend', `<div class='msg-row ai'><div class='msg-avatar'><i class='fa fa-robot'></i></div><div class='msg ai-msg'><div class='markdown-body'>${html}</div>${sourceText}</div></div>`);
+          // 渲染新插入的markdown-body中的公式
           setTimeout(() => {
             if (window.MathJax && MathJax.typesetPromise) {
               MathJax.typesetPromise();
