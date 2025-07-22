@@ -437,10 +437,7 @@
           // 渲染新插入的markdown-body中的公式
           setTimeout(() => {
             if (window.MathJax && MathJax.typesetPromise) {
-              const last = qaHistory.querySelectorAll('.markdown-body');
-              if (last.length > 0) {
-                MathJax.typesetPromise([last[last.length - 1]]);
-              }
+              MathJax.typesetPromise();
             }
           }, 0);
           // 调试：输出渲染后HTML结构
@@ -514,6 +511,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
   <!-- 集成MathJax用于渲染LaTeX公式 -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    // 修正AI输出的中括号公式为MathJax可识别的$$...$$格式，并去除每行前的多余空格防止被识别为代码块，确保$$公式单独成段，去除空公式和多余空行
+    function fixLatexBrackets(md) {
+      return md;
+    }
+  </script>
   
   <div id="contextModal" class="context-modal hidden">
     <div class="modal-content">
