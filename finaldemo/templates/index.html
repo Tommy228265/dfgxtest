@@ -403,8 +403,6 @@
           } else if (data.source === 'web') {
             sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
           }
-          // 渲染前修正中括号公式为$$...$$
-          let fixedAnswer = fixLatexBrackets(data.answer);
           // 保护所有LaTeX公式，防止被marked破坏
           function protectLatexBlocks(md) {
             let blocks = [];
@@ -429,7 +427,7 @@
             return html;
           }
           // 保护公式
-          const {md, blocks, inlines} = protectLatexBlocks(fixedAnswer);
+          const {md, blocks, inlines} = protectLatexBlocks(data.answer);
           // 只对非公式部分做 marked 解析
           let html = marked.parse(md);
           // 还原公式
