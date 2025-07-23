@@ -1,460 +1,1350 @@
-import httpx
 import os
+import re
 import json
 import uuid
 import time
 import threading
 import logging
 import sqlite3
+from PyPDF2 import PdfReader
+from docx import Document
+from bs4 import BeautifulSoup
+from pptx import Presentation
 from flask import Flask, request, jsonify, render_template, g
 from flask_cors import CORS
 from contextlib import closing
-from dotenv import load_dotenv
-from openai import OpenAI
-from openai.types.beta import Assistant
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from collections import defaultdict
 
-# --- 步骤 1: 初始化与配置 ---
-load_dotenv()
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger("KnowledgeGraphAssistantsApp")
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("knowledge_graph.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("KnowledgeGraphGenerator")
+
+# 初始化Flask应用
 app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})  # 增强CORS配置
+
+# 配置上传文件夹
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise ValueError("未在.env文件中找到OPENAI_API_KEY环境变量。")
-http_client = httpx.Client()
 
-client = OpenAI(
-    api_key=OPENAI_API_KEY,
-    default_headers={"OpenAI-Beta": "assistants=v2"},
-    http_client=http_client
-)
+# DeepSeek API配置（示例密钥，需替换为实际密钥）
+OPENAI_API_KEY = "sk-ba9cc9a26b8c4859ba5c9bad33785093"
+MAX_RETRIES = 3
+BACKOFF_FACTOR = 2
+
+# 数据库配置
 DATABASE = os.path.join(app.root_path, 'knowledge_graph.db')
-topology_results = {}
-quiz_sessions = {}
 
-# --- 步骤 2: 数据库相关函数 ---
 def get_db():
+    """获取数据库连接"""
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
-    db.row_factory = sqlite3.Row
+        db.row_factory = sqlite3.Row
     return db
 
 def init_db():
-    if os.path.exists(DATABASE):
-        logger.info("数据库已存在，跳过初始化。")
-        return
+    """初始化数据库（包含问答会话表）"""
+    logger.info("开始初始化数据库...")
     with app.app_context():
+        db_path = os.path.abspath(DATABASE)
+        logger.info(f"数据库文件路径: {db_path}")
+        
+        # 确保数据库目录存在
+        db_dir = os.path.dirname(db_path)
+        if not os.path.exists(db_dir):
+            os.makedirs(db_dir)
+        
+        # 如果数据库已存在，跳过初始化
+        if os.path.exists(db_path):
+            logger.info("数据库已存在，跳过初始化")
+            return
+        
+        logger.info("数据库文件不存在，创建新数据库...")
         with closing(get_db()) as db:
-            schema = """
-            CREATE TABLE topologies (id TEXT PRIMARY KEY,content TEXT,max_nodes INTEGER,created_at TEXT,file_id TEXT,assistant_id TEXT,vector_store_id TEXT);
-            CREATE TABLE nodes (id TEXT, topology_id TEXT, label TEXT, PRIMARY KEY (topology_id, id));
-            CREATE TABLE edges (topology_id TEXT, from_node TEXT, to_node TEXT, label TEXT, PRIMARY KEY (topology_id, from_node, to_node));
-            CREATE TABLE questions (id TEXT PRIMARY KEY, topology_id TEXT, node_id TEXT, question TEXT, answer TEXT, feedback TEXT, correctness INTEGER, created_at TEXT, answered_at TEXT);
-            """
-            db.cursor().executescript(schema)
-            db.commit()
-            logger.info("数据库初始化成功。")
+            try:
+                schema = """
+                CREATE TABLE IF NOT EXISTS topologies (
+                    id TEXT PRIMARY KEY,
+                    content TEXT NOT NULL,
+                    max_nodes INTEGER DEFAULT 0,
+                    created_at TEXT
+                );
 
-# --- 步骤 3: 辅助工具函数 ---
+                CREATE TABLE IF NOT EXISTS nodes (
+                    id TEXT,
+                    topology_id TEXT,
+                    label TEXT,
+                    level INTEGER,
+                    value INTEGER,
+                    mastered INTEGER DEFAULT 0,
+                    mastery_score REAL DEFAULT 0,
+                    consecutive_correct INTEGER DEFAULT 0,
+                    content_snippet TEXT,
+                    PRIMARY KEY (topology_id, id),
+                    FOREIGN KEY (topology_id) REFERENCES topologies (id)
+                );
+
+                CREATE TABLE IF NOT EXISTS edges (
+                    topology_id TEXT,
+                    from_node TEXT,
+                    to_node TEXT,
+                    label TEXT,
+                    PRIMARY KEY (topology_id, from_node, to_node),
+                    FOREIGN KEY (topology_id) REFERENCES topologies (id),
+                    FOREIGN KEY (from_node) REFERENCES nodes (id),
+                    FOREIGN KEY (to_node) REFERENCES nodes (id)
+                );
+
+                CREATE TABLE IF NOT EXISTS questions (
+                    id TEXT PRIMARY KEY,
+                    topology_id TEXT,
+                    node_id TEXT,
+                    question TEXT,
+                    answer TEXT,
+                    feedback TEXT,
+                    correctness INTEGER DEFAULT 0,
+                    created_at TEXT,
+                    answered_at TEXT,
+                    session_id TEXT,
+                    FOREIGN KEY (topology_id, node_id) REFERENCES nodes (topology_id, id)
+                );
+
+                -- 问答会话表
+                CREATE TABLE IF NOT EXISTS quiz_sessions (
+                    id TEXT PRIMARY KEY,
+                    topology_id TEXT,
+                    node_id TEXT,
+                    created_at TEXT,
+                    questions_answered INTEGER DEFAULT 0,
+                    consecutive_correct INTEGER DEFAULT 0,
+                    mastered INTEGER DEFAULT 0,
+                    FOREIGN KEY (topology_id, node_id) REFERENCES nodes (topology_id, id)
+                );
+                """
+                db.cursor().executescript(schema)
+                db.commit()
+                logger.info("数据库表创建成功")
+            except Exception as e:
+                logger.error(f"数据库初始化失败: {str(e)}", exc_info=True)
+                raise
+
 def clean_json_string(s: str) -> str:
-    # 修正：现在需要提取JSON对象，所以查找第一个'{'和最后一个'}'
-    start_index = s.find('{')
-    end_index = s.rfind('}')
-    if start_index != -1 and end_index != -1 and end_index > start_index:
-        return s[start_index : end_index + 1].strip()
-    return s
+    """清洗模型输出，去除Markdown代码块标记"""
+    s = re.sub(r"```(?:json)?", "", s)
+    return s.strip()
 
-def update_progress(topology_id, progress, message):
-    if topology_id in topology_results:
-        topology_results[topology_id].update({'progress': progress, 'message': message})
-        logger.info(f"进度更新 {topology_id}: {progress}% - {message}")
-
-def with_app_context(func, *args, **kwargs):
-    with app.app_context():
-        func(*args, **kwargs)
-
-# --- 步骤 4: 核心AI交互逻辑 ---
-def _run_assistant_and_wait(assistant_id: str, thread_id: str) -> str:
+def enhance_json_format(json_str: str) -> str:
+    """增强JSON格式，处理各种复杂格式问题"""
+    import json
+    import re
+    
+    logger.info(f"原始JSON内容: {json_str[:200]}...")
+    
+    # 1. 移除可能的前导/尾随非JSON字符
+    json_str = re.sub(r'^.*?(\[.*\]).*$', r'\1', json_str, flags=re.DOTALL)
+    
+    # 2. 处理行首缩进和换行
+    json_str = re.sub(r'\n\s*', ' ', json_str)
+    
+    # 3. 处理可能的单引号问题
+    json_str = re.sub(r"'", '"', json_str)
+    
+    # 4. 处理常见的格式错误（尝试修复）
     try:
-        run = client.beta.threads.runs.create_and_poll(
-            thread_id=thread_id,
-            assistant_id=assistant_id
-        )
-        if run.status == 'completed':
-            messages = client.beta.threads.messages.list(thread_id=thread_id)
-            if messages.data:
-                latest_message = messages.data[0]
-                if latest_message.content:
-                    message_content = latest_message.content[0].text
-                    annotations = message_content.annotations
-                    text_value = message_content.value
-                    if annotations:
-                        for annotation in annotations:
-                            text_value = text_value.replace(annotation.text, '')
-                    return text_value.strip()
-            return ""
-        else:
-            raise RuntimeError(f"助手运行失败，最终状态: {run.status}, 原因: {run.last_error}")
-    except Exception as e:
-        logger.error(f"运行助手时出错 (Assistant ID: {assistant_id}, Thread ID: {thread_id}): {e}", exc_info=True)
-        raise
+        # 尝试直接解析
+        return json.loads(json_str)
+    except json.JSONDecodeError as e:
+        logger.error(f"初始解析失败: {e}")
+        
+        # 错误定位
+        error_pos = e.pos
+        logger.error(f"错误位置: {error_pos}, 附近内容: {json_str[error_pos-20:error_pos+20]}")
+        
+        # 5. 智能修复常见错误
+        # 5.1 处理缺少逗号的情况
+        if e.msg == "Expecting ',' delimiter":
+            logger.info("尝试修复缺少逗号的问题...")
+            json_list = list(json_str)
+            
+            # 在错误位置前查找可能缺少逗号的位置
+            search_start = max(0, error_pos - 100)
+            bracket_count = 0
+            for i in range(error_pos-1, search_start, -1):
+                if json_list[i] == ']':
+                    bracket_count += 1
+                elif json_list[i] == '[':
+                    bracket_count -= 1
+                
+                # 找到合适的位置插入逗号
+                if bracket_count == 0 and json_list[i] == ']':
+                    json_list.insert(i+1, ',')
+                    logger.info(f"在位置 {i+1} 插入逗号")
+                    break
+            
+            # 尝试再次解析
+            try:
+                return json.loads(''.join(json_list))
+            except json.JSONDecodeError as e2:
+                logger.error(f"修复后仍失败: {e2}")
+        
+        # 5.2 处理未闭合的引号
+        if e.msg.startswith('Expecting property name enclosed in double quotes'):
+            logger.info("尝试修复未闭合的引号...")
+            # 查找最近的未闭合引号并添加
+            unclosed_quote_pos = json_str.rfind('"', 0, error_pos)
+            if unclosed_quote_pos != -1:
+                json_list = list(json_str)
+                json_list.insert(error_pos, '"')
+                logger.info(f"在位置 {error_pos} 添加引号")
+                try:
+                    return json.loads(''.join(json_list))
+                except json.JSONDecodeError as e3:
+                    logger.error(f"修复后仍失败: {e3}")
+        
+        # 6. 使用更宽松的解析器（作为最后的手段）
+        try:
+            import ast
+            logger.info("尝试使用ast.literal_eval进行宽松解析...")
+            parsed = ast.literal_eval(json_str)
+            # 转换为标准JSON
+            return json.loads(json.dumps(parsed))
+        except Exception as e4:
+            logger.error(f"宽松解析失败: {e4}")
+            logger.error(f"无法修复的JSON内容: {json_str}")
+            raise RuntimeError("无法解析API返回的JSON格式") from e4
 
-def _create_graph_assistant(vector_store_id: str, topology_id: str, max_nodes: int) -> Assistant:
-    # 【MODIFIED】: 全新Prompt，指导AI自行完成从“三元组思考”到“nodes/edges输出”的转换
-    instructions = """你是顶级的知识图谱构建专家。
+def sanitize_text(text: str) -> str:
+    """清理文本中的特殊字符，防止破坏JSON格式"""
+    # 移除可能干扰JSON解析的字符
+    text = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', text)  # 移除控制字符
+    # 转义特殊字符
+    text = text.replace('\\', '\\\\')
+    text = text.replace('"', '\\"')
+    return text
 
-### **思考过程 (你的内心活动)**
-1.  **识别三元组**: 你的首要任务是深入分析文档，识别出其中所有具备层级关系的知识点，并将它们构造成 `[父知识点, 关系, 子知识点]` 格式的三元组。关系词应选择如“包含”、“组成部分是”、“负责”等。
-2.  **去重与整合**: 在脑海中形成一个所有三元组的列表。
-
-### **最终输出格式 (你必须严格遵守)**
-你的最终输出**绝对不能**是三元组列表！你必须将你思考得出的三元组，转换成一个**单一的、严格的JSON对象**，该对象包含 `nodes` 和 `edges` 两个键。
-
--   `"nodes"`: 一个对象数组。
-    -   遍历你识别出的所有知识点（父节点和子节点），为每一个**不重复**的知识点创建一个节点对象。
-    -   每个节点对象格式为 `{"id": "知识点名称", "label": "知识点名称"}`。`id` 和 `label` 必须相同。
--   `"edges"`: 一个对象数组。
-    -   遍历你识别出的每一个三元组 `[父, 关系, 子]`。
-    -   为每个三元组创建一个边对象，格式为 `{"from": "父知识点ID", "to": "子知识点ID", "label": "关系"}`。
-
-### **示例**
--   **如果你的思考结果是**: `[["AI", "包含", "机器学习"], ["机器学习", "是一种", "算法"]]`
--   **那么你的最终输出必须是**:
-    ```json
-    {
-      "nodes": [
-        {"id": "AI", "label": "AI"},
-        {"id": "机器学习", "label": "机器学习"},
-        {"id": "算法", "label": "算法"}
-      ],
-      "edges": [
-        {"from": "AI", "to": "机器学习", "label": "包含"},
-        {"from": "机器学习", "to": "算法", "label": "是一种"}
-      ]
-    }
-    ```
-
-### **其他规则**
-- **语言**: 所有 `label` 都必须是**中文**。
-- **来源**: 所有内容必须严格来自文件。
-"""
-    return client.beta.assistants.create(
-        name=f"GraphGen-{topology_id}",
-        instructions=instructions,
-        model="gpt-4-turbo",
-        tools=[{"type": "file_search"}],
-        tool_resources={"file_search": {"vector_store_ids": [vector_store_id]}}
+def analyze_text_and_generate_graph_structure(text: str, max_nodes: int = 0) -> dict:
+    """
+    【新的核心函数】
+    调用DeepSeek API，通过一个强大的Prompt直接分析文本，并生成完整的知识图谱JSON结构。
+    这个函数将替代旧的 extract_knowledge_from_text 和 build_tree_structure。
+    """
+    from openai import OpenAI
+    
+    client = OpenAI(
+        api_key=OPENAI_API_KEY,
+        base_url="https://api.deepseek.com"
     )
+    
+    node_limit_prompt = ""
+    if max_nodes > 0:
+        node_limit_prompt = f"请确保最终生成的知识点（节点）数量大致在 {max_nodes} 个左右，应优先选择最核心、最关键的概念。"
 
-# --- 步骤 5: 主要的后台处理函数 ---
+    # --- 这是关键的Prompt Engineering ---
+    system_prompt = f"""
+你是一个顶级的知识图谱构建专家。你的任务是接收一段文本，并将其转化为一个结构化的、逻辑清晰的知识图谱。
+
+你需要完成以下步骤：
+1.  **通读并理解全文**：识别出文本的核心主题、关键概念、实体以及它们之间的层级和关联关系。
+2.  **构建知识结构**：将这些识别出的知识点组织成一个具有逻辑性的图结构。通常应该有一个或少数几个核心顶层节点。
+3.  **生成最终输出**：将你构建的结构严格按照下面的JSON格式进行输出。
+
+**输出格式要求：**
+你必须返回一个单一的、合法的JSON对象，该对象包含 "nodes" 和 "edges" 两个键。
+
+-   `nodes`: 一个JSON数组，其中每个元素都是一个代表知识点的对象，必须包含 `id` (知识点/概念的名称) 和 `label` (与id相同) 两个字段。
+-   `edges`: 一个JSON数组，其中每个元素都是一个代表关系的对象，必须包含 `from` (父节点id), `to` (子节点id) 和 `label` (描述关系的词语，如"包含", "分为", "是...的特征") 三个字段。
+
+**示例：**
+{{
+  "nodes": [
+    {{"id": "计算机科学", "label": "计算机科学"}},
+    {{"id": "编程语言", "label": "编程语言"}},
+    {{"id": "Python", "label": "Python"}}
+  ],
+  "edges": [
+    {{"from": "计算机科学", "to": "编程语言", "label": "包含"}},
+    {{"from": "编程语言", "to": "Python", "label": "是其中一种"}}
+  ]
+}}
+
+{node_limit_prompt}
+
+**重要提示**：你的全部输出必须且只能是一个完整的、有效的JSON对象。不要在JSON对象前后添加任何解释、注释、或 ```json 标记。
+"""
+    
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"请根据以下文本内容，生成符合要求的知识图谱JSON：\n\n{text}"}
+    ]
+
+    backoff = BACKOFF_FACTOR
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            logger.info(f"第{attempt}次尝试调用DeepSeek API进行一体化知识图谱分析...")
+            
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=messages,
+                max_tokens=4096,  # 增加Token限制以容纳更大的JSON
+                temperature=0.1   # 降低随机性以保证格式稳定
+            )
+
+            raw_response = response.choices[0].message.content
+            cleaned_json_str = clean_json_string(raw_response)
+            
+            # 这里我们直接使用 enhance_json_format 来解析，但需要它返回 dict
+            # 确保 enhance_json_format 最终能正确解析出字典
+            try:
+                knowledge_graph_data = json.loads(cleaned_json_str)
+            except json.JSONDecodeError as e:
+                logger.error(f"无法将清洗后的字符串解析为JSON: {e}")
+                # 尝试更强的修复
+                start = cleaned_json_str.find('{')
+                end = cleaned_json_str.rfind('}')
+                if start != -1 and end != -1:
+                    knowledge_graph_data = json.loads(cleaned_json_str[start:end+1])
+                else:
+                    raise
+
+            if not isinstance(knowledge_graph_data, dict) or "nodes" not in knowledge_graph_data or "edges" not in knowledge_graph_data:
+                raise ValueError("API返回的JSON格式不符合预期（缺少nodes或edges键）")
+
+            logger.info(f"成功解析知识图谱，节点数: {len(knowledge_graph_data['nodes'])}, 边数: {len(knowledge_graph_data['edges'])}")
+            return knowledge_graph_data
+
+        except Exception as e:
+            logger.error(f"一体化分析API请求错误: {str(e)}", exc_info=True)
+            if attempt < MAX_RETRIES:
+                logger.info(f"准备第{attempt + 1}次重试...")
+                time.sleep(backoff)
+                backoff *= 2
+            else:
+                raise
+    
+    raise RuntimeError("多次重试后仍无法获取有效的图谱JSON")
+
+def parse_document(file_path):
+    """解析文档内容，返回文本（新增PPT支持）"""
+    file_ext = os.path.splitext(file_path)[1].lower()
+    logger.info(f"开始解析文档: {file_path}, 类型: {file_ext}")
+    
+    try:
+        if file_ext == '.txt':
+            with open(file_path, 'r', encoding='utf-8') as file:
+                return file.read()
+        elif file_ext == '.pdf':
+            text = ""
+            with open(file_path, 'rb') as file:
+                reader = PdfReader(file)
+                for page_num, page in enumerate(reader.pages):
+                    page_text = page.extract_text() or ""
+                    text += page_text
+                    if page_num % 10 == 0:
+                        logger.info(f"已解析PDF第 {page_num} 页")
+            return text
+        elif file_ext in ['.docx', '.doc']:
+            doc = Document(file_path)
+            full_text = []
+            for para_num, para in enumerate(doc.paragraphs):
+                full_text.append(para.text)
+                if para_num % 50 == 0:
+                    logger.info(f"已解析Word第 {para_num} 段落")
+            return '\n'.join(full_text)
+        elif file_ext == '.html':
+            with open(file_path, 'r', encoding='utf-8') as file:
+                html_content = file.read()
+            soup = BeautifulSoup(html_content, 'lxml')
+            text = soup.get_text()
+            return ' '.join(text.split())
+        elif file_ext in ['.ppt', '.pptx']:  # 新增PPT/PPTX支持
+            text = ""
+            prs = Presentation(file_path)
+            for slide_num, slide in enumerate(prs.slides):
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        text += shape.text + "\n"
+                if slide_num % 10 == 0:
+                    logger.info(f"已解析PPT第 {slide_num} 页")
+            return text
+        else:
+            logger.error(f"不支持的文件格式: {file_ext}")
+            return None
+    except Exception as e:
+        logger.error(f"解析文档出错: {str(e)}", exc_info=True)
+        return None
+
+def extract_content_snippet(content: str, topic: str) -> str:
+    """从原文中提取与主题相关的片段"""
+    # 查找主题在内容中的位置
+    index = content.lower().find(topic.lower())
+    if index == -1:
+        return ""
+    
+    # 提取上下文片段（主题前后各200个字符）
+    start = max(0, index - 200)
+    end = min(len(content), index + len(topic) + 200)
+    snippet = content[start:end]
+    
+    # 确保片段包含主题
+    if topic.lower() not in snippet.lower():
+        return ""
+    
+    # 添加省略号表示截断
+    if start > 0:
+        snippet = "..." + snippet
+    if end < len(content):
+        snippet = snippet + "..."
+    
+    return snippet
+
+
+
+def save_to_database(topology_id, nodes, edges, content: str, max_nodes=0):
+    """将知识图谱数据保存到数据库（保存原文内容和节点数量限制）"""
+    with app.app_context():
+        db = get_db()
+        cursor = db.cursor()
+        
+        # 保存拓扑图信息（包含原文内容和节点数量限制）
+        cursor.execute(
+            "INSERT OR REPLACE INTO topologies (id, content, max_nodes, created_at) VALUES (?, ?, ?, ?)",
+            (topology_id, content, max_nodes, time.strftime('%Y-%m-%d %H:%M:%S'))
+        )
+        
+        # 保存节点
+        for node in nodes:
+            cursor.execute(
+                """INSERT OR REPLACE INTO nodes 
+                (topology_id, id, label, level, value, mastered, mastery_score, consecutive_correct, content_snippet) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (topology_id, node["id"], node["label"], node["level"], node["value"], 
+                 int(node["mastered"]), node["mastery_score"], node["consecutive_correct"], 
+                 node.get("content_snippet", ""))
+            )
+        
+        # 保存边
+        for edge in edges:
+            cursor.execute(
+                "INSERT OR REPLACE INTO edges (topology_id, from_node, to_node, label) VALUES (?, ?, ?, ?)",
+                (topology_id, edge["from"], edge["to"], edge["label"])
+            )
+        
+        db.commit()
+
 def process_document(file_path, topology_id, max_nodes=0):
+    """
+    【已重构】处理文档并生成知识图谱的后台线程任务。
+    """
     start_time = time.time()
-    topology_results[topology_id] = {"status": "processing", "progress": 0, "message": "任务开始..."}
+    logger.info(f"开始处理文档: {file_path}, 拓扑ID: {topology_id}, 最大节点数: {max_nodes}")
+    
+    topology_results[topology_id] = {
+        "status": "processing", "progress": 0, "message": "开始处理文档..."
+    }
+
     try:
         with app.app_context():
-            update_progress(topology_id, 10, "正在创建向量存储并上传文件...")
-            vector_store = client.beta.vector_stores.create(name=f"GraphGenStore-{topology_id}")
-            
-            with open(file_path, "rb") as f:
-                file_object = client.files.create(file=f, purpose="assistants")
-            
-            client.beta.vector_stores.files.create_and_poll(vector_store_id=vector_store.id, file_id=file_object.id)
-            file_id = file_object.id
+            update_progress(topology_id, 10, "解析文档内容...")
+            text = parse_document(file_path)
 
-            update_progress(topology_id, 25, "正在创建AI助手...")
-            assistant = _create_graph_assistant(vector_store.id, topology_id, max_nodes)
+            if not text or len(text) < 50: # 内容太短则直接报错
+                raise ValueError("无法解析文档内容，或文档内容过短。")
             
-            update_progress(topology_id, 50, "正在生成知识图谱...")
-            thread = client.beta.threads.create()
-            client.beta.threads.messages.create(thread_id=thread.id, role="user", content="请根据你的指令，分析文件并生成知识图谱的JSON对象。")
+            # --- 核心步骤改变 ---
+            # 直接调用新的核心函数进行一体化分析
+            update_progress(topology_id, 40, "调用大模型进行一体化分析...")
+            knowledge_graph_data = analyze_text_and_generate_graph_structure(text, max_nodes)
             
-            json_response = _run_assistant_and_wait(assistant.id, thread.id)
-            logger.info(f"收到的来自AI的原始响应: '{json_response}'")
-            
-            try:
-                cleaned_json = clean_json_string(json_response)
-                # 【MODIFIED】: 直接解析为最终格式，不再需要本地转换
-                knowledge_graph_data = json.loads(cleaned_json)
-                if not isinstance(knowledge_graph_data, dict) or "nodes" not in knowledge_graph_data or "edges" not in knowledge_graph_data:
-                    raise ValueError("AI返回的不是一个有效的nodes/edges JSON对象。")
-            except (json.JSONDecodeError, ValueError) as e:
-                logger.error(f"解析AI响应时失败: '{cleaned_json}'", exc_info=True)
-                raise ValueError("AI助手返回了无法解析的JSON内容。") from e
-
-            update_progress(topology_id, 90, "正在保存至数据库...")
+            update_progress(topology_id, 80, "正在保存图谱数据到数据库...")
             db = get_db()
             cursor = db.cursor()
-            cursor.execute("INSERT INTO topologies (id, max_nodes, created_at, file_id, assistant_id, vector_store_id) VALUES (?, ?, ?, ?, ?, ?)", (topology_id, max_nodes, time.strftime('%Y-%m-%d %H:%M:%S'), file_id, assistant.id, vector_store.id))
+
+            # 保存拓扑图元信息（包括原文）
+            cursor.execute(
+                "INSERT OR REPLACE INTO topologies (id, content, max_nodes, created_at) VALUES (?, ?, ?, ?)",
+                (topology_id, text, max_nodes, time.strftime('%Y-%m-%d %H:%M:%S'))
+            )
+
+            # --- 保存节点和边 ---
+            # 清理可能存在的旧数据
+            cursor.execute("DELETE FROM nodes WHERE topology_id = ?", (topology_id,))
+            cursor.execute("DELETE FROM edges WHERE topology_id = ?", (topology_id,))
             
+            # 保存节点，并为问答模块准备 content_snippet
             nodes_to_save = knowledge_graph_data.get('nodes', [])
-            edges_to_save = knowledge_graph_data.get('edges', [])
             for node in nodes_to_save:
-                cursor.execute("INSERT INTO nodes (topology_id, id, label) VALUES (?, ?, ?)", (topology_id, node.get('id'), node.get('label')))
+                node_id = node.get('id')
+                snippet = extract_content_snippet(text, node_id)
+                # 为保持兼容性，level和value设为默认值
+                cursor.execute(
+                    """INSERT INTO nodes 
+                    (topology_id, id, label, level, value, content_snippet) 
+                    VALUES (?, ?, ?, ?, ?, ?)""",
+                    (topology_id, node_id, node.get('label'), 0, 1, snippet)
+                )
+
+            # 保存边
+            edges_to_save = knowledge_graph_data.get('edges', [])
             for edge in edges_to_save:
-                cursor.execute("INSERT INTO edges (topology_id, from_node, to_node, label) VALUES (?, ?, ?, ?)", (topology_id, edge.get('from'), edge.get('to'), edge.get('label')))
+                cursor.execute(
+                    "INSERT INTO edges (topology_id, from_node, to_node, label) VALUES (?, ?, ?, ?)",
+                    (topology_id, edge.get('from'), edge.get('to'), edge.get('label'))
+                )
+            
             db.commit()
+            logger.info("图谱数据已成功存入数据库。")
+
+            # --- 准备返回给前端的数据 ---
+            # 为前端可视化补充一些字段
+            for edge in edges_to_save:
+                edge['arrows'] = "to"
+                edge['title'] = edge.get('label', '')
+            # 返回的数据结构保持不变
+            final_data_for_frontend = {
+                "nodes": nodes_to_save,
+                "edges": edges_to_save,
+                # root可以不提供，让前端自行布局
+            }
 
             update_progress(topology_id, 100, "处理完成")
-            topology_results[topology_id] = {"status": "success", "data": knowledge_graph_data, "node_count": len(nodes_to_save), "edge_count": len(edges_to_save), "processing_time": round(time.time() - start_time, 2)}
+            processing_time = time.time() - start_time
+            topology_results[topology_id] = {
+                "status": "completed",
+                "data": final_data_for_frontend,
+                "created_at": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "node_count": len(nodes_to_save),
+                "edge_count": len(edges_to_save),
+                "processing_time": round(processing_time, 2),
+                "max_nodes": max_nodes
+            }
+            
     except Exception as e:
-        logger.error(f"处理文档 {topology_id} 时出错: {e}", exc_info=True)
-        topology_results[topology_id] = {"status": "error", "message": str(e)}
+        import traceback
+        error_msg = traceback.format_exc()
+        logger.error(f"处理文档出错: {str(e)}", exc_info=True)
+        topology_results[topology_id] = {
+            "status": "error",
+            "message": f"处理过程中出错: {str(e)}"
+        }
 
-# --- 步骤 6: Flask API 接口定义 ---
+
+def update_progress(topology_id, progress, message):
+    """更新处理进度"""
+    if topology_id in topology_results:
+        topology_results[topology_id].update({
+            'progress': progress,
+            'message': message
+        })
+        logger.info(f"拓扑ID: {topology_id}, 进度: {progress}%, 消息: {message}")
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# ... 其他路由保持不变 ...
 @app.route('/api/generate', methods=['POST'])
-def generate_knowledge_graph_route():
-    if 'file' not in request.files: return jsonify({'status': 'error', 'message': '没有文件部分'}), 400
+def generate_knowledge_graph():
+    """处理用户点击生成按钮后的请求，支持节点数量控制"""
+    if 'file' not in request.files:
+        logger.error("文件上传错误: 没有文件")
+        return jsonify({'status': 'error', 'message': '没有文件上传'}), 400
+    
     file = request.files['file']
-    if file.filename == '': return jsonify({'status': 'error', 'message': '未选择文件'}), 400
+    if file.filename == '':
+        logger.error("文件上传错误: 未选择文件")
+        return jsonify({'status': 'error', 'message': '未选择文件'}), 400
+    
+    # 获取节点数量 - 确保从表单获取
+    max_nodes = request.form.get('max_nodes', 0, type=int)
+    
+    # 检查文件大小
+    file.seek(0, os.SEEK_END)
+    file_size = file.tell()
+    file.seek(0)
+    
+    if file_size > 50 * 1024 * 1024:  # 50MB限制
+        logger.error(f"文件上传错误: 文件过大 ({file_size/1024/1024:.2f} MB)")
+        return jsonify({'status': 'error', 'message': '文件大小超过50MB限制'}), 400
     
     topology_id = str(uuid.uuid4())
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{topology_id}_{file.filename}")
     file.save(file_path)
     
-    max_nodes = request.form.get('max_nodes', 0, type=int)
-    threading.Thread(target=with_app_context, args=(process_document, file_path, topology_id, max_nodes)).start()
+    logger.info(f"文件上传成功: {file_path}, 大小: {file_size/1024/1024:.2f} MB, 最大节点数: {max_nodes}")
     
-    return jsonify({'status': 'success', 'topology_id': topology_id})
+    # 启动处理线程，并在应用上下文中执行
+    threading.Thread(
+        target=lambda: with_app_context(process_document, file_path, topology_id, max_nodes)
+    ).start()
+    
+    return jsonify({
+        'status': 'success',
+        'topology_id': topology_id,
+        'message': '文档上传成功，正在生成知识图谱',
+        'max_nodes': max_nodes  # 返回节点数量限制
+    })
+
+def with_app_context(func, *args, **kwargs):
+    """在应用上下文中执行函数"""
+    with app.app_context():
+        func(*args, **kwargs)
 
 @app.route('/api/topology/<topology_id>', methods=['GET'])
-def get_topology_route(topology_id):
-    if topology_id in topology_results:
-        result = topology_results[topology_id]
-        if result.get("status") == "completed":
-            result["status"] = "success"
-        return jsonify(result)
+def get_topology(topology_id):
+    if topology_id not in topology_results:
+        # 尝试从数据库获取
+        with app.app_context():
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute(
+                "SELECT id, content, max_nodes, created_at FROM topologies WHERE id = ?",
+                (topology_id,)
+            )
+            topology = cursor.fetchone()
+            
+            if not topology:
+                logger.error(f"获取拓扑图错误: ID不存在 ({topology_id})")
+                return jsonify({'status': 'error', 'message': '拓扑图不存在'}), 404
+            
+            # 从数据库获取节点和边
+            cursor.execute(
+                "SELECT id, label, level, value, mastered, mastery_score, consecutive_correct, content_snippet FROM nodes WHERE topology_id = ?",
+                (topology_id,)
+            )
+            nodes = [dict(row) for row in cursor.fetchall()]
+            
+            cursor.execute(
+                "SELECT from_node, to_node, label FROM edges WHERE topology_id = ?",
+                (topology_id,)
+            )
+            edges = [dict(row) for row in cursor.fetchall()]
+            
+            knowledge_graph = {
+                "nodes": nodes,
+                "edges": edges,
+                "root": next((node["id"] for node in nodes if node["level"] == 0), nodes[0]["id"] if nodes else None)
+            }
+            
+            return jsonify({
+                'status': 'success',
+                'data': knowledge_graph,
+                'created_at': topology["created_at"],
+                'node_count': len(nodes),
+                'edge_count': len(edges),
+                'text_length': len(topology["content"]),
+                'max_nodes': topology["max_nodes"]  # 返回节点数量限制
+            })
     
-    with app.app_context():
-        db = get_db()
-        cursor = db.cursor()
-        if not cursor.execute("SELECT id FROM topologies WHERE id=?", (topology_id,)).fetchone():
-            return jsonify({'status': 'error', 'message': '未找到该拓扑图'}), 404
-        
-        nodes_query = cursor.execute("SELECT id, label FROM nodes WHERE topology_id=?", (topology_id,)).fetchall()
-        edges_query = cursor.execute("SELECT from_node as 'from', to_node as 'to', label FROM edges WHERE topology_id=?", (topology_id,)).fetchall()
-        
-        nodes = [dict(row) for row in nodes_query]
-        edges = [dict(row) for row in edges_query]
-
-        for node in nodes:
-            node['mastered'] = False
-            node['mastery_score'] = 0
-            node['consecutive_correct'] = 0
-        
+    topology = topology_results[topology_id]
+    
+    if topology['status'] == 'processing':
         return jsonify({
-            'status': 'success', 
-            'data': {'nodes': nodes, 'edges': edges},
-            'node_count': len(nodes),
-            'edge_count': len(edges)
+            'status': 'processing',
+            'progress': topology.get('progress', 0),
+            'message': topology.get('message', '正在处理中'),
+            'max_nodes': topology.get('max_nodes', 0)  # 返回节点数量限制
         })
-
-@app.route('/api/topology/<topology_id>/regenerate', methods=['POST'])
-def regenerate_topology_route(topology_id):
-    max_nodes = request.json.get('max_nodes', 0)
     
-    with app.app_context():
-        db = get_db()
-        cursor = db.cursor()
-        topo_info = cursor.execute("SELECT vector_store_id FROM topologies WHERE id=?", (topology_id,)).fetchone()
-        if not topo_info: return jsonify({'status': 'error', 'message': '未找到该拓扑图'}), 404
-        vector_store_id = topo_info['vector_store_id']
+    if topology['status'] == 'error':
+        logger.error(f"获取拓扑图错误: {topology.get('message', '未知错误')}")
+        return jsonify({
+            'status': 'error',
+            'message': topology.get('message', '生成知识图时出错')
+        }), 500
+    
+    return jsonify({
+        'status': 'success',
+        'data': topology['data'],
+        'created_at': topology['created_at'],
+        'node_count': topology['node_count'],
+        'edge_count': topology['edge_count'],
+        'processing_time': topology['processing_time'],
+        'text_length': topology.get('text_length', 0),
+        'max_nodes': topology.get('max_nodes', 0)  # 返回节点数量限制
+    })
 
+@app.route('/api/topology/<topology_id>/set_max_nodes', methods=['POST'])
+def set_topology_max_nodes(topology_id):
+    """更新拓扑图的节点数量设置"""
     try:
-        new_assistant = _create_graph_assistant(vector_store_id, topology_id, max_nodes)
-        
-        thread = client.beta.threads.create()
-        client.beta.threads.messages.create(thread_id=thread.id, role="user", content="请根据你的新指令，重新生成知识图谱JSON。")
-        json_response = _run_assistant_and_wait(new_assistant.id, thread.id)
-        
-        # 直接解析，无需转换
-        new_graph_data = json.loads(clean_json_string(json_response))
+        data = request.json
+        max_nodes = data.get('max_nodes', 0)
         
         with app.app_context():
             db = get_db()
             cursor = db.cursor()
-            cursor.execute("DELETE FROM nodes WHERE topology_id=?", (topology_id,))
-            cursor.execute("DELETE FROM edges WHERE topology_id=?", (topology_id,))
             
-            nodes_to_save = new_graph_data.get('nodes', [])
-            edges_to_save = new_graph_data.get('edges', [])
-
-            for node in nodes_to_save:
-                cursor.execute("INSERT INTO nodes (topology_id, id, label) VALUES (?, ?, ?)", (topology_id, node.get('id'), node.get('label')))
-            for edge in edges_to_save:
-                cursor.execute("INSERT INTO edges (topology_id, from_node, to_node, label) VALUES (?, ?, ?, ?)", (topology_id, edge.get('from'), edge.get('to'), edge.get('label')))
-
-            cursor.execute("UPDATE topologies SET assistant_id=?, max_nodes=? WHERE id=?", (new_assistant.id, max_nodes, topology_id))
+            # 更新拓扑图的节点数量设置
+            cursor.execute(
+                "UPDATE topologies SET max_nodes = ? WHERE id = ?",
+                (max_nodes, topology_id)
+            )
+            
             db.commit()
-        
-        return jsonify({'status': 'success', 'message': '图谱已成功重新生成。', 'data': new_graph_data, 'node_count': len(nodes_to_save), 'edge_count': len(edges_to_save)})
-
+            
+            return jsonify({
+                'status': 'success',
+                'message': '节点数量设置已更新',
+                'max_nodes': max_nodes
+            })
+            
     except Exception as e:
-        logger.error(f"重新生成图谱 {topology_id} 时出错: {e}", exc_info=True)
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        logger.error(f"设置节点数量错误: {str(e)}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f"设置节点数量时出错: {str(e)}"
+        }), 500
 
+@app.route('/api/topology/<topology_id>/regenerate', methods=['POST'])
+def regenerate_topology(topology_id):
+    """
+    【已重构】重新生成知识图谱，使用新的节点数量限制。
+    """
+    try:
+        with app.app_context():
+            data = request.json
+            max_nodes = data.get('max_nodes', 0)
+            
+            db = get_db()
+            cursor = db.cursor()
 
-def _generate_question_for_node(assistant_id: str, node_id: str) -> str:
-    thread = client.beta.threads.create()
-    client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=f"""
-        **重要指令**：
-        你的最高优先级任务是为知识点 **"{node_id}"** 生成一个问题。
-        1.  请在文档中找到与 **"{node_id}"** 最直接相关的内容。
-        2.  **只能**根据这部分内容生成一个简明扼要的测验问题。
-        3.  如果检索到的其他信息与 **"{node_id}"** 无关，必须忽略它们。
-        4.  问题中不要包含任何答案或提示。
-        """
-    )
-    return _run_assistant_and_wait(assistant_id, thread.id)
+            # 从数据库获取原文内容
+            cursor.execute("SELECT content FROM topologies WHERE id = ?", (topology_id,))
+            topology = cursor.fetchone()
+            if not topology:
+                return jsonify({'status': 'error', 'message': '拓扑图不存在'}), 404
+            
+            content = topology["content"]
+
+            # 保存当前节点的掌握状态，以便恢复
+            cursor.execute("SELECT id, mastered, mastery_score, consecutive_correct FROM nodes WHERE topology_id = ?", (topology_id,))
+            mastery_states = {row["id"]: dict(row) for row in cursor.fetchall()}
+
+            # 直接调用新的核心函数进行一体化分析
+            knowledge_graph_data = analyze_text_and_generate_graph_structure(content, max_nodes)
+            
+            # 清理旧的图谱数据
+            cursor.execute("DELETE FROM nodes WHERE topology_id = ?", (topology_id,))
+            cursor.execute("DELETE FROM edges WHERE topology_id = ?", (topology_id,))
+
+            # 更新拓扑图的节点数设置
+            cursor.execute("UPDATE topologies SET max_nodes = ? WHERE id = ?", (max_nodes, topology_id))
+
+            # 保存新节点，并恢复掌握状态
+            nodes_to_save = knowledge_graph_data.get('nodes', [])
+            for node in nodes_to_save:
+                node_id = node.get('id')
+                snippet = extract_content_snippet(content, node_id)
+                state = mastery_states.get(node_id, {})
+                cursor.execute(
+                    """INSERT INTO nodes 
+                    (topology_id, id, label, level, value, content_snippet, mastered, mastery_score, consecutive_correct) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (topology_id, node_id, node.get('label'), 0, 1, snippet,
+                     state.get('mastered', 0), state.get('mastery_score', 0), state.get('consecutive_correct', 0))
+                )
+
+            # 保存新边
+            edges_to_save = knowledge_graph_data.get('edges', [])
+            for edge in edges_to_save:
+                cursor.execute(
+                    "INSERT INTO edges (topology_id, from_node, to_node, label) VALUES (?, ?, ?, ?)",
+                    (topology_id, edge.get('from'), edge.get('to'), edge.get('label'))
+                )
+            
+            db.commit()
+
+            # 准备返回给前端的数据
+            for edge in edges_to_save:
+                edge['arrows'] = "to"
+                edge['title'] = edge.get('label', '')
+            final_data_for_frontend = {"nodes": nodes_to_save, "edges": edges_to_save}
+
+            # 更新内存中的结果
+            topology_results[topology_id] = {
+                "status": "completed",
+                "data": final_data_for_frontend,
+                "created_at": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "node_count": len(nodes_to_save),
+                "edge_count": len(edges_to_save),
+                "max_nodes": max_nodes
+            }
+            
+            return jsonify({
+                'status': 'success',
+                'message': '知识图谱重新生成成功',
+                'data': final_data_for_frontend
+            })
+            
+    except Exception as e:
+        logger.error(f"重新生成知识图谱错误: {str(e)}", exc_info=True)
+        return jsonify({'status': 'error', 'message': f"重新生成知识图谱时出错: {str(e)}"}), 500
+
 
 @app.route('/api/topology/<topology_id>/node/<node_id>/question', methods=['GET'])
-def get_question_route(topology_id, node_id):
-    session_id = request.args.get('session_id')
-    
-    with app.app_context():
-        topo_info = get_db().cursor().execute("SELECT assistant_id FROM topologies WHERE id=?", (topology_id,)).fetchone()
-        if not topo_info: return jsonify({'status': 'error', 'message': '未找到该拓扑图'}), 404
-    
-    assistant_id = topo_info['assistant_id']
-
-    if not session_id:
-        session_id = str(uuid.uuid4())
-        quiz_sessions[session_id] = {"node_id": node_id, "consecutive_correct": 0, "mastered": False}
-        logger.info(f"为节点 {node_id} 创建新问答会话: {session_id}")
-    
-    session = quiz_sessions.get(session_id)
-    if not session or session.get("node_id") != node_id:
-        return jsonify({'status': 'error', 'message': '会话无效或节点不匹配'}), 400
-
-    if session.get("mastered"):
-        logger.info(f"节点 {node_id} 在会话 {session_id} 中已掌握。")
-        return jsonify({'status': 'success', 'mastered': True})
-
+def get_question(topology_id, node_id):
+    """获取关于指定节点的问题（基于原文内容，支持会话管理）"""
     try:
-        question_text = _generate_question_for_node(assistant_id, node_id)
-        question_id = str(uuid.uuid4())
-        
         with app.app_context():
+            # 从数据库获取节点信息
             db = get_db()
-            db.cursor().execute("INSERT INTO questions (id, topology_id, node_id, question, created_at) VALUES (?, ?, ?, ?, ?)", (question_id, topology_id, node_id, question_text, time.strftime('%Y-%m-%d %H:%M:%S')))
+            cursor = db.cursor()
+            cursor.execute(
+                "SELECT label, content_snippet FROM nodes WHERE topology_id = ? AND id = ?",
+                (topology_id, node_id)
+            )
+            node = cursor.fetchone()
+            
+            if not node:
+                return jsonify({
+                    'status': 'error',
+                    'message': '节点不存在'
+                }), 404
+            
+            node_label = node["label"]
+            content_snippet = node["content_snippet"]
+            
+            # 检查是否已有活跃会话
+            session_id = request.args.get('session_id')
+            if session_id:
+                cursor.execute(
+                    "SELECT mastered, consecutive_correct FROM quiz_sessions WHERE id = ?",
+                    (session_id,)
+                )
+                session = cursor.fetchone()
+                if session and session["mastered"]:
+                    return jsonify({
+                        'status': 'success',
+                        'mastered': True,
+                        'message': '该知识点已掌握'
+                    })
+            
+            # 创建或获取会话
+            if not session_id:
+                session_id = str(uuid.uuid4())
+                cursor.execute(
+                    "INSERT INTO quiz_sessions (id, topology_id, node_id, created_at) VALUES (?, ?, ?, ?)",
+                    (session_id, topology_id, node_id, time.strftime('%Y-%m-%d %H:%M:%S'))
+                )
+                db.commit()
+            
+            # 获取会话状态
+            cursor.execute(
+                "SELECT consecutive_correct FROM quiz_sessions WHERE id = ?",
+                (session_id,)
+            )
+            session = cursor.fetchone()
+            consecutive_correct = session["consecutive_correct"] if session else 0
+            
+            # 生成问题（基于会话状态）
+            question = generate_question(node_label, content_snippet, consecutive_correct)
+            
+            # 保存问题到数据库
+            question_id = str(uuid.uuid4())
+            cursor.execute(
+                "INSERT INTO questions (id, topology_id, node_id, question, session_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (question_id, topology_id, node_id, question, session_id, time.strftime('%Y-%m-%d %H:%M:%S'))
+            )
             db.commit()
-
-        response_data = {"question_id": question_id, "question": question_text, "session_id": session_id}
-        return jsonify({'status': 'success', 'data': response_data, 'mastered': False})
-        
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'question_id': question_id,
+                    'question': question,
+                    'node_id': node_id,
+                    'session_id': session_id
+                }
+            })
     except Exception as e:
-        logger.error(f"为节点 {node_id} 获取问题时出错: {e}", exc_info=True)
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        logger.error(f"获取问题错误: {str(e)}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f"生成问题时出错: {str(e)}"
+        }), 500
 
-
-class AnswerEvaluation(BaseModel):
-    correct: bool = Field(description="用户的回答是否正确。")
-    feedback: str = Field(description="对用户的回答进行评价，解释为什么正确或错误。")
-    correct_answer_from_document: str = Field(description="直接从文档中提取的、能够完整回答问题的原文段落，作为标准参考答案。")
-
+def generate_question(topic, context, consecutive_correct=0):
+    """根据连续正确次数生成不同难度的问题"""
+    from openai import OpenAI
+    
+    client = OpenAI(
+        api_key=OPENAI_API_KEY,
+        base_url="https://api.deepseek.com"
+    )
+    
+    # 根据掌握程度生成不同难度的问题
+    difficulty_map = {
+        0: "基础概念题，用简洁的语言解释",
+        1: "理解应用题，结合实例说明",
+        2: "综合分析题，比较相关概念"
+    }
+    difficulty = difficulty_map.get(consecutive_correct, "进阶思考题，拓展应用场景")
+    
+    # 构建提示词
+    messages = [
+        {"role": "system", "content": f"""你是一个教育专家，能够基于原文内容生成有针对性的问题。
+请生成一个{difficulty}，测试用户对"{topic}"的理解。
+问题应该清晰明确，基于提供的原文内容，难度适合当前掌握程度。
+只返回问题文本，不需要其他内容。"""},
+        {"role": "user", "content": f"原文片段: {context}\n问题:"}
+    ]
+    
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=messages,
+            max_tokens=150
+        )
+        
+        question = response.choices[0].message.content.strip()
+        return question
+    except Exception as e:
+        logger.error(f"生成问题出错: {str(e)}", exc_info=True)
+        return f"关于{topic}的问题（基于原文）"
 
 @app.route('/api/topology/<topology_id>/question/<question_id>/answer', methods=['POST'])
-def answer_question_route(topology_id, question_id):
-    data = request.json
-    user_answer = data.get('answer')
-    session_id = data.get('session_id')
-    node_id = data.get('node_id')
-
-    if not all([user_answer, session_id, node_id]):
-        return jsonify({'status': 'error', 'message': '缺少必要参数 (answer, session_id, node_id)'}), 400
-
-    session = quiz_sessions.get(session_id)
-    if not session or session.get("node_id") != node_id:
-        return jsonify({'status': 'error', 'message': '会话ID无效或与节点不匹配'}), 400
-
-    with app.app_context():
-        db = get_db()
-        cursor = db.cursor()
-        q_info = cursor.execute("SELECT question FROM questions WHERE id=?", (question_id,)).fetchone()
-        topo_info = cursor.execute("SELECT assistant_id FROM topologies WHERE id=?", (topology_id,)).fetchone()
-        if not q_info or not topo_info:
-            return jsonify({'status': 'error', 'message': '问题或拓扑图未找到'}), 404
-
+def answer_question(topology_id, question_id):
+    """处理用户对问题的回答（支持会话状态管理）并更新节点状态"""
     try:
-        schema = AnswerEvaluation.model_json_schema()
-        
-        eval_response = client.chat.completions.create(
-            model="gpt-4-turbo",
-            messages=[
-                {"role": "system", "content": "你是一位专业的助教。你的任务是：1. 评估学生对问题的回答是否正确。2. 给出评价。3. 最重要的是，从你关联的文档中，找出并提供这个问题的标准答案原文。"},
-                {"role": "user", "content": f"问题是：“{q_info['question']}”。学生的回答是：“{user_answer}”。请根据文件内容，完成评估和提取标准答案的任务。"}
-            ],
-            tools=[{"type": "function", "function": {"name": "evaluate_answer", "parameters": schema}}],
-            tool_choice={"type": "function", "function": {"name": "evaluate_answer"}}
+        with app.app_context():
+            data = request.json
+            answer = data.get('answer', '')
+            node_id = data.get('node_id', '')
+            session_id = data.get('session_id', '')
+            
+            if not answer or not node_id or not session_id:
+                return jsonify({
+                    'status': 'error',
+                    'message': '缺少必要的参数'
+                }), 400
+            
+            # 从数据库获取问题
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute(
+                "SELECT question, node_id, session_id FROM questions WHERE id = ? AND topology_id = ?",
+                (question_id, topology_id)
+            )
+            question_data = cursor.fetchone()
+            
+            if not question_data:
+                return jsonify({
+                    'status': 'error',
+                    'message': '问题不存在'
+                }), 404
+            
+            question = question_data["question"]
+            stored_node_id = question_data["node_id"]
+            stored_session_id = question_data["session_id"]
+            
+            if stored_node_id != node_id or stored_session_id != session_id:
+                return jsonify({
+                    'status': 'error',
+                    'message': '问题与会话不匹配'
+                }), 400
+            
+            # 从数据库获取节点信息
+            cursor.execute(
+                "SELECT label, content_snippet FROM nodes WHERE topology_id = ? AND id = ?",
+                (topology_id, node_id)
+            )
+            node = cursor.fetchone()
+            if not node:
+                return jsonify({
+                    'status': 'error',
+                    'message': '节点不存在'
+                }), 400
+            
+            node_label = node["label"]
+            content_snippet = node["content_snippet"]
+            
+            # 调用DeepSeek评估回答
+            evaluation = evaluate_answer(question, answer, node_label, content_snippet)
+            
+            # 确定回答是否正确
+            is_correct = evaluation["correct"] if "correct" in evaluation else False
+            feedback_text = evaluation["feedback"] if "feedback" in evaluation else "无法评估回答"
+            
+            # 更新问题状态
+            cursor.execute(
+                "UPDATE questions SET answered_at = ?, answer = ?, feedback = ?, correctness = ? WHERE id = ?",
+                (time.strftime('%Y-%m-%d %H:%M:%S'), answer, feedback_text, 1 if is_correct else 0, question_id)
+            )
+            
+            # 更新会话状态
+            cursor.execute(
+                "SELECT consecutive_correct, mastered FROM quiz_sessions WHERE id = ?",
+                (session_id,)
+            )
+            session = cursor.fetchone()
+            if not session:
+                return jsonify({
+                    'status': 'error',
+                    'message': '问答会话不存在'
+                }), 404
+            
+            current_consecutive = session["consecutive_correct"]
+            current_mastered = session["mastered"]
+            
+            # 更新连续正确计数
+            new_consecutive = current_consecutive + 1 if is_correct else 0
+            new_mastered = 1 if new_consecutive >= 1 else 0  # 只需答对1次即可掌握
+            
+            cursor.execute(
+                """UPDATE quiz_sessions SET 
+                questions_answered = questions_answered + 1,
+                consecutive_correct = ?,
+                mastered = ?
+                WHERE id = ?""",
+                (new_consecutive, new_mastered, session_id)
+            )
+            
+            # 更新节点的掌握状态
+            cursor.execute(
+                "SELECT mastery_score, consecutive_correct FROM nodes WHERE topology_id = ? AND id = ?",
+                (topology_id, node_id)
+            )
+            node_status = cursor.fetchone()
+            current_node_score = node_status["mastery_score"] if node_status else 0
+            current_node_consecutive = node_status["consecutive_correct"] if node_status else 0
+            
+            node_new_score = min(10, current_node_score + (1 if is_correct else -0.5))
+            node_new_consecutive = new_consecutive
+            node_new_mastered = new_mastered
+            
+            cursor.execute(
+                "UPDATE nodes SET mastery_score = ?, consecutive_correct = ?, mastered = ? WHERE topology_id = ? AND id = ?",
+                (node_new_score, node_new_consecutive, int(node_new_mastered), topology_id, node_id)
+            )
+            
+            # 确保掌握状态正确更新（显式处理）
+            if node_new_mastered:
+                cursor.execute(
+                    "UPDATE nodes SET mastered = 1 WHERE topology_id = ? AND id = ?",
+                    (topology_id, node_id)
+                )
+            
+            # 如果未掌握，生成下一个问题
+            next_question = None
+            next_question_id = None
+            if not new_mastered:
+                # 生成下一个问题（基于更新后的状态）
+                next_question = generate_question(node_label, content_snippet, new_consecutive)
+                if next_question:
+                    next_question_id = str(uuid.uuid4())
+                    cursor.execute(
+                        "INSERT INTO questions (id, topology_id, node_id, question, session_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                        (next_question_id, topology_id, node_id, next_question, session_id, time.strftime('%Y-%m-%d %H:%M:%S'))
+                    )
+            
+            db.commit()
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'correct': is_correct,
+                    'feedback': feedback_text,
+                    'mastered': new_mastered,
+                    'consecutive_correct': new_consecutive,
+                    'session_id': session_id,
+                    'next_question': {
+                        'id': next_question_id,
+                        'question': next_question
+                    } if next_question else None
+                }
+            })
+    except Exception as e:
+        logger.error(f"处理回答错误: {str(e)}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f"处理回答时出错: {str(e)}"
+        }), 500
+
+def evaluate_answer(question, answer, topic, context):
+    """调用DeepSeek评估回答是否正确（包含上下文）"""
+    from openai import OpenAI
+    
+    client = OpenAI(
+        api_key=OPENAI_API_KEY,
+        base_url="https://api.deepseek.com"
+    )
+    
+    messages = [
+        {"role": "system", "content": """你是一个知识评估专家，能够准确判断用户回答的正确性，并给出详细反馈。
+请评估用户对问题"{question}"的回答"{answer}"是否正确，参考原文片段："{context}"。
+你的评估应该包括：
+1. 判断回答是否正确（是/否）
+2. 提供具体的反馈，解释为什么正确或错误
+3. 如果回答错误，提供正确的信息
+4. 如果回答正确，考虑是否需要进一步提问以深化理解
+
+输出格式为JSON，包含以下字段：
+{
+  "correct": true/false,
+  "feedback": "具体的反馈信息",
+  "next_question": "如果需要进一步提问，这里是下一个问题，否则为null"
+}""".replace("{question}", question).replace("{answer}", answer).replace("{context}", context)},
+        {"role": "user", "content": f"问题: {question}\n回答: {answer}\n原文片段: {context}\n请评估这个回答是否正确，并提供反馈。如果正确，考虑是否需要进一步提问。"}
+    ]
+    
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=messages,
+            max_tokens=300
         )
-        tool_call = eval_response.choices[0].message.tool_calls[0]
-        eval_data = json.loads(tool_call.function.arguments)
-        is_correct = eval_data.get('correct', False)
+        
+        response_text = response.choices[0].message.content.strip()
+        logger.info(f"评估回答响应: {response_text[:200]}...")
+        
+        # 解析响应为JSON
+        try:
+            feedback = json.loads(clean_json_string(response_text))
+            # 确保包含所有必要字段
+            if 'correct' not in feedback:
+                feedback['correct'] = False
+            if 'feedback' not in feedback:
+                feedback['feedback'] = "无法解析评估结果，请重试"
+            if 'next_question' not in feedback:
+                feedback['next_question'] = None
+        except json.JSONDecodeError:
+            # 如果解析失败，创建默认反馈
+            feedback = {
+                "correct": False,
+                "feedback": "无法解析评估结果，请重试",
+                "next_question": None
+            }
+        
+        return feedback
+    except Exception as e:
+        logger.error(f"评估回答出错: {str(e)}", exc_info=True)
+        return {
+            "correct": False,
+            "feedback": f"评估回答时出错: {str(e)}",
+            "next_question": None
+        }
 
-        if is_correct:
-            session["consecutive_correct"] += 1
-        else:
-            session["consecutive_correct"] = 0
-        
-        if session["consecutive_correct"] >= 3:
-            session["mastered"] = True
-        
-        quiz_sessions[session_id] = session
-        
-        next_question_data = None
-        if not session["mastered"]:
-            try:
-                next_q_text = _generate_question_for_node(topo_info['assistant_id'], node_id)
-                next_q_id = str(uuid.uuid4())
-                next_question_data = {"id": next_q_id, "question": next_q_text}
-                with app.app_context():
-                    db = get_db()
-                    db.cursor().execute("INSERT INTO questions (id, topology_id, node_id, question, created_at) VALUES (?, ?, ?, ?, ?)", (next_q_id, topology_id, node_id, next_q_text, time.strftime('%Y-%m-%d %H:%M:%S')))
-                    db.commit()
-            except Exception as e:
-                logger.error(f"为会话 {session_id} 生成下一个问题时失败: {e}")
-        
-        final_feedback = eval_data.get('feedback', '')
-        correct_answer = eval_data.get('correct_answer_from_document', '')
-        if correct_answer:
-            final_feedback += f"\n\n**参考答案：**\n{correct_answer}"
+@app.route('/api/topology/<topology_id>/ignore', methods=['POST'])
+def ignore_nodes(topology_id):
+    """忽略用户选择的节点"""
+    try:
+        with app.app_context():
+            data = request.json
+            ignored_nodes = data.get('ignored_nodes', [])
+            
+            db = get_db()
+            cursor = db.cursor()
+            
+            # 获取所有节点
+            cursor.execute(
+                "SELECT id, label, level, value, mastered, mastery_score, content_snippet FROM nodes WHERE topology_id = ?",
+                (topology_id,)
+            )
+            all_nodes = [dict(row) for row in cursor.fetchall()]
+            
+            # 获取所有边
+            cursor.execute(
+                "SELECT from_node, to_node, label FROM edges WHERE topology_id = ?",
+                (topology_id,)
+            )
+            all_edges = [dict(row) for row in cursor.fetchall()]
+            
+            # 筛选节点（排除被忽略的）
+            filtered_nodes = [node for node in all_nodes if node["id"] not in ignored_nodes]
+            
+            # 筛选边（只保留未被忽略节点之间的边）
+            filtered_edges = []
+            node_ids = set([node["id"] for node in filtered_nodes])
+            for edge in all_edges:
+                if edge["from_node"] in node_ids and edge["to_node"] in node_ids:
+                    filtered_edges.append(edge)
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'nodes': filtered_nodes,
+                    'edges': filtered_edges,
+                    'root': next((node["id"] for node in filtered_nodes if node["level"] == 0), filtered_nodes[0]["id"] if filtered_nodes else None)
+                }
+            })
+    except Exception as e:
+        logger.error(f"忽略节点错误: {str(e)}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f"忽略节点时出错: {str(e)}"
+        }), 500
 
+
+###智能助手模块
+from openai import OpenAI
+
+client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
+
+# 全局变量缓存上传文档内容，方便检索（示例，生产应用用数据库或向量数据库）
+uploaded_documents = {}  # topology_id: 原文全文字符串
+
+def recommend_resources_based_on_question(question):
+    """
+    使用 DeepSeek API 根据用户问题推荐相关学习资源，返回格式：
+    [
+      {"title": "资源标题", "url": "链接", "snippet": "相关内容摘要"},
+      ...
+    ]
+    """
+    from openai import OpenAI
+    client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
+    messages = [
+        {"role": "system", "content": "你是一个学习资源推荐专家，能够根据用户的问题推荐最相关的高质量中文学习资料。请根据用户的问题，推荐5个高质量的可访问的中文学习资源，每个资源包含title、url、snippet，要求以JSON数组格式输出。只返回JSON数组，不要有多余解释。"},
+        {"role": "user", "content": f"问题：{question}\n请推荐5个相关学习资源。"}
+    ]
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=messages,
+            max_tokens=800
+        )
+        import json
+        raw = response.choices[0].message.content.strip()
+        # 尝试解析JSON
+        try:
+            # 处理可能的markdown代码块
+            if raw.startswith('```json'):
+                raw = raw[7:]
+            if raw.endswith('```'):
+                raw = raw[:-3]
+            resources = json.loads(raw)
+            if isinstance(resources, list):
+                return resources
+        except Exception:
+            pass
+        # 解析失败返回空
+        return []
+    except Exception as e:
+        logger.error(f"学习资源推荐API错误: {str(e)}", exc_info=True)
+        return []
+
+@app.route('/api/chat', methods=['POST'])
+def chat_with_knowledge():
+    """
+    用户交互问答接口：
+    优先基于上传文档内容回答，若文档匹配度低，则调用网络智能问答。
+    同时进行相关学习资源推荐，返回相关链接和内容片段。
+    """
+    try:
+        data = request.json
+        topology_id = data.get('topology_id', '')
+        user_question = data.get('question', '').strip()
+        
+        if not user_question:
+            return jsonify({'status': 'error', 'message': '问题不能为空'}), 400
+        
+        # 获取上传文档全文内容
         with app.app_context():
             db = get_db()
-            db.cursor().execute("UPDATE questions SET answer=?, feedback=?, correctness=?, answered_at=? WHERE id=?", (user_answer, final_feedback, int(is_correct), time.strftime('%Y-%m-%d %H:%M:%S'), question_id))
-            db.commit()
-
-        response_data = {"correct": is_correct, "feedback": final_feedback, "consecutive_correct": session["consecutive_correct"], "mastered": session["mastered"], "next_question": next_question_data}
-        return jsonify({'status': 'success', 'data': response_data})
-
+            cursor = db.cursor()
+            cursor.execute("SELECT content FROM topologies WHERE id = ?", (topology_id,))
+            row = cursor.fetchone()
+            document_text = row["content"] if row else ""
+        
+        # 直接用DeepSeek API在文档内容中查找相关内容
+        doc_search_prompt = (
+            "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
+            "并直接用文档原文文本回答。回答时可用Markdown格式排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
+            "**所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式**，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
+            "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
+        )
+        messages = [
+            {"role": "system", "content": "你是一个文档检索助手。"},
+            {"role": "user", "content": doc_search_prompt}
+        ]
+        try:
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=messages,
+                max_tokens=512
+            )
+            doc_answer = response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.error(f"DeepSeek文档检索API错误: {str(e)}", exc_info=True)
+            doc_answer = ""
+        
+        deny_phrases = ["未找到", "没有相关内容", "查无相关", "未检索到", "未能找到", "未能检索到", "没有找到"]
+        deny_matched = [deny for deny in deny_phrases if deny in doc_answer] if doc_answer else []
+        logger.info(f"[问答调试] doc_answer: {doc_answer}")
+        logger.info(f"[问答调试] deny_matched: {deny_matched}")
+        if doc_answer and not deny_matched:
+            answer = doc_answer  # 直接返回原始AI回答，保留Markdown
+            source = "document"
+        else:
+            # 文档中查不到，调用智能网络问答接口
+            answer = generate_answer_from_web(user_question)  # 直接返回原始AI回答，保留Markdown
+            source = "web"
+        # 推荐学习资源
+        resources = recommend_resources_based_on_question(user_question)
+        return jsonify({
+            'status': 'success',
+            'answer': answer,
+            'resources': resources,
+            'source': source
+        })
+        
     except Exception as e:
-        logger.error(f"评估问题 {question_id} 的答案时出错: {e}", exc_info=True)
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        logger.error(f"交互问答错误: {str(e)}", exc_info=True)
+        return jsonify({'status': 'error', 'message': f"交互问答出错: {str(e)}"}), 500
 
-# ... 其余部分保持不变 ...
+def generate_answer_from_web(question):
+    """
+    调用网络智能问答接口（DeepSeek）
+    """
+    messages = [
+        {"role": "system", "content": "你是一个智能助理，能够基于互联网资源回答各种问题。回答时用Markdown格式排版，所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式。只返回直接的答案内容，不要多余解释。"},
+        {"role": "user", "content": question}
+    ]
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=messages,
+            max_tokens=1024  # 增大输出长度
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"生成网络回答错误: {str(e)}", exc_info=True)
+        return "抱歉，网络问答服务不可用。"
+
 @app.teardown_appcontext
 def close_db(exception):
+    """关闭数据库连接"""
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
 if __name__ == '__main__':
-    init_db()
+    # 创建必要的文件夹
+    folders = ['uploads', 'static/css', 'static/js', 'templates']
+    for folder in folders:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+    
+    # 初始化数据库
+    try:
+        init_db()
+        logger.info("数据库初始化完成")
+    except Exception as e:
+        logger.error(f"数据库初始化异常: {str(e)}", exc_info=True)
+        logger.info("尝试继续运行，但可能会出现数据库相关错误")
+    
+    # 拓扑图处理结果存储（使用全局变量）
+    topology_results = {}
+    uploaded_documents = {}
+    
     logger.info("知识图谱生成系统启动中...")
     app.run(debug=True, port=5000)
