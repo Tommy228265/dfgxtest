@@ -308,14 +308,11 @@
             </div>
             <div class="feedback-body">
               <p id="feedbackText">你的回答准确覆盖了OSI七层模型的核心功能，特别是对网络层和传输层的区分描述清晰。</p>
-              <!-- 删除详细解析部分 -->
-              <!-- <div class="feedback-explanation">
-                <h5>详细解析</h5>
-                <p>OSI七层模型从下至上分别为：物理层（传输比特流）、数据链路层（帧传输与错误检测）、网络层（路由与寻址）...（完整解析内容）</p>
-              </div> -->
             </div>
             <div class="feedback-actions">
-              <button id="nextQuestion" class="action-btn">下一个问题</button>
+              <button id="nextQuestion" class="action-btn">
+                <span id="nextQuestionText">选择下一个知识点</span>
+              </button>
             </div>
           </div>
           
@@ -357,10 +354,9 @@
   const qaInput = document.getElementById('qaInput');
   const qaHistory = document.getElementById('qaHistory');
   const resourceRecommend = document.getElementById('resourceRecommend');
-  const greetingMsg = document.getElementById('greetingMsg'); // 新增：问候语div
+  const greetingMsg = document.getElementById('greetingMsg');
   let hasAsked = false; // 新增：是否已提问标志
 
-  // qaSubmitBtn点击事件监听, 首次提问时隐藏问候语
   if (qaSubmitBtn) {
     qaSubmitBtn.addEventListener('click', () => {
       const question = qaInput.value.trim();
@@ -370,7 +366,6 @@
         greetingMsg.style.display = 'none';
         hasAsked = true;
       }
-
       // 用户气泡（右侧）
       const userMsg = `<div class='msg-row user'><div class='msg user-msg'>${question}</div><div class='msg-avatar'><i class='fa fa-user'></i></div></div>`;
       qaHistory.innerHTML += userMsg;
@@ -401,28 +396,39 @@
         }
 
         if (data.status === 'success') {
-          // 显示AI回答，后跟来源
-          let sourceText = '';
+          let sourceText = ''; // 显示AI回答，后跟来源
           if (data.source === 'document') {
             sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：文档</span>`;
           } else if (data.source === 'web') {
             sourceText = `<br><span style="color:#888;font-size:13px;font-style:italic;">来源：网络</span>`;
           }
-          // 渲染前修正中括号公式为$$...$$
-          let fixedAnswer = fixLatexBrackets(data.answer);
-          // AI气泡（左侧）
-          const aiMsg = `<div class='msg ai-msg'><strong>智能助手：</strong><br><div class='markdown-body'>${marked.parse(fixedAnswer)}</div>${sourceText}</div>`;
-          qaHistory.innerHTML += aiMsg;
-          // 关键：将<p>$$...$$</p>替换为独立div，防止被<p>包裹
-          qaHistory.querySelectorAll('p').forEach(p => {
-            const text = p.textContent.trim();
-            if (/^\$\$[\s\S]*\$\$$/.test(text)) {
-              const latexDiv = document.createElement('div');
-              latexDiv.innerHTML = text;
-              p.replaceWith(latexDiv);
-            }
-          });
-          // 延迟调用MathJax渲染，确保公式100%被渲染
+          // 保护所有LaTeX公式，防止被marked破坏
+          function protectLatexBlocks(md) {
+            let blocks = [];
+            md = md.replace(/\$\$([\s\S]*?)\$\$/g, function(match, p1) {
+              blocks.push(p1);
+              return `@@LATEX_BLOCK_${blocks.length - 1}@@`;
+            });
+            let inlines = [];
+            md = md.replace(/\$([^\$\n]+?)\$/g, function(match, p1) {
+              inlines.push(p1);
+              return `@@LATEX_INLINE_${inlines.length - 1}@@`;
+            });
+            return {md, blocks, inlines};
+          }
+          function restoreLatexBlocks(html, blocks, inlines) {
+            html = html.replace(/@@LATEX_BLOCK_(\d+)@@/g, function(match, idx) {
+              return `$$${blocks[parseInt(idx)]}$$`;
+            });
+            html = html.replace(/@@LATEX_INLINE_(\d+)@@/g, function(match, idx) {
+              return `$${inlines[parseInt(idx)]}$`;
+            });
+            return html;
+          }
+          const {md, blocks, inlines} = protectLatexBlocks(data.answer); // 保护公式
+          let html = marked.parse(md); // 只对非公式部分做 marked 解析
+          html = restoreLatexBlocks(html, blocks, inlines); // 还原公式
+          qaHistory.insertAdjacentHTML('beforeend', `<div class='msg-row ai'><div class='msg-avatar'><i class='fa fa-robot'></i></div><div class='msg ai-msg'><div class='markdown-body'>${html}</div>${sourceText}</div></div>`); // 用insertAdjacentHTML插入，避免innerHTML+=带来的重解析
           setTimeout(() => {
             if (window.MathJax && MathJax.typesetPromise) {
               MathJax.typesetPromise();
@@ -499,66 +505,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
   <!-- 集成MathJax用于渲染LaTeX公式 -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script>
-    // 修正AI输出的中括号公式为MathJax可识别的$$...$$格式，并去除每行前的多余空格防止被识别为代码块，确保$$公式单独成段，去除空公式和多余空行
-    function fixLatexBrackets(md) {
-      return md;
-    }
-  </script>
 
-  <script>
-    // 修正AI输出的中括号公式为MathJax可识别的$$...$$格式，并去除每行前的多余空格防止被识别为代码块，确保$$公式单独成段，去除空公式和多余空行
-    function fixLatexBrackets(md) {
-      // 1. 去除每行前的多余空格
-      md = md.replace(/^[ \t]+/gm, '');
-      // 2. 替换独占一行的 [ ... ] 为 $$ ... $$
-      md = md.replace(/(^|\n)\s*\[\s*([\s\S]*?)\s*\]\s*(?=\n|$)/g, function(match, p1, p2) {
-        return `${p1}$$\n${p2.trim()}\n$$`;
-      });
-      // 3. 补全裸的独占一行LaTeX公式为块级公式
-      md = md.replace(/(^|\n)\s*(\\[a-zA-Z]+[\s\S]*?=.+)\s*(?=\n|$)/g, function(match, p1, p2) {
-        // 如果本行已经有$$则不处理
-        if (/^\s*\$\$/.test(p2)) return match;
-        return `${p1}$$\n${p2.trim()}\n$$`;
-      });
-      // 4. 确保所有 $$...$$ 公式单独成段，前后都有换行
-      md = md.replace(/([^\n])(\$\$[\s\S]*?\$\$)/g, '$1\n$2');
-      md = md.replace(/(\$\$[\s\S]*?\$\$)([^\n])/g, '$1\n$2');
-      // 5. 去除空公式
-      md = md.replace(/^\s*\$\$\s*$/gm, '');
-      // 6. 去除$$与内容之间的多余空行
-      md = md.replace(/\$\$\n{2,}/g, '$$\n');
-      md = md.replace(/\n{2,}\$\$/g, '\n$$');
-      return md;
-    }
-  </script>
-  
-  <div id="contextModal" class="context-modal hidden">
+  <div id="nodeActionModal" class="hidden">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">原文上下文</h3>
-        <button id="closeContextModal" class="close-modal">&times;</button>
-      </div>
-      <div class="modal-body" id="contextContent">
-        <div class="context-loading">
-          <i class="fa fa-spinner fa-spin"></i>
-          <p>加载原文上下文... (该功能需文档解析完成后可用)</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="nodeActionModal" class="modal-dialog hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">节点操作</h3>
+        <h3 class="modal-title" id="modalTitle">节点操作</h3>
         <button id="closeNodeActionModal" class="close-modal">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="node-info">
-          <h4 id="modalNodeName">知识点名称</h4>
-          <p id="modalNodeDesc">知识点描述信息将显示在这里</p>
-        </div>
         <p>请选择操作：</p>
         <div class="action-buttons">
           <button id="startQuizBtn" class="action-btn">

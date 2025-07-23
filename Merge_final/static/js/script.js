@@ -8,7 +8,6 @@ let topologyResults = {};
 let selectedFile = null;
 let maxNodes = 0;
 let nodeActionModal = null; // 在全局声明节点操作模态框变量
-let modalNodeName = null; // 新增：全局声明模态框节点名称元素
 let modalNodeDesc = null; // 新增：全局声明模态框节点描述元素
 let currentQuestionIndex = 1;
 
@@ -43,6 +42,51 @@ const questionGenerating = document.getElementById('questionGenerating'); // 问
 
 // 对话历史记录
 let chatHistory = [];
+
+// 更新节点颜色设置（点亮节点）- 全局函数
+function updateNodeColor(node) {
+  const style = {
+    shape: 'circle',
+    size: Math.max(10, node.value * 2),
+    font: {
+      color: '#ffffff',
+      size: 14,
+      face: 'Inter'
+    }
+  };
+
+  // 根据掌握程度设置颜色
+  if (node.mastered) {
+    style.color = {
+      border: '#2ecc71',
+      background: '#2ecc71',
+      highlight: {
+        border: '#27ae60',
+        background: '#27ae60'
+      }
+    };
+  } else if (node.mastery_score > 0) {
+    style.color = {
+      border: '#f39c12',
+      background: '#f39c12',
+      highlight: {
+        border: '#d35400',
+        background: '#d35400'
+      }
+    };
+  } else {
+    style.color = {
+      border: '#e74c3c',
+      background: '#e74c3c',
+      highlight: {
+        border: '#c0392b',
+        background: '#c0392b'
+      }
+    };
+  }
+
+  return style;
+}
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -355,7 +399,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const startQuizBtn = document.getElementById('startQuizBtn');
   const markNodeBtn = document.getElementById('markNodeBtn');
   const deleteNodeBtn = document.getElementById('deleteNodeBtn');
-  modalNodeName = document.getElementById('modalNodeName'); // 修改：使用全局变量
   modalNodeDesc = document.getElementById('modalNodeDesc'); // 修改：使用全局变量
   const navbarToggler = document.querySelector('.navbar-toggler');
   const navLinks = document.getElementById('nav-links');
@@ -576,51 +619,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
   }
 
-  // 更新节点颜色设置（点亮节点）
-  function updateNodeColor(node) {
-    const style = {
-      shape: 'circle',
-      size: Math.max(10, node.value * 2),
-      font: {
-        color: '#ffffff',
-        size: 14,
-        face: 'Inter'
-      }
-    };
-
-    // 根据掌握程度设置颜色
-    if (node.mastered) {
-      style.color = {
-        border: '#2ecc71',
-        background: '#2ecc71',
-        highlight: {
-          border: '#27ae60',
-          background: '#27ae60'
-        }
-      };
-    } else if (node.mastery_score > 0) {
-      style.color = {
-        border: '#f39c12',
-        background: '#f39c12',
-        highlight: {
-          border: '#d35400',
-          background: '#d35400'
-        }
-      };
-    } else {
-      style.color = {
-        border: '#e74c3c',
-        background: '#e74c3c',
-        highlight: {
-          border: '#c0392b',
-          background: '#c0392b'
-        }
-      };
-    }
-
-    return style;
-  }
-
   // 渲染知识图谱
   function renderGraph(graphData) {
     console.log('开始渲染图谱，节点数:', graphData.nodes.length);
@@ -717,7 +715,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 节点点击事件 - 修复弹窗显示问题
     network.on('click', function(params) {
       console.log('节点点击事件触发', params); // 调试信息
-      console.log('modalNodeName:', modalNodeName); // 调试信息
       console.log('modalNodeDesc:', modalNodeDesc); // 调试信息
       console.log('nodeActionModal:', nodeActionModal); // 调试信息
       
@@ -726,12 +723,56 @@ document.addEventListener('DOMContentLoaded', function() {
         const node = nodes.get(selectedNodeId);
         console.log('选中的节点:', node); // 调试信息
         
-        if (modalNodeName) modalNodeName.textContent = node.label;
-        if (modalNodeDesc) modalNodeDesc.textContent = node.content_snippet || '暂无详细描述';
+        // 获取节点在屏幕上的位置
+        const nodePosition = network.getPositions([selectedNodeId])[selectedNodeId];
+        const canvasPosition = network.canvasToDOM(nodePosition);
+        console.log('节点位置:', nodePosition); // 调试信息
+        console.log('画布位置:', canvasPosition); // 调试信息
+        
+        // 获取网络容器的位置偏移
+        const networkContainer = document.getElementById('networkContainer');
+        const containerRect = networkContainer.getBoundingClientRect();
+        console.log('容器位置:', containerRect); // 调试信息
+        
+        // 更新模态框标题为节点名称
+        const modalTitle = document.getElementById('modalTitle');
+        if (modalTitle) modalTitle.textContent = node.label;
 
         if (nodeActionModal) {
-          nodeActionModal.classList.remove('hidden'); // 新增：移除hidden类
+          // 根据节点位置动态定位模态框
+          const modalWidth = 320; // 模态框宽度
+          const modalHeight = 200; // 模态框高度
+          const padding = 20; // 边距
+          
+          // 计算模态框位置 - 显示在节点正右边
+          let left = canvasPosition.x + containerRect.left + padding;
+          let top = canvasPosition.y + containerRect.top - modalHeight / 2;
+          
+          // 确保模态框不超出屏幕边界
+          const screenWidth = window.innerWidth;
+          const screenHeight = window.innerHeight;
+          
+          // 如果右边空间不够，则显示在左边
+          if (left + modalWidth > screenWidth) {
+            left = canvasPosition.x - modalWidth - padding;
+          }
+          
+          if (top < 0) {
+            top = padding;
+          } else if (top + modalHeight > screenHeight) {
+            top = screenHeight - modalHeight - padding;
+          }
+          
+          // 设置模态框位置
+          nodeActionModal.style.position = 'fixed';
+          nodeActionModal.style.left = left + 'px';
+          nodeActionModal.style.top = top + 'px';
+          nodeActionModal.style.right = 'auto';
+          nodeActionModal.style.transform = 'none';
+          
+          nodeActionModal.classList.remove('hidden');
           nodeActionModal.classList.add('show');
+          console.log('模态框位置:', {left, top}); // 调试信息
           console.log('模态框已显示'); // 调试信息
         } else {
           console.log('模态框元素未找到'); // 调试信息
@@ -739,7 +780,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         if (nodeActionModal) {
           nodeActionModal.classList.remove('show');
-          nodeActionModal.classList.add('hidden'); // 新增：添加hidden类
+          nodeActionModal.classList.add('hidden');
         }
       }
     });
@@ -785,19 +826,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // 为关闭按钮添加事件监听器
-  if(closeNodeActionModal) {
-      closeNodeActionModal.addEventListener('click', () => {
-          nodeActionModal.classList.remove('show');
-          nodeActionModal.classList.add('hidden'); // 新增：添加hidden类
-      });
+  // 关闭节点操作模态框 - 添加空值检查
+  if (closeNodeActionModal) {
+    closeNodeActionModal.addEventListener('click', function() {
+      // 添加淡出动画
+      if (nodeActionModal) {
+        nodeActionModal.classList.remove('show');
+        setTimeout(() => {
+          nodeActionModal.classList.add('hidden');
+        }, 300);
+      }
+    });
+  } else {
+    console.error('关闭模态框按钮未找到');
+  }
+
+  // 点击模态框背景关闭 - 添加空值检查
+  if (nodeActionModal) {
+    nodeActionModal.addEventListener('click', function(e) {
+      if (e.target === this) { // 点击背景时关闭
+        this.classList.remove('show');
+        setTimeout(() => {
+          this.classList.add('hidden');
+        }, 300);
+      }
+    });
+  } else {
+    console.error('节点操作模态框未找到');
   }
 
   // 事件：开始问答
   if(startQuizBtn) {
       startQuizBtn.addEventListener('click', () => {
           nodeActionModal.classList.remove('show');
-          nodeActionModal.classList.add('hidden'); // 新增：添加hidden类
+          nodeActionModal.classList.add('hidden');
           startQuizSession(selectedNodeId);
       });
   }
@@ -808,7 +870,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (selectedNodeId) {
               markNodeAsMastered(selectedNodeId);
               nodeActionModal.classList.remove('show');
-              nodeActionModal.classList.add('hidden'); // 新增：添加hidden类
+              nodeActionModal.classList.add('hidden');
           }
       });
   }
@@ -818,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function() {
       deleteNodeBtn.addEventListener('click', () => {
           if (!selectedNodeId) return;
           nodeActionModal.classList.remove('show');
-          nodeActionModal.classList.add('hidden'); // 新增：添加hidden类
+          nodeActionModal.classList.add('hidden');
           
           const nodes = network.body.data.nodes;
           const edges = network.body.data.edges;
@@ -1092,6 +1154,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // 显示反馈
         if (feedbackTitle) feedbackTitle.textContent = data.data.correct ? '回答正确!' : '回答错误';
         if (feedbackCard) feedbackCard.className = data.data.correct ? 'feedback-box success' : 'feedback-box error';
+        
+        // 动态设置按钮文本
+        const nextQuestionText = document.getElementById('nextQuestionText');
+        if (nextQuestionText) {
+          if (data.data.correct) {
+            nextQuestionText.textContent = '选择下一个知识点';
+          } else {
+            nextQuestionText.textContent = '生成下个问题';
+          }
+        }
         
         // 清空现有反馈内容并添加新内容
         if (feedbackText) {
@@ -1643,55 +1715,28 @@ function regenerateGraphWithNodeCount(nodeCount) {
 function markNodeAsMastered(nodeId) {
   if (!currentTopologyId || !nodeId || !network) return;
   
-  // 检查当前节点的掌握状态
+  // 直接点亮节点，不管当前状态
   const nodes = network.body.data.nodes;
   const node = nodes.get(nodeId);
   
-  // 根据节点颜色判断掌握状态
   if (node) {
-    const nodeColor = node.color;
-    const nodeLabel = node.label || '该节点';
-    
-    // 如果节点是绿色（已掌握），显示已掌握消息
-    if (nodeColor && (nodeColor.background === '#2ecc71' || nodeColor.background === 'green' || 
-        nodeColor === '#2ecc71' || nodeColor === 'green')) {
-      showNotification('成功', `您已掌握该节点`, 'success');
-      return;
-    }
-    
-    // 如果节点是红色（未掌握），显示未掌握消息
-    if (nodeColor && (nodeColor.background === '#e74c3c' || nodeColor.background === 'red' || 
-        nodeColor === '#e74c3c' || nodeColor === 'red')) {
-      showNotification('错误', '您还未掌握该节点', 'error');
-      return;
-    }
-    
-    // 如果节点有mastered属性，使用该属性
-    if (node.mastered === true) {
-      showNotification('成功', `您已掌握该节点`, 'success');
-      return;
-    }
-    
-    if (node.mastered === false) {
-      showNotification('错误', '您还未掌握该节点', 'error');
-      return;
-    }
-
-
+    // 直接设置节点为已掌握状态
     node.mastered = true;
     node.mastery_score = 10;
     node.consecutive_correct = 3;
     
+    // 更新节点颜色为绿色（已掌握）
     const updatedStyle = updateNodeColor(node);
     nodes.update({
       id: nodeId,
       ...updatedStyle
     });
     
-    showNotification('成功', `已将"${node.label}"标记为已掌握`, 'success');
+    // 显示成功消息
+    showNotification('成功', '您已掌握该节点', 'success');
   }
   
-  // 如果无法确定状态，调用API
+  // 调用API更新数据库
   fetch(`/api/topology/${currentTopologyId}/node/${nodeId}/master`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1700,7 +1745,7 @@ function markNodeAsMastered(nodeId) {
   .then(res => res.json())
   .then(data => {
     if (data.status === 'success') {
-      showNotification('成功', `您已掌握该节点`, 'success');
+      // API调用成功，确保节点状态正确
       const nodes = network.body.data.nodes;
       const node = nodes.get(nodeId);
       if (node) {
@@ -1708,13 +1753,12 @@ function markNodeAsMastered(nodeId) {
         nodes.update({ id: nodeId, ...updateNodeColor(node) });
       }
     } else {
-      // 如果API返回错误，显示未掌握提示
-      showNotification('错误', '您还未掌握该节点', 'error');
+      // API调用失败，但仍然保持前端显示为已掌握
+      console.error('API更新失败:', data.message);
     }
   }).catch(err => {
-    // 如果网络错误，显示未掌握提示
-    showNotification('错误', '您还未掌握该节点', 'error');
-    console.error(err);
+    // 网络错误，但仍然保持前端显示为已掌握
+    console.error('网络错误:', err);
   });
 }
 
