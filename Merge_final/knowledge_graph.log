@@ -8236,3 +8236,1142 @@ openai.APIConnectionError: Connection error.
 2025-07-22 16:53:08,628 - KnowledgeGraphGenerator - INFO - ֪ʶͼ�� c7f07343-9ded-4dc1-972b-e9f322601d77 ����ɹ����û�: anonymous
 2025-07-22 16:53:08,628 - werkzeug - INFO - 127.0.0.1 - - [22/Jul/2025 16:53:08] "POST /api/topology/c7f07343-9ded-4dc1-972b-e9f322601d77/regenerate HTTP/1.1" 200 -
 2025-07-22 16:53:08,643 - werkzeug - INFO - 127.0.0.1 - - [22/Jul/2025 16:53:08] "GET /api/topology/c7f07343-9ded-4dc1-972b-e9f322601d77 HTTP/1.1" 200 -
+2025-07-23 10:38:53,556 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 10:38:53,558 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 10:38:53,559 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 10:38:53,559 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 10:38:53,559 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 10:38:53,577 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-23 10:38:53,577 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-23 10:38:53,589 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 10:38:54,743 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 10:38:54,743 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 10:38:54,743 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 10:38:54,744 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 10:38:54,744 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 10:38:54,748 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 10:38:54,770 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 10:39:03,928 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:03] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-23 10:39:04,013 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:04] "GET /login HTTP/1.1" 200 -
+2025-07-23 10:39:04,166 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:04] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-23 10:39:17,056 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:17] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-23 10:39:17,076 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:17] "GET /login HTTP/1.1" 200 -
+2025-07-23 10:39:17,112 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:17] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 10:39:18,830 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:18] "GET /login HTTP/1.1" 200 -
+2025-07-23 10:39:18,862 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:18] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 10:39:19,710 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:19] "GET /register HTTP/1.1" 200 -
+2025-07-23 10:39:19,768 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 10:39:19] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:01:04,651 - werkzeug - INFO -  * Detected change in '/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py', reloading
+2025-07-23 11:01:05,063 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 11:01:08,403 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 11:01:08,405 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 11:01:08,405 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 11:01:08,406 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 11:01:08,406 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 11:01:08,436 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 11:01:08,459 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 11:05:16,527 - werkzeug - INFO -  * Detected change in '/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py', reloading
+2025-07-23 11:05:16,763 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 11:05:21,060 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 11:05:21,060 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 11:05:21,060 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 11:05:21,061 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 11:05:21,061 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 11:05:21,084 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 11:05:21,102 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 11:13:07,988 - werkzeug - INFO -  * Detected change in '/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py', reloading
+2025-07-23 11:13:08,292 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 11:13:12,239 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 11:13:12,245 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 11:13:12,245 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 11:13:12,245 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 11:13:12,246 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 11:13:12,272 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 11:13:12,288 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 11:13:12,720 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:12] "GET /login HTTP/1.1" 200 -
+2025-07-23 11:13:12,832 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:12] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:13:14,182 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:14] "GET /login HTTP/1.1" 200 -
+2025-07-23 11:13:14,208 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:14] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:13:14,876 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:14] "GET /login HTTP/1.1" 200 -
+2025-07-23 11:13:14,896 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:14] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:13:32,988 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 11:13:32,988 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 11:13:32,989 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 11:13:32,989 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 11:13:32,989 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 11:13:33,025 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-23 11:13:33,025 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-23 11:13:33,026 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 11:13:34,435 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 11:13:34,436 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 11:13:34,436 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 11:13:34,436 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 11:13:34,436 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 11:13:34,443 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 11:13:34,477 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 11:13:36,705 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:36] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-23 11:13:36,795 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:36] "GET /login HTTP/1.1" 200 -
+2025-07-23 11:13:36,875 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:36] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:13:41,725 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:41] "GET /register HTTP/1.1" 200 -
+2025-07-23 11:13:41,791 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:41] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:13:58,016 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:58] "POST /register HTTP/1.1" 200 -
+2025-07-23 11:13:58,081 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:13:58] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:14:36,946 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:14:36] "[32mPOST /verify_email HTTP/1.1[0m" 302 -
+2025-07-23 11:14:36,951 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:14:36] "GET /login HTTP/1.1" 200 -
+2025-07-23 11:14:36,984 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:14:36] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 11:14:45,564 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:14:45] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-23 11:14:45,585 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:14:45] "GET / HTTP/1.1" 200 -
+2025-07-23 11:14:45,635 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:14:45] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:14:45,663 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:14:45] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-23 11:15:17,778 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 11:15:21,873 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 未找到
+2025-07-23 11:15:21,874 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: ['未找到']
+2025-07-23 11:15:21,986 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 11:15:41,676 - KnowledgeGraphGenerator - INFO - [问答调试] 网络AI原始返回内容: '生成对抗网络（GAN, Generative Adversarial Network）是一种深度学习模型，由生成器（Generator）和判别器（Discriminator）两部分组成，通过对抗训练的方式生成逼真的数据。\n\n### 基本结构\n1. **生成器（$G$）**：输入随机噪声$z$，生成假数据$G(z)$，目标是欺骗判别器。\n2. **判别器（$D$）**：输入真实数据$x$或生成数据$G(z)$，输出其为真的概率$D(x)$或$D(G(z))$，目标是区分真假。\n\n### 目标函数\nGAN的优化目标是一个极小极大博弈：\n$$\n\\min_G \\max_D V(D, G) = \\mathbb{E}_{x \\sim p_{\\text{data}}}[\\log D(x)] + \\mathbb{E}_{z \\sim p_z}[\\log(1 - D(G(z)))]\n$$\n\n### 训练过程\n1. 固定$G$，训练$D$最大化$V(D, G)$。\n2. 固定$D$，训练$G$最小化$V(D, G)$（或最大化$\\log D(G(z))$）。\n\n### 变体与应用\n- **DCGAN**：使用卷积结构的GAN。\n- **WGAN**：通过Wasserstein距离改进训练稳定性。\n- **CycleGAN**：用于图像风格迁移。\n- **应用**：图像生成、超分辨率、数据增强等。'
+2025-07-23 11:15:41,806 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 11:16:04,317 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:16:04] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 11:26:58,712 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:26:58] "GET / HTTP/1.1" 200 -
+2025-07-23 11:26:58,759 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:26:58] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:26:58,760 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:26:58] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:27:03,616 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:27:03] "GET / HTTP/1.1" 200 -
+2025-07-23 11:27:03,659 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:27:03] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:27:03,659 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:27:03] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 11:31:49,974 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:31:49] "GET / HTTP/1.1" 200 -
+2025-07-23 11:31:50,018 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:31:50] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:31:50,055 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:31:50] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:31:51,516 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:31:51] "GET / HTTP/1.1" 200 -
+2025-07-23 11:31:51,554 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:31:51] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 11:31:51,556 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:31:51] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:32:00,465 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 11:32:04,661 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 未找到
+2025-07-23 11:32:04,661 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: ['未找到']
+2025-07-23 11:32:04,941 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 11:32:31,286 - KnowledgeGraphGenerator - INFO - [问答调试] 网络AI原始返回内容: '生成对抗网络（GAN，Generative Adversarial Network）是一种深度学习模型，由生成器（Generator）和判别器（Discriminator）两部分组成，通过对抗训练的方式生成逼真的数据。\n\n### 1. 基本结构\n- **生成器（$G$）**：输入随机噪声$z$（通常从高斯分布采样），生成假数据$G(z)$，目标是欺骗判别器。\n- **判别器（$D$）**：输入真实数据$x$或生成数据$G(z)$，输出一个概率值$D(x)$或$D(G(z))$，判断输入是否为真实数据。\n\n### 2. 目标函数\nGAN的训练目标是一个极小极大博弈（minimax game）：\n$$\n\\min_G \\max_D V(D, G) = \\mathbb{E}_{x \\sim p_{\\text{data}}}[\\log D(x)] + \\mathbb{E}_{z \\sim p_z}[\\log(1 - D(G(z)))]\n$$\n- 判别器$D$希望最大化$V(D, G)$（正确分类真实和生成数据）。\n- 生成器$G$希望最小化$V(D, G)$（生成数据被判别为真实）。\n\n### 3. 训练过程\n1. 固定$G$，训练$D$区分真实数据和生成数据。\n2. 固定$D$，训练$G$生成更逼真的数据以欺骗$D$。\n3. 交替迭代，直到平衡（纳什均衡）。\n\n### 4. 常见变体\n- **DCGAN**：使用卷积网络的GAN，生成高质量图像。\n- **WGAN**：通过Wasserstein距离改进训练稳定性。\n- **CycleGAN**：实现无配对数据的图像风格转换。\n- **StyleGAN**：生成高分辨率、可控的人脸图像。\n\n### 5. 应用领域\n- 图像生成（如人脸、艺术品）。\n- 数据增强（生成训练样本）。\n- 图像超分辨率、修复。\n- 文本到图像合成。\n\nGAN的核心思想是通过对抗训练让生成器和判别器相互促进，最终生成高质量数据。'
+2025-07-23 11:32:31,370 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 11:32:52,691 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:32:52] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 11:45:24,457 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:45:24] "GET / HTTP/1.1" 200 -
+2025-07-23 11:45:24,547 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:45:24] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:45:24,558 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:45:24] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:45:39,746 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:45:39] "GET / HTTP/1.1" 200 -
+2025-07-23 11:45:39,797 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:45:39] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:45:39,797 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:45:39] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:45:48,647 - openai._base_client - INFO - Retrying request to /chat/completions in 0.495788 seconds
+2025-07-23 11:45:49,148 - openai._base_client - INFO - Retrying request to /chat/completions in 0.756222 seconds
+2025-07-23 11:45:49,912 - KnowledgeGraphGenerator - ERROR - DeepSeek文档检索API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1562, in chat_with_knowledge
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:45:49,952 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 
+2025-07-23 11:45:49,952 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 11:45:49,956 - openai._base_client - INFO - Retrying request to /chat/completions in 0.436643 seconds
+2025-07-23 11:45:50,400 - openai._base_client - INFO - Retrying request to /chat/completions in 0.882410 seconds
+2025-07-23 11:45:51,291 - KnowledgeGraphGenerator - ERROR - 生成网络回答错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1611, in generate_answer_from_web
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:45:51,295 - openai._base_client - INFO - Retrying request to /chat/completions in 0.474020 seconds
+2025-07-23 11:45:51,810 - openai._base_client - INFO - Retrying request to /chat/completions in 0.988889 seconds
+2025-07-23 11:45:52,807 - KnowledgeGraphGenerator - ERROR - 学习资源推荐API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1503, in recommend_resources_based_on_question
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:45:52,812 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:45:52] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 11:46:03,091 - openai._base_client - INFO - Retrying request to /chat/completions in 0.384194 seconds
+2025-07-23 11:46:03,486 - openai._base_client - INFO - Retrying request to /chat/completions in 0.992879 seconds
+2025-07-23 11:46:04,491 - KnowledgeGraphGenerator - ERROR - DeepSeek文档检索API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1562, in chat_with_knowledge
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:46:04,494 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 
+2025-07-23 11:46:04,494 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 11:46:04,497 - openai._base_client - INFO - Retrying request to /chat/completions in 0.468474 seconds
+2025-07-23 11:46:04,974 - openai._base_client - INFO - Retrying request to /chat/completions in 0.932632 seconds
+2025-07-23 11:46:05,916 - KnowledgeGraphGenerator - ERROR - 生成网络回答错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1611, in generate_answer_from_web
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:46:05,924 - openai._base_client - INFO - Retrying request to /chat/completions in 0.448471 seconds
+2025-07-23 11:46:06,379 - openai._base_client - INFO - Retrying request to /chat/completions in 0.833176 seconds
+2025-07-23 11:46:07,219 - KnowledgeGraphGenerator - ERROR - 学习资源推荐API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1503, in recommend_resources_based_on_question
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:46:07,224 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:07] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 11:46:21,348 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:21] "GET / HTTP/1.1" 200 -
+2025-07-23 11:46:21,383 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:21] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:46:21,384 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:21] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 11:46:22,119 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:22] "GET / HTTP/1.1" 200 -
+2025-07-23 11:46:22,138 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:22] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 11:46:22,144 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:22] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:46:31,774 - openai._base_client - INFO - Retrying request to /chat/completions in 0.408168 seconds
+2025-07-23 11:46:32,192 - openai._base_client - INFO - Retrying request to /chat/completions in 0.938130 seconds
+2025-07-23 11:46:33,137 - KnowledgeGraphGenerator - ERROR - DeepSeek文档检索API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1562, in chat_with_knowledge
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:46:33,139 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 
+2025-07-23 11:46:33,139 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 11:46:33,141 - openai._base_client - INFO - Retrying request to /chat/completions in 0.380098 seconds
+2025-07-23 11:46:33,527 - openai._base_client - INFO - Retrying request to /chat/completions in 0.993743 seconds
+2025-07-23 11:46:34,526 - KnowledgeGraphGenerator - ERROR - 生成网络回答错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1611, in generate_answer_from_web
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:46:34,542 - openai._base_client - INFO - Retrying request to /chat/completions in 0.415698 seconds
+2025-07-23 11:46:34,966 - openai._base_client - INFO - Retrying request to /chat/completions in 0.812820 seconds
+2025-07-23 11:46:35,786 - KnowledgeGraphGenerator - ERROR - 学习资源推荐API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1503, in recommend_resources_based_on_question
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:46:35,789 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:46:35] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 11:51:19,759 - openai._base_client - INFO - Retrying request to /chat/completions in 0.492931 seconds
+2025-07-23 11:51:20,257 - openai._base_client - INFO - Retrying request to /chat/completions in 0.877940 seconds
+2025-07-23 11:51:21,140 - KnowledgeGraphGenerator - ERROR - DeepSeek文档检索API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1562, in chat_with_knowledge
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:51:21,145 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 
+2025-07-23 11:51:21,145 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 11:51:21,148 - openai._base_client - INFO - Retrying request to /chat/completions in 0.405849 seconds
+2025-07-23 11:51:21,579 - openai._base_client - INFO - Retrying request to /chat/completions in 0.836452 seconds
+2025-07-23 11:51:22,417 - KnowledgeGraphGenerator - ERROR - 生成网络回答错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1611, in generate_answer_from_web
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:51:22,422 - openai._base_client - INFO - Retrying request to /chat/completions in 0.491169 seconds
+2025-07-23 11:51:22,920 - openai._base_client - INFO - Retrying request to /chat/completions in 0.830021 seconds
+2025-07-23 11:51:23,757 - KnowledgeGraphGenerator - ERROR - 学习资源推荐API错误: Connection error.
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/http_proxy.py", line 288, in handle_request
+    connect_response = self._connection.handle_request(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 972, in request
+    response = self._client.send(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 1503, in recommend_resources_based_on_question
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1004, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2025-07-23 11:51:23,762 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:51:23] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 11:51:34,351 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:51:34] "GET /login HTTP/1.1" 200 -
+2025-07-23 11:51:40,011 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:51:40] "GET / HTTP/1.1" 200 -
+2025-07-23 11:51:40,051 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:51:40] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 11:51:40,051 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:51:40] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:55:28,023 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:55:28] "GET / HTTP/1.1" 200 -
+2025-07-23 11:55:28,068 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:55:28] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:55:28,070 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:55:28] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:56:03,552 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:56:03] "GET / HTTP/1.1" 200 -
+2025-07-23 11:56:03,598 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:56:03] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:56:03,599 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:56:03] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:57:25,389 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:57:25] "GET / HTTP/1.1" 200 -
+2025-07-23 11:57:25,429 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:57:25] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:57:25,430 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:57:25] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:57:40,318 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:57:40] "GET / HTTP/1.1" 200 -
+2025-07-23 11:57:40,354 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:57:40] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:57:40,368 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:57:40] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 11:58:35,189 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:58:35] "GET / HTTP/1.1" 200 -
+2025-07-23 11:58:35,219 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:58:35] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 11:58:35,250 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 11:58:35] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:04:39,806 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:04:39] "GET / HTTP/1.1" 200 -
+2025-07-23 12:04:39,845 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:04:39] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:04:39,845 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:04:39] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:07:17,968 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:07:17] "GET / HTTP/1.1" 200 -
+2025-07-23 12:07:18,014 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:07:18] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:07:18,015 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:07:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:07:32,825 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:07:32] "GET / HTTP/1.1" 200 -
+2025-07-23 12:07:32,860 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:07:32] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:07:32,861 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:07:32] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:08:24,327 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:08:24] "GET / HTTP/1.1" 200 -
+2025-07-23 12:08:24,362 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:08:24] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:08:24,368 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:08:24] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:10:14,558 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:14] "GET / HTTP/1.1" 200 -
+2025-07-23 12:10:14,595 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:14] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:10:14,595 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:14] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:10:45,350 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:45] "GET / HTTP/1.1" 200 -
+2025-07-23 12:10:45,388 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:45] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 12:10:45,390 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:45] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:10:49,644 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:49] "GET / HTTP/1.1" 200 -
+2025-07-23 12:10:49,685 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:49] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:10:49,685 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:49] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:10:59,241 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:59] "GET / HTTP/1.1" 200 -
+2025-07-23 12:10:59,281 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:59] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:10:59,281 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:10:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:11:33,579 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:33] "GET / HTTP/1.1" 200 -
+2025-07-23 12:11:33,613 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:33] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:11:33,613 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:33] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:11:41,556 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:41] "GET / HTTP/1.1" 200 -
+2025-07-23 12:11:41,590 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:41] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:11:41,591 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:41] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 12:11:55,573 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:55] "GET / HTTP/1.1" 200 -
+2025-07-23 12:11:55,611 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:55] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 12:11:55,611 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:55] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -

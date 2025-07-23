@@ -167,7 +167,7 @@ body > *:last-child {
 
 .upload-area p {
   color: #444444;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
   line-height: 1.6;
 }
 
@@ -181,6 +181,7 @@ body > *:last-child {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+  margin-bottom: 10px;
 }
 
 .upload-btn:hover {
@@ -191,6 +192,18 @@ body > *:last-child {
 
 .upload-btn input {
   display: none;
+}
+
+.generate-btn {
+  display: inline-block;
+  background: #737b80;
+  color: white;
+  padding: 10px 30px;
+  font-size: 0.8rem;   
+  border-radius: 32px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 /* 文件状态提示 */
@@ -802,8 +815,6 @@ body > *:last-child {
 .chat-feedback li {
   margin-bottom: 6px;
 }
-
-
 
 /* 新的顶部灰色框样式 */
 .header {
@@ -1489,8 +1500,6 @@ body > *:last-child {
   }
 }
 
-/* 优化的导航栏和底部栏样式 */
-
 /* 顶部导航栏优化 */
 .navbar {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -1505,7 +1514,6 @@ body > *:last-child {
 .navbar-subtitle {
     font-size: 0.9rem;
 }
-
 
 /* Index页面特殊样式 */
 .index-page-wrapper {
@@ -1738,7 +1746,6 @@ body > *:last-child {
     border-top: 1px solid #5fa2dd; /* Lighter blue border */
 }
 
-
 /* Toast message styles */
 .toast-container {
     z-index: 1100;
@@ -1920,13 +1927,89 @@ body > *:last-child {
     max-width: 450px;
 }
 
+/* 智能助手气泡式对话 */
+.msg-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+.msg-row.user {
+  justify-content: flex-end;
+}
+.msg-row.ai {
+  justify-content: flex-start;
+}
+
+.msg-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #eaf6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin: 0 10px;
+  box-shadow: 0 1px 4px rgba(52,152,219,0.08);
+}
+.msg-row.user .msg-avatar {
+  background: #f3f4f6;
+  color: #2176ae;
+}
+.msg-row.ai .msg-avatar {
+  background: #eaf6ff;
+  color: #2ecc71;
+}
+
+.msg {
+  max-width: 70%;
+  padding: 10px 22px 10px 27px;
+  border-radius: 18px;
+  font-size: 17px;
+  line-height: 1.5;
+  word-break: break-word;
+  box-shadow: 0 2px 8px rgba(52,152,219,0.06);
+  position: relative;
+  margin: 0;
+}
+.msg.user-msg {
+  background: #f3f4f6;
+  color: #222;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-right: 5px solid #3498db;
+  text-align: right;
+  border-left: none;
+}
+.msg.ai-msg {
+  background: #eaf6ff;
+  color: #1a355b;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-left: 5px solid #2ecc71;
+  text-align: left;
+  padding: 10px 22px 10px 27px;
+}
+
+.chat-history {
+  scrollbar-width: thin;
+  scrollbar-color: #b3d4fc #f8fafc;
+}
+.chat-history::-webkit-scrollbar {
+  width: 8px;
+  background: #f8fafc;
+}
+.chat-history::-webkit-scrollbar-thumb {
+  background: #b3d4fc;
+  border-radius: 6px;
+}
 .chat-box {
     background: #f8fafc;
     border-radius: 14px;
     box-shadow: 0 2px 12px rgba(52,152,219,0.08);
     padding: 24px 20px 16px 20px;
     margin-bottom: 32px;
-    max-width: 700px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -2020,43 +2103,47 @@ body > *:last-child {
     color: #3498db;
     margin-right: 6px;
   }
+
   .resource-list {
     background: #f6fafd;
     border-radius: 8px;
     padding: 14px 18px 10px 18px;
-    margin-top: 15px;
-    border: 1px solid #e3edf7;
+    margin: 18px 0 0 0;
+    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
   }
-  
   .resource-list h4 {
-    font-size: 15px;
-    color: #2c3e50;
+    color: #2176ae;
+    font-size: 16px;
     margin-bottom: 10px;
+    font-weight: bold;
   }
-  
   .resource-list ul {
-    list-style: none;
-    padding: 0;
+    padding-left: 18px;
     margin: 0;
   }
-  
   .resource-list li {
-    margin-bottom: 8px;
+    margin-bottom: 7px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1a355b;
   }
-  
   .resource-list a {
-    color: #3498db;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  .resource-list a:hover {
+    color: #2980b9;
     text-decoration: underline;
+    font-weight: 500;
+    margin-right: 4px;
   }
-  
-  .resource-list span {
-    font-size: 13px;
-    color: #666;
+  .resource-list a:hover {
+    color: #e67e22;
+  }
+  .error-msg {
+    background: #fff0f0;
+    color: #e74c3c;
+    border-left: 5px solid #e74c3c;
+    font-size: 15px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
   }
   
   .chat-section {
@@ -2071,31 +2158,28 @@ body > *:last-child {
     padding-top: 20px;
   }
   
-  .chat-input textarea {
-    flex-grow: 1;
-    padding: 12px 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 16px;
-    resize: vertical;
-    min-height: 50px;
-    max-height: 150px;
-    margin-right: 10px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-  }
-  
-  .chat-input button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 25px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    box-shadow: 0 2px 5px rgba(52,152,219,0.2);
-  }
-  
-  .chat-input button:hover {
-    background-color: #2980b9;
-  }
+  /* 聊天输入区 */
+.chat-input textarea {
+  border-radius: 10px;
+  border: 1.5px solid #b3d4fc;
+  padding: 12px;
+  font-size: 16px;
+  min-height: 48px;
+  box-shadow: 0 1px 4px rgba(52,152,219,0.04);
+  resize: vertical;
+}
+#qaSubmitBtn {
+  background: linear-gradient(90deg, #3498db 0%, #2ecc71 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(52,152,219,0.08);
+  transition: background 0.2s; 
+}
+#qaSubmitBtn:hover {
+  background: linear-gradient(90deg, #2176ae 0%, #27ae60 100%);
+}

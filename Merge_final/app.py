@@ -19,12 +19,9 @@ from flask import Flask, request, jsonify, render_template, g, session, redirect
 from flask_cors import CORS
 from contextlib import closing
 from collections import defaultdict
-# 添加邮件功能
 from flask_mail import Mail, Message
-# 添加密码哈希功能
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# 配置日志
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -71,8 +68,6 @@ verification_codes = {}
 
 # 全局变量存储拓扑结果
 topology_results = {}
-
-# 全局变量缓存上传文档内容  # topology_id: 原文全文字符串
 
 def get_db():
     """获取数据库连接"""
@@ -1442,50 +1437,6 @@ def ignore_nodes(topology_id):
             'message': f"忽略节点时出错: {str(e)}"
         }), 500
 
-###智能助手模块
-from openai import OpenAI
-client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
-
-# 全局变量缓存上传文档内容，方便检索（示例，生产应用用数据库或向量数据库）
-uploaded_documents = {}  # topology_id: 原文全文字符串
-
-def recommend_resources_based_on_question(question):
-    """
-    使用 DeepSeek API 根据用户问题推荐相关学习资源，返回格式：
-    [
-      {"title": "资源标题", "url": "链接", "snippet": "相关内容摘要"},
-      ...
-    ]
-    """
-    messages = [
-        {"role": "system", "content": "你是一个学习资源推荐专家，能够根据用户的问题推荐最相关的高质量中文学习资料。请根据用户的问题，推荐5个高质量的可访问的中文学习资源，每个资源包含title、url、snippet，要求以JSON数组格式输出。只返回JSON数组，不要有多余解释。"},
-        {"role": "user", "content": f"问题：{question}\n请推荐5个相关学习资源。"}
-    ]
-    try:
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=messages,
-            max_tokens=800
-        )
-        raw = response.choices[0].message.content.strip()
-        # 尝试解析JSON
-        try:
-            # 处理可能的markdown代码块
-            if raw.startswith('```json'):
-                raw = raw[7:]
-            if raw.endswith('```'):
-                raw = raw[:-3]
-            resources = json.loads(raw)
-            if isinstance(resources, list):
-                return resources
-        except Exception:
-            pass
-        # 解析失败返回空
-        return []
-    except Exception as e:
-        logger.error(f"学习资源推荐API错误: {str(e)}", exc_info=True)
-        return []
-
 @app.route('/api/topology/<topology_id>/node/<node_id>/master', methods=['POST'])
 def master_node(topology_id, node_id):
     """设置节点的掌握状态"""
@@ -1529,8 +1480,8 @@ def master_node(topology_id, node_id):
             'message': f"更新节点状态时出错: {str(e)}"
         }), 500
 
+###智能助手模块
 from openai import OpenAI
-
 client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
 
 # 全局变量缓存上传文档内容，方便检索
@@ -1544,10 +1495,8 @@ def recommend_resources_based_on_question(question):
       ...
     ]
     """
-    from openai import OpenAI
-    client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://api.deepseek.com")
     messages = [
-        {"role": "system", "content": "你是一个学习资源推荐专家，能够根据用户的问题推荐最相关的高质量学习资料。请根据用户的问题，推荐5个高质量的学习资源，每个资源包含title、url、snippet，要求以JSON数组格式输出。只返回JSON数组，不要有多余解释。"},
+        {"role": "system", "content": "你是一个学习资源推荐专家，能够根据用户的问题推荐最相关的高质量中文学习资料。请根据用户的问题，推荐5个高质量的可访问的中文学习资源，每个资源包含title、url、snippet，要求以JSON数组格式输出。只返回JSON数组，不要有多余解释。"},
         {"role": "user", "content": f"问题：{question}\n请推荐5个相关学习资源。"}
     ]
     try:
@@ -1556,8 +1505,7 @@ def recommend_resources_based_on_question(question):
             messages=messages,
             max_tokens=800
         )
-        import json
-        raw = (response.choices[0].message.content or "").strip()
+        raw = response.choices[0].message.content.strip()
         # 尝试解析JSON
         try:
             # 处理可能的markdown代码块
@@ -1580,7 +1528,7 @@ def recommend_resources_based_on_question(question):
 def chat_with_knowledge():
     """
     用户交互问答接口：
-    优先基于上传文档内容回答，若文档匹配度低，则调用网络智能问答。
+    优先基于上传文档内容回答，若文档中没有相关内容，则调用网络智能问答。
     同时进行相关学习资源推荐，返回相关链接和内容片段。
     """
     try:
@@ -1602,7 +1550,7 @@ def chat_with_knowledge():
         # 直接用DeepSeek API在文档内容中查找相关内容
         doc_search_prompt = (
             "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
-            "并直接用文档原文文本回答。回答时可用Markdown格式排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
+            "并直接用文档原文文本回答。回答时用Markdown格式对原文文字进行重新排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
             "**所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式**，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
             "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
         )
@@ -1645,10 +1593,6 @@ def chat_with_knowledge():
         logger.error(f"交互问答错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': f"交互问答出错: {str(e)}"}), 500
 
-
-
-
-
 def generate_answer_from_web(question):
     """
     调用网络智能问答接口（DeepSeek）
@@ -1683,7 +1627,7 @@ def close_db(exception):
     if db is not None:
         db.close()
 
-# 用户注册
+###首页登录模块
 @app.route('/api/register', methods=['POST'])
 def api_register():
     """用户注册接口"""
@@ -1731,7 +1675,6 @@ def api_register():
         logger.error(f"注册错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '注册时出错'}), 500
 
-# 用户登录
 @app.route('/api/login', methods=['POST'])
 def api_login():
     """用户登录接口"""
@@ -1744,7 +1687,6 @@ def api_login():
         
         if not username or not password:
             return jsonify({'status': 'error', 'message': '用户名和密码不能为空'}), 400
-        
         # 查询用户
         with app.app_context():
             db = get_db()
@@ -1757,11 +1699,9 @@ def api_login():
             
             if not user:
                 return jsonify({'status': 'error', 'message': '用户不存在'}), 404
-            
             # 验证密码
             if not check_password_hash(user["password"], password):
                 return jsonify({'status': 'error', 'message': '密码错误'}), 401
-            
             # 登录成功，创建会话
             session['user_id'] = user["id"]
             session['username'] = username
@@ -1772,7 +1712,6 @@ def api_login():
         logger.error(f"登录错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '登录时出错'}), 500
 
-# 用户登出
 @app.route('/api/logout', methods=['POST'])
 def api_logout():
     """用户登出接口"""
@@ -1783,7 +1722,6 @@ def api_logout():
         logger.error(f"登出错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '登出时出错'}), 500
 
-# 请求密码重置链接
 @app.route('/api/request_password_reset', methods=['POST'])
 def request_password_reset():
     """请求密码重置链接接口"""
@@ -1795,7 +1733,6 @@ def request_password_reset():
         
         if not email:
             return jsonify({'status': 'error', 'message': '邮箱不能为空'}), 400
-        
         # 检查邮箱是否存在
         with app.app_context():
             db = get_db()
@@ -1808,18 +1745,15 @@ def request_password_reset():
             
             if not user:
                 return jsonify({'status': 'error', 'message': '邮箱未注册'}), 404
-            
             # 生成密码重置令牌
             token = secrets.token_urlsafe(16)
             created_at = time.strftime('%Y-%m-%d %H:%M:%S')
-            
             # 存储令牌和用户关联
             cursor.execute(
                 "INSERT INTO password_resets (id, user_id, token, created_at) VALUES (?, ?, ?, ?)",
                 (str(uuid.uuid4()), user["id"], token, created_at)
             )
             db.commit()
-            
             # 发送密码重置邮件
             reset_url = f"http://localhost:5000/reset_password?token={token}"
             with app.app_context():
@@ -1832,7 +1766,6 @@ def request_password_reset():
         logger.error(f"请求密码重置错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '请求密码重置时出错'}), 500
 
-# 重置密码
 @app.route('/api/reset_password', methods=['POST'])
 def reset_password():
     """重置密码接口"""
@@ -1845,7 +1778,6 @@ def reset_password():
         
         if not token or not new_password:
             return jsonify({'status': 'error', 'message': '令牌和新密码不能为空'}), 400
-        
         # 验证令牌并获取用户
         with app.app_context():
             db = get_db()
@@ -1860,14 +1792,12 @@ def reset_password():
                 return jsonify({'status': 'error', 'message': '无效或过期的令牌'}), 400
             
             user_id = reset_request["user_id"]
-            
             # 更新用户密码
             hashed_password = generate_password_hash(new_password)
             cursor.execute(
                 "UPDATE users SET password = ? WHERE id = ?",
                 (hashed_password, user_id)
             )
-            
             # 删除密码重置请求
             cursor.execute(
                 "DELETE FROM password_resets WHERE token = ?",
@@ -1881,7 +1811,6 @@ def reset_password():
         logger.error(f"重置密码错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '重置密码时出错'}), 500
 
-# 获取用户信息
 @app.route('/api/user', methods=['GET'])
 def get_user_info():
     """获取当前登录用户信息"""
@@ -1916,7 +1845,6 @@ def get_user_info():
         logger.error(f"获取用户信息错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '获取用户信息时出错'}), 500
 
-# 更新用户信息
 @app.route('/api/user', methods=['PUT'])
 def update_user_info():
     """更新用户信息"""
@@ -1931,11 +1859,8 @@ def update_user_info():
         username = data.get('username', '').strip()
         email = data.get('email', '').strip()
         
-
-
         if not username or not email:
             return jsonify({'status': 'error', 'message': '用户名和邮箱不能为空'}), 400
-        
         # 更新用户信息
         with app.app_context():
             db = get_db()
@@ -1945,7 +1870,6 @@ def update_user_info():
                 (username, email, user_id)
             )
             db.commit()
-            
             # 更新会话信息
             session['username'] = username
             
@@ -1954,7 +1878,6 @@ def update_user_info():
         logger.error(f"更新用户信息错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '更新用户信息时出错'}), 500
 
-# 修改密码
 @app.route('/api/user/password', methods=['PUT'])
 def api_change_password():
     """修改用户密码"""
@@ -1971,7 +1894,6 @@ def api_change_password():
         
         if not old_password or not new_password:
             return jsonify({'status': 'error', 'message': '旧密码和新密码不能为空'}), 400
-        
         # 验证旧密码
         with app.app_context():
             db = get_db()
@@ -1984,7 +1906,6 @@ def api_change_password():
             
             if not user or not check_password_hash(user["password"], old_password):
                 return jsonify({'status': 'error', 'message': '旧密码错误'}), 401
-            
             # 更新新密码
             hashed_password = generate_password_hash(new_password)
             cursor.execute(
@@ -1998,7 +1919,6 @@ def api_change_password():
         logger.error(f"修改密码错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': '修改密码时出错'}), 500
 
-# 获取拓扑图处理状态
 @app.route('/api/topology/status/<topology_id>', methods=['GET'])
 def get_topology_status(topology_id):
     """获取拓扑图处理状态"""
@@ -2026,7 +1946,6 @@ def get_topology_status(topology_id):
         }
     }), 200
 
-# 获取所有拓扑图列表
 @app.route('/api/topologies', methods=['GET'])
 def get_topologies():
     """获取当前用户所有拓扑图列表"""
@@ -2063,7 +1982,6 @@ def get_topologies():
         logger.error(f"获取拓扑图列表出错: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': f"获取拓扑图列表失败: {str(e)}"}), 500
 
-# 登录相关路由
 @app.route('/')
 def index():
     """主页"""
