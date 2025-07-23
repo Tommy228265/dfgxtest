@@ -43,7 +43,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # DeepSeek API配置（示例密钥，需替换为实际密钥）
-OPENAI_API_KEY = "sk-ba9cc9a26b8c4859ba5c9bad33785093"
+OPENAI_API_KEY = "sk-420816a747e6490d8980d0807b9b5b24"
 MAX_RETRIES = 3
 BACKOFF_FACTOR = 2
 
@@ -1547,10 +1547,9 @@ def chat_with_knowledge():
             row = cursor.fetchone()
             document_text = row["content"] if row else ""
         
-        # 直接用DeepSeek API在文档内容中查找相关内容
         doc_search_prompt = (
             "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
-            "并直接用文档原文文本回答。回答时用Markdown格式对原文文字进行重新排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
+            "并直接用文档原文文本回答。回答时分析原文语义，用Markdown格式对原文文字进行重新排版，不对文字进行更改，只优化排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
             "**所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式**，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
             "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
         )
@@ -1574,11 +1573,11 @@ def chat_with_knowledge():
         logger.info(f"[问答调试] doc_answer: {doc_answer}")
         logger.info(f"[问答调试] deny_matched: {deny_matched}")
         if doc_answer and not deny_matched:
-            answer = doc_answer  # 直接返回原始AI回答，保留Markdown
+            answer = doc_answer
             source = "document"
         else:
             # 文档中查不到，调用智能网络问答接口
-            answer = generate_answer_from_web(user_question)  # 直接返回原始AI回答，保留Markdown
+            answer = generate_answer_from_web(user_question)
             source = "web"
         # 推荐学习资源
         resources = recommend_resources_based_on_question(user_question)

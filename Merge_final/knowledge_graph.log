@@ -9375,3 +9375,514 @@ openai.APIConnectionError: Connection error.
 2025-07-23 12:11:55,573 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:55] "GET / HTTP/1.1" 200 -
 2025-07-23 12:11:55,611 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:55] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
 2025-07-23 12:11:55,611 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 12:11:55] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 14:35:36,111 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 14:35:36,112 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 14:35:36,112 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 14:35:36,113 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 14:35:36,113 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 14:35:36,179 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-23 14:35:36,179 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-23 14:35:36,182 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 14:35:37,715 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 14:35:37,715 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 14:35:37,725 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 14:35:37,726 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 14:35:37,728 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 14:35:37,737 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 14:35:37,776 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 14:35:51,978 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:35:51] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-23 14:35:52,081 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:35:52] "GET /login HTTP/1.1" 200 -
+2025-07-23 14:35:52,435 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:35:52] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-23 14:35:59,080 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:35:59] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-23 14:35:59,096 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:35:59] "GET / HTTP/1.1" 200 -
+2025-07-23 14:35:59,170 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:35:59] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-23 14:35:59,173 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:35:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 14:36:24,182 - KnowledgeGraphGenerator - INFO - 文件上传成功: uploads/4ad24c79-11e8-4ee0-8910-2682738c5f01_数据与模型 测试(1).pdf, 大小: 6.78 MB, 最大节点数: 10
+2025-07-23 14:36:24,183 - KnowledgeGraphGenerator - INFO - 开始处理文档: uploads/4ad24c79-11e8-4ee0-8910-2682738c5f01_数据与模型 测试(1).pdf, 拓扑ID: 4ad24c79-11e8-4ee0-8910-2682738c5f01, 最大节点数: 10
+2025-07-23 14:36:24,183 - KnowledgeGraphGenerator - INFO - 拓扑ID: 4ad24c79-11e8-4ee0-8910-2682738c5f01, 进度: 10%, 消息: 解析文档内容...
+2025-07-23 14:36:24,189 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/4ad24c79-11e8-4ee0-8910-2682738c5f01_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:36:24,250 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:24] "POST /api/generate HTTP/1.1" 200 -
+2025-07-23 14:36:24,891 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:36:25,297 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:25] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:26,291 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:26] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:26,407 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:36:27,346 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:27] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:27,449 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:36:28,291 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:28] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:28,446 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:36:29,283 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:29] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:29,960 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:36:30,294 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:30] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:31,868 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:31] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:32,295 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:32] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:32,530 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:36:33,293 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:33] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:34,062 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:36:34,420 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:34] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:35,295 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:35] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:35,565 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:36:36,204 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:36:36,556 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/4ad24c79-11e8-4ee0-8910-2682738c5f01_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:36:36,655 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:36:37,068 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:37] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:37,174 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:36:37,719 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:36:38,235 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:36:38,707 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:36:39,264 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:36:39,665 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:39] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:39,970 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:36:40,524 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:36:41,121 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:36:41,550 - KnowledgeGraphGenerator - INFO - 拓扑ID: 4ad24c79-11e8-4ee0-8910-2682738c5f01, 进度: 20%, 消息: 准备提取知识层级...
+2025-07-23 14:36:41,550 - KnowledgeGraphGenerator - INFO - 拓扑ID: 4ad24c79-11e8-4ee0-8910-2682738c5f01, 进度: 60%, 消息: 调用DeepSeek API提取知识层级...
+2025-07-23 14:36:41,622 - KnowledgeGraphGenerator - INFO - 第1次尝试调用DeepSeek API...
+2025-07-23 14:36:41,940 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:41] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:43,111 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 402 Payment Required"
+2025-07-23 14:36:43,115 - KnowledgeGraphGenerator - ERROR - API请求错误: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 404, in extract_knowledge_from_text
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+2025-07-23 14:36:43,147 - KnowledgeGraphGenerator - INFO - 准备第2次重试...
+2025-07-23 14:36:43,502 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:43] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:44,607 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:44] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:45,152 - KnowledgeGraphGenerator - INFO - 第2次尝试调用DeepSeek API...
+2025-07-23 14:36:45,515 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 402 Payment Required"
+2025-07-23 14:36:45,516 - KnowledgeGraphGenerator - ERROR - API请求错误: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 404, in extract_knowledge_from_text
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+2025-07-23 14:36:45,521 - KnowledgeGraphGenerator - INFO - 准备第3次重试...
+2025-07-23 14:36:47,383 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:47] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:48,283 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:48] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:49,289 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:49] "GET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1" 200 -
+2025-07-23 14:36:49,610 - KnowledgeGraphGenerator - INFO - 第3次尝试调用DeepSeek API...
+2025-07-23 14:36:49,956 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 402 Payment Required"
+2025-07-23 14:36:49,957 - KnowledgeGraphGenerator - ERROR - API请求错误: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 404, in extract_knowledge_from_text
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+2025-07-23 14:36:49,959 - KnowledgeGraphGenerator - ERROR - 处理文档出错: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+Traceback (most recent call last):
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 727, in process_document
+    knowledge_edges = extract_knowledge_from_text(text, max_nodes)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py", line 404, in extract_knowledge_from_text
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 1087, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1249, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/teaching_assistant/lib/python3.12/site-packages/openai/_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+2025-07-23 14:36:51,455 - KnowledgeGraphGenerator - ERROR - 获取拓扑图错误: 处理过程中出错: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}
+2025-07-23 14:36:51,456 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:36:51] "[35m[1mGET /api/topology/4ad24c79-11e8-4ee0-8910-2682738c5f01 HTTP/1.1[0m" 500 -
+2025-07-23 14:37:51,873 - werkzeug - INFO -  * Detected change in '/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py', reloading
+2025-07-23 14:37:52,564 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 14:37:59,178 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 14:37:59,178 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 14:37:59,178 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 14:37:59,179 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 14:37:59,179 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 14:37:59,200 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 14:37:59,217 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 14:37:59,265 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:37:59] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-23 14:37:59,301 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:37:59] "GET /login HTTP/1.1" 200 -
+2025-07-23 14:37:59,367 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:37:59] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 14:38:06,210 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:06] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-23 14:38:06,224 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:06] "GET / HTTP/1.1" 200 -
+2025-07-23 14:38:06,262 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:06] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 14:38:06,267 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:06] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 14:38:17,974 - KnowledgeGraphGenerator - INFO - 文件上传成功: uploads/9a45f468-38df-4617-b733-9298264d87ba_数据与模型 测试(1).pdf, 大小: 6.78 MB, 最大节点数: 10
+2025-07-23 14:38:17,975 - KnowledgeGraphGenerator - INFO - 开始处理文档: uploads/9a45f468-38df-4617-b733-9298264d87ba_数据与模型 测试(1).pdf, 拓扑ID: 9a45f468-38df-4617-b733-9298264d87ba, 最大节点数: 10
+2025-07-23 14:38:17,976 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a45f468-38df-4617-b733-9298264d87ba, 进度: 10%, 消息: 解析文档内容...
+2025-07-23 14:38:17,977 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/9a45f468-38df-4617-b733-9298264d87ba_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:38:17,997 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:17] "POST /api/generate HTTP/1.1" 200 -
+2025-07-23 14:38:18,239 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:38:19,025 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:19] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:19,066 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:38:20,073 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:20] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:20,456 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:38:21,014 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:21] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:22,030 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:38:22,033 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:22] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:23,026 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:23] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:24,036 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:24] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:25,013 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:25] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:26,281 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:26] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:27,373 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:38:28,430 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:28] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:28,663 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:38:29,085 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:29] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:29,664 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:38:30,010 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:30] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:30,363 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:38:31,035 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:31] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:32,141 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:38:32,524 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/9a45f468-38df-4617-b733-9298264d87ba_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:38:32,616 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:38:32,762 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:32] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:33,470 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:33] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:33,665 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:38:34,850 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:38:35,414 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:38:35,882 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:38:36,442 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:38:37,055 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:38:37,547 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:38:38,084 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:38:38,365 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a45f468-38df-4617-b733-9298264d87ba, 进度: 20%, 消息: 准备提取知识层级...
+2025-07-23 14:38:38,366 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a45f468-38df-4617-b733-9298264d87ba, 进度: 60%, 消息: 调用DeepSeek API提取知识层级...
+2025-07-23 14:38:38,422 - KnowledgeGraphGenerator - INFO - 第1次尝试调用DeepSeek API...
+2025-07-23 14:38:39,068 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:38:40,106 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:40] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:41,455 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:41] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:48,053 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:48] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:49,798 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:49] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:50,008 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:50] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:51,050 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:51] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:51,568 - KnowledgeGraphGenerator - INFO - API返回知识关系: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-23 14:38:51,568 - KnowledgeGraphGenerator - INFO - 原始JSON内容: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-23 14:38:51,568 - KnowledgeGraphGenerator - INFO - 成功解析知识关系，共10条
+2025-07-23 14:38:51,568 - KnowledgeGraphGenerator - INFO - 成功提取10条知识层级关系
+2025-07-23 14:38:51,577 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a45f468-38df-4617-b733-9298264d87ba, 进度: 80%, 消息: 构建树形知识图并提取原文片段...
+2025-07-23 14:38:51,627 - KnowledgeGraphGenerator - INFO - 知识图谱 9a45f468-38df-4617-b733-9298264d87ba 保存成功，用户: 12345
+2025-07-23 14:38:51,632 - KnowledgeGraphGenerator - INFO - 树形知识图生成完成，耗时: 33.66 秒
+2025-07-23 14:38:51,636 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a45f468-38df-4617-b733-9298264d87ba, 进度: 100%, 消息: 处理完成
+2025-07-23 14:38:52,116 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:52] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:38:53,011 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:38:53] "GET /api/topology/9a45f468-38df-4617-b733-9298264d87ba HTTP/1.1" 200 -
+2025-07-23 14:40:05,187 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:40:20,616 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 以下是文档中关于"数据在AI中的核心地位"的原文内容：
+
+**数据在AI中的核心地位**  
+数据是AI技术发展的核心驱动力，其质量、规模和多样性直接决定了AI系统的性能和应用范围。在AI模型的训练过程中，大量高质量的数据是必不可少的。这些数据不仅为模型提供了学习的基础，还帮助模型不断优化参数，提高预测和决策的准确性。  
+
+> “没有数据，AI寸步难行；没有模型，数据只是数字。”  
+> 数据是AI模型迭代的基石，AI是深入挖掘数据价值的途径。  
+> AI模型生命周期中多个环节需要数据输入，在模型开发过程中实现数据的价值发现。  
+
+关键要点：  
+- 数据质量、规模和多样性直接影响AI系统性能  
+- 高质量数据是模型训练和参数优化的基础  
+- 数据与模型的关系是相互依存的（数据是基石，模型是价值挖掘途径）  
+- AI模型全生命周期依赖数据输入
+2025-07-23 14:40:20,617 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 14:40:20,652 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:40:43,455 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:40:43] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 14:42:23,452 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 14:42:23,453 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 14:42:23,454 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 14:42:23,454 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 14:42:23,454 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 14:42:23,490 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-23 14:42:23,491 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-23 14:42:23,494 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 14:42:26,013 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 14:42:26,013 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 14:42:26,014 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 14:42:26,015 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 14:42:26,015 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 14:42:26,021 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 14:42:26,053 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 14:42:52,278 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:42:52] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-23 14:42:52,388 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:42:52] "GET /login HTTP/1.1" 200 -
+2025-07-23 14:42:52,627 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:42:52] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 14:42:59,013 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:42:59] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-23 14:42:59,033 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:42:59] "GET / HTTP/1.1" 200 -
+2025-07-23 14:42:59,067 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:42:59] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 14:42:59,071 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:42:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 14:43:10,682 - KnowledgeGraphGenerator - INFO - 文件上传成功: uploads/9a6f7beb-ca68-49ff-946c-5a1051e26a2f_数据与模型 测试(1).pdf, 大小: 6.78 MB, 最大节点数: 10
+2025-07-23 14:43:10,684 - KnowledgeGraphGenerator - INFO - 开始处理文档: uploads/9a6f7beb-ca68-49ff-946c-5a1051e26a2f_数据与模型 测试(1).pdf, 拓扑ID: 9a6f7beb-ca68-49ff-946c-5a1051e26a2f, 最大节点数: 10
+2025-07-23 14:43:10,693 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a6f7beb-ca68-49ff-946c-5a1051e26a2f, 进度: 10%, 消息: 解析文档内容...
+2025-07-23 14:43:10,697 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:10] "POST /api/generate HTTP/1.1" 200 -
+2025-07-23 14:43:10,698 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/9a6f7beb-ca68-49ff-946c-5a1051e26a2f_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:43:11,193 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:43:11,733 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:11] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:12,688 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:43:12,717 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:12] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:13,731 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:13] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:14,694 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:43:14,729 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:14] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:15,638 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:43:15,722 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:15] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:16,745 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:16] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:16,789 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:43:17,785 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:17] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:18,806 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:18] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:19,729 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:19] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:19,753 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:43:20,754 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:20] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:21,722 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:21] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:22,229 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:43:22,733 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:22] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:23,676 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:43:23,752 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:23] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:24,761 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:24] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:25,064 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:43:25,556 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/9a6f7beb-ca68-49ff-946c-5a1051e26a2f_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:43:25,866 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:43:26,321 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:26] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:26,756 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:26] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:27,730 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:27] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:28,071 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:43:28,619 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:43:29,118 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:43:29,558 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:43:30,137 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:30] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:30,174 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:43:30,864 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:43:31,493 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:43:32,070 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:43:32,491 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a6f7beb-ca68-49ff-946c-5a1051e26a2f, 进度: 20%, 消息: 准备提取知识层级...
+2025-07-23 14:43:32,491 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a6f7beb-ca68-49ff-946c-5a1051e26a2f, 进度: 60%, 消息: 调用DeepSeek API提取知识层级...
+2025-07-23 14:43:32,552 - KnowledgeGraphGenerator - INFO - 第1次尝试调用DeepSeek API...
+2025-07-23 14:43:33,627 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:43:36,848 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:36] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:37,732 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:37] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:38,706 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:38] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:39,711 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:39] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:40,801 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:40] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:41,731 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:41] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:42,712 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:42] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:43,714 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:43] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:44,713 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:44] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:45,712 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:45] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:46,711 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:46] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:43:46,821 - KnowledgeGraphGenerator - INFO - API返回知识关系: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在AI中的核心地位"],
+  ...
+2025-07-23 14:43:46,821 - KnowledgeGraphGenerator - INFO - 原始JSON内容: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在AI中的核心地位"],
+  ...
+2025-07-23 14:43:46,821 - KnowledgeGraphGenerator - INFO - 成功解析知识关系，共10条
+2025-07-23 14:43:46,822 - KnowledgeGraphGenerator - INFO - 成功提取10条知识层级关系
+2025-07-23 14:43:46,822 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a6f7beb-ca68-49ff-946c-5a1051e26a2f, 进度: 80%, 消息: 构建树形知识图并提取原文片段...
+2025-07-23 14:43:46,855 - KnowledgeGraphGenerator - INFO - 知识图谱 9a6f7beb-ca68-49ff-946c-5a1051e26a2f 保存成功，用户: 12345
+2025-07-23 14:43:46,856 - KnowledgeGraphGenerator - INFO - 树形知识图生成完成，耗时: 36.17 秒
+2025-07-23 14:43:46,856 - KnowledgeGraphGenerator - INFO - 拓扑ID: 9a6f7beb-ca68-49ff-946c-5a1051e26a2f, 进度: 100%, 消息: 处理完成
+2025-07-23 14:43:49,121 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:43:49] "GET /api/topology/9a6f7beb-ca68-49ff-946c-5a1051e26a2f HTTP/1.1" 200 -
+2025-07-23 14:44:02,194 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:44:14,427 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 数据预处理的通用流程如下：
+
+1. **数据探索**：通过可视化（直方图、箱线图、散点图）和统计分析了解数据分布、缺失值、异常值等。  
+2. **数据清洗**：处理缺失值、异常值、重复值。  
+3. **数据转换**：进行标准化、归一化、编码等操作。  
+4. **特征工程**：选择特征、降维、构造新特征。  
+5. **数据平衡与增强**：处理不平衡数据，增加数据多样性。  
+6. **验证与迭代**：通过交叉验证评估预处理效果，必要时调整策略。
+2025-07-23 14:44:14,428 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 14:44:14,501 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:44:34,890 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:44:34] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 14:47:04,267 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:47:19,408 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 以下是文档中关于"数据在AI中的核心地位"的原文内容：
+
+**数据在AI中的核心地位**  
+数据是AI技术发展的核心驱动力，其质量、规模和多样性直接决定了AI系统的性能和应用范围。在AI模型的训练过程中，大量高质量的数据是必不可少的。这些数据不仅为模型提供了学习的基础，还帮助模型不断优化参数，提高预测和决策的准确性。  
+
+> “没有数据，AI寸步难行；没有模型，数据只是数字。”  
+> 数据是AI模型迭代的基石，AI是深入挖掘数据价值的途径。  
+> AI模型生命周期中多个环节需要数据输入，在模型开发过程中实现数据的价值发现。  
+
+关键要点：  
+- 数据质量、规模、多样性直接影响AI系统性能  
+- 高质量数据是模型训练和参数优化的基础  
+- 数据与模型的关系是相互依存的循环：数据驱动模型改进，模型挖掘数据价值
+2025-07-23 14:47:19,409 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 14:47:19,471 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:47:41,994 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:47:41] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 14:49:21,199 - werkzeug - INFO -  * Detected change in '/Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/app.py', reloading
+2025-07-23 14:49:21,908 - werkzeug - INFO -  * Restarting with stat
+2025-07-23 14:49:26,230 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-23 14:49:26,230 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-23 14:49:26,231 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-23 14:49:26,231 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-23 14:49:26,231 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-23 14:49:26,270 - werkzeug - WARNING -  * Debugger is active!
+2025-07-23 14:49:26,282 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-23 14:49:26,299 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:26] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-23 14:49:26,330 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:26] "GET /login HTTP/1.1" 200 -
+2025-07-23 14:49:26,451 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-23 14:49:34,336 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:34] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-23 14:49:34,347 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:34] "GET / HTTP/1.1" 200 -
+2025-07-23 14:49:34,384 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:34] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-23 14:49:34,386 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:34] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-23 14:49:54,809 - KnowledgeGraphGenerator - INFO - 文件上传成功: uploads/71c97d2b-ee05-4755-9e9e-66213ae96d04_数据与模型 测试(1).pdf, 大小: 6.78 MB, 最大节点数: 10
+2025-07-23 14:49:54,814 - KnowledgeGraphGenerator - INFO - 开始处理文档: uploads/71c97d2b-ee05-4755-9e9e-66213ae96d04_数据与模型 测试(1).pdf, 拓扑ID: 71c97d2b-ee05-4755-9e9e-66213ae96d04, 最大节点数: 10
+2025-07-23 14:49:54,814 - KnowledgeGraphGenerator - INFO - 拓扑ID: 71c97d2b-ee05-4755-9e9e-66213ae96d04, 进度: 10%, 消息: 解析文档内容...
+2025-07-23 14:49:54,815 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/71c97d2b-ee05-4755-9e9e-66213ae96d04_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:49:54,840 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:54] "POST /api/generate HTTP/1.1" 200 -
+2025-07-23 14:49:55,085 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:49:55,719 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:49:55,869 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:55] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:49:56,782 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:49:56,858 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:56] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:49:57,398 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:49:57,890 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:57] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:49:58,526 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:49:59,139 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:59] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:49:59,684 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:49:59,871 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:49:59] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:00,410 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:50:00,881 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:00] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:01,253 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:50:01,869 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:01] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:02,060 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:50:02,374 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/71c97d2b-ee05-4755-9e9e-66213ae96d04_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-23 14:50:02,533 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-23 14:50:02,866 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:02] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:03,164 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-23 14:50:03,867 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:03] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:03,894 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-23 14:50:04,881 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-23 14:50:04,882 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:04] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:05,385 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-23 14:50:05,869 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:05] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:06,018 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-23 14:50:06,860 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:06] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:06,867 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-23 14:50:07,593 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-23 14:50:07,871 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:07] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:08,877 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:08] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:09,153 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-23 14:50:09,659 - KnowledgeGraphGenerator - INFO - 拓扑ID: 71c97d2b-ee05-4755-9e9e-66213ae96d04, 进度: 20%, 消息: 准备提取知识层级...
+2025-07-23 14:50:09,659 - KnowledgeGraphGenerator - INFO - 拓扑ID: 71c97d2b-ee05-4755-9e9e-66213ae96d04, 进度: 60%, 消息: 调用DeepSeek API提取知识层级...
+2025-07-23 14:50:09,784 - KnowledgeGraphGenerator - INFO - 第1次尝试调用DeepSeek API...
+2025-07-23 14:50:10,676 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:10] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:10,970 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:50:11,721 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:11] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:21,875 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:21] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:22,583 - KnowledgeGraphGenerator - INFO - API返回知识关系: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-23 14:50:22,584 - KnowledgeGraphGenerator - INFO - 原始JSON内容: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-23 14:50:22,585 - KnowledgeGraphGenerator - INFO - 成功解析知识关系，共10条
+2025-07-23 14:50:22,585 - KnowledgeGraphGenerator - INFO - 成功提取10条知识层级关系
+2025-07-23 14:50:22,585 - KnowledgeGraphGenerator - INFO - 拓扑ID: 71c97d2b-ee05-4755-9e9e-66213ae96d04, 进度: 80%, 消息: 构建树形知识图并提取原文片段...
+2025-07-23 14:50:22,605 - KnowledgeGraphGenerator - INFO - 知识图谱 71c97d2b-ee05-4755-9e9e-66213ae96d04 保存成功，用户: 12345
+2025-07-23 14:50:22,605 - KnowledgeGraphGenerator - INFO - 树形知识图生成完成，耗时: 27.79 秒
+2025-07-23 14:50:22,605 - KnowledgeGraphGenerator - INFO - 拓扑ID: 71c97d2b-ee05-4755-9e9e-66213ae96d04, 进度: 100%, 消息: 处理完成
+2025-07-23 14:50:23,824 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:50:23] "GET /api/topology/71c97d2b-ee05-4755-9e9e-66213ae96d04 HTTP/1.1" 200 -
+2025-07-23 14:50:52,123 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:51:06,894 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 根据文档内容，建模过程的原文描述如下：
+
+**建模过程基于对业务的理解，给数据做结构化设计，让数据变得可读、可用、可分析。建模，是一个搞清楚事情运行本质的过程。  
+这个过程包括两部分：  
+一是找出来影响运行的因素/输入条件  
+二是找出来运行规则/关系。**
+
+原文还补充说明了模型与建模的关系：  
+**所谓模型，本质就是一个数学公式，或者更准确的说是一个函数。数据模型是“结果”，建模是“过程”。**  
+**通俗地讲，模型是一个基于神经网络构建好的处理器，比如函数 $y=F(x)$，它能够根据输入 $x$，产生相应的预测 $y$或者输出内容 $y$。**
+
+关键步骤的数学表达：  
+1. **确定输入条件**：找出影响系统的变量（如 $x$）。  
+2. **定义映射关系**：建立函数 $F$ 描述输入与输出的规则（如线性关系 $y=kx+b$ 或复杂神经网络）。  
+3. **训练调整参数**：通过数据拟合优化 $F$ 的具体参数（如反向传播算法调整 $k$ 和 $b$）。
+2025-07-23 14:51:06,894 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 14:51:06,936 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:51:27,452 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:51:27] "POST /api/chat HTTP/1.1" 200 -
+2025-07-23 14:52:18,226 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:52:33,579 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 以下是文档中关于"什么是大模型？"的原文内容：
+
+**什么是大模型？**
+
+大模型是使用大规模数据和强大计算能力训练出来的具有大量参数的深度学习模型。
+
+1. **训练数据大**  
+   以GPT-3为例，采用了45TB的文本数据进行训练，即便是清洗之后也有570GB。
+
+2. **架构规模大**  
+   大模型往往采用了非常深的神经网络架构，比如基于Transformer的模型，其中包含了多层编码器和解码器堆叠而成的复杂结构。
+
+3. **参数规模大**  
+   大模型拥有极其庞大的参数数量，从数亿到数千亿不等，例如GPT-3有大约1750亿个参数，而更近期的模型如阿里云的通义万相系列，参数量更是达到了万亿级别。
+
+4. **算力需求大**  
+   由于模型尺寸巨大且需要处理大量数据，因此对计算资源（如GPU、TPU）的要求极高，训练一个大型语言模型可能需要成百上千块高端图形处理器协同工作数周甚至数月的时间。
+2025-07-23 14:52:33,580 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: []
+2025-07-23 14:52:33,633 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-23 14:52:53,305 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 14:52:53] "POST /api/chat HTTP/1.1" 200 -
