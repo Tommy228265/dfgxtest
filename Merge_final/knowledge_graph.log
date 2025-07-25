@@ -10376,3 +10376,29 @@ openai.APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Bal
 2025-07-25 11:23:19,310 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:23:19] "GET / HTTP/1.1" 200 -
 2025-07-25 11:23:19,365 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:23:19] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
 2025-07-25 11:23:19,366 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:23:19] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 11:51:10,968 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 11:51:10,970 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 11:51:10,971 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 11:51:10,971 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 11:51:10,971 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 11:51:10,992 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-25 11:51:10,992 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-25 11:51:10,995 - werkzeug - INFO -  * Restarting with stat
+2025-07-25 11:51:12,350 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 11:51:12,350 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 11:51:12,350 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 11:51:12,353 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 11:51:12,353 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 11:51:12,360 - werkzeug - WARNING -  * Debugger is active!
+2025-07-25 11:51:12,373 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-25 11:51:13,919 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:51:13] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-25 11:51:13,951 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:51:13] "GET /login HTTP/1.1" 200 -
+2025-07-25 11:51:14,052 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:51:14] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-25 11:51:18,740 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:51:18] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-25 11:51:18,764 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:51:18] "GET / HTTP/1.1" 200 -
+2025-07-25 11:51:18,810 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:51:18] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-25 11:51:18,815 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:51:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 11:54:31,894 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:54:31] "GET / HTTP/1.1" 200 -
+2025-07-25 11:54:31,981 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:54:31] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-25 11:54:31,983 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:54:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
