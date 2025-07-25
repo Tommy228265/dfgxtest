@@ -10105,3 +10105,274 @@ openai.APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Bal
 2025-07-23 15:40:18,345 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 15:40:18] "GET / HTTP/1.1" 200 -
 2025-07-23 15:40:18,397 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 15:40:18] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
 2025-07-23 15:40:18,399 - werkzeug - INFO - 127.0.0.1 - - [23/Jul/2025 15:40:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 10:13:46,645 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 10:13:46,646 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 10:13:46,646 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 10:13:46,646 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 10:13:46,646 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 10:13:46,742 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-25 10:13:46,742 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-25 10:13:46,744 - werkzeug - INFO -  * Restarting with stat
+2025-07-25 10:13:48,642 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 10:13:48,642 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 10:13:48,643 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 10:13:48,646 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 10:13:48,646 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 10:13:48,654 - werkzeug - WARNING -  * Debugger is active!
+2025-07-25 10:13:48,698 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-25 10:13:51,864 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:13:51] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-25 10:13:52,189 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:13:52] "GET /login HTTP/1.1" 200 -
+2025-07-25 10:13:52,360 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:13:52] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-25 10:13:59,364 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:13:59] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-25 10:13:59,379 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:13:59] "GET / HTTP/1.1" 200 -
+2025-07-25 10:13:59,442 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:13:59] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-25 10:13:59,473 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:13:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 10:14:14,758 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:14:17,586 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 未找到
+2025-07-25 10:14:17,588 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: ['未找到']
+2025-07-25 10:14:17,625 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:14:37,502 - KnowledgeGraphGenerator - INFO - [问答调试] 网络AI原始返回内容: '图神经网络（GNN）的核心思想是通过**消息传递机制（Message Passing）**在图的节点之间传播和聚合信息，从而学习节点或图的表示。具体包括以下步骤：\n\n1. **邻居信息聚合**：对于每个节点$v$，聚合其邻居节点$u \\in \\mathcal{N}(v)$的特征或消息，通常通过可微函数（如求和、均值、最大值或注意力加权）实现：\n   $$\n   \\mathbf{m}_v^{(k)} = \\text{AGGREGATE}^{(k)}\\left( \\{\\mathbf{h}_u^{(k-1)} \\mid u \\in \\mathcal{N}(v)\\} \\right)\n   $$\n\n2. **节点状态更新**：结合节点自身上一层的表示$\\mathbf{h}_v^{(k-1)}$和聚合的邻居信息$\\mathbf{m}_v^{(k)}$，通过更新函数（如神经网络）生成新的节点表示：\n   $$\n   \\mathbf{h}_v^{(k)} = \\text{UPDATE}^{(k)}\\left( \\mathbf{h}_v^{(k-1)}, \\mathbf{m}_v^{(k)} \\right)\n   $$\n\n3. **多层堆叠**：通过多次迭代（$K$层）逐步扩大节点的感受野，捕捉高阶邻域信息。\n\n最终，GNN可输出节点级表示（如节点分类）或通过**图级池化**（如求和、均值或图注意力）生成图级表示（如图分类）。核心优势是直接处理非欧几里得数据（如社交网络、分子结构），并保持图的拓扑不变性。'
+2025-07-25 10:14:37,550 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:14:56,397 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:14:56] "POST /api/chat HTTP/1.1" 200 -
+2025-07-25 10:17:46,478 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:17:46] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-25 10:17:46,526 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:17:46] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-25 10:22:15,315 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:22:15] "GET / HTTP/1.1" 200 -
+2025-07-25 10:22:15,404 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:22:15] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-25 10:22:15,408 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:22:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 10:22:15,457 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:22:15] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-25 10:22:27,749 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:22:31,198 - KnowledgeGraphGenerator - INFO - [问答调试] doc_answer: 未找到
+2025-07-25 10:22:31,198 - KnowledgeGraphGenerator - INFO - [问答调试] deny_matched: ['未找到']
+2025-07-25 10:22:31,236 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:22:45,350 - KnowledgeGraphGenerator - INFO - [问答调试] 网络AI原始返回内容: '图神经网络（GNN）的核心思想是通过**消息传递机制（Message Passing）**在图的节点之间传播和聚合信息，从而学习节点或图的表示。具体包括以下步骤：\n\n1. **邻居信息聚合**：对于每个节点$v$，聚合其邻居节点$u \\in \\mathcal{N}(v)$的信息，通常表示为：\n   $$h_v^{(k)} = \\text{AGGREGATE}^{(k)}\\left(\\{h_u^{(k-1)} \\mid u \\in \\mathcal{N}(v)\\}\\right)$$\n\n2. **节点状态更新**：将聚合后的信息与节点自身当前状态结合，更新节点表示：\n   $$h_v^{(k)} = \\text{UPDATE}^{(k)}\\left(h_v^{(k-1)}, h_{\\mathcal{N}(v)}^{(k)}\\right)$$\n\n3. **多层堆叠**：通过多轮迭代（$K$层）逐步扩大感受野，捕获高阶邻域信息。\n\n最终，节点或图的表示可用于下游任务（如分类、链接预测等）。典型变体包括GCN、GAT、GraphSAGE等。'
+2025-07-25 10:22:45,383 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:23:03,552 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:23:03] "POST /api/chat HTTP/1.1" 200 -
+2025-07-25 10:51:05,362 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 10:51:05,369 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 10:51:05,370 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 10:51:05,370 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 10:51:05,370 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 10:51:05,395 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-25 10:51:05,396 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-25 10:51:05,401 - werkzeug - INFO -  * Restarting with stat
+2025-07-25 10:51:06,607 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 10:51:06,607 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 10:51:06,608 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 10:51:06,608 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 10:51:06,608 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 10:51:06,612 - werkzeug - WARNING -  * Debugger is active!
+2025-07-25 10:51:06,644 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-25 10:51:42,342 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:42] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-25 10:51:42,388 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:42] "GET /login HTTP/1.1" 200 -
+2025-07-25 10:51:42,528 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:42] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-25 10:51:42,729 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:42] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-25 10:51:50,077 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:50] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-25 10:51:50,093 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:50] "GET / HTTP/1.1" 200 -
+2025-07-25 10:51:50,197 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:50] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-25 10:51:50,203 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:50] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-25 10:51:50,257 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:51:50] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 10:52:03,260 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:52:06,208 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:52:06] "POST /api/chat HTTP/1.1" 200 -
+2025-07-25 10:52:06,920 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:52:24,188 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:52:59,529 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:53:02,485 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:53:02] "POST /api/chat HTTP/1.1" 200 -
+2025-07-25 10:53:03,029 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:53:21,982 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:54:50,145 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:54:50] "GET / HTTP/1.1" 200 -
+2025-07-25 10:54:50,199 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:54:50] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-25 10:54:50,208 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:54:50] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 10:55:02,832 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:55:02] "GET / HTTP/1.1" 200 -
+2025-07-25 10:55:02,866 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:55:02] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-25 10:55:02,867 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:55:02] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 10:55:14,055 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:55:17,164 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:55:17] "POST /api/chat HTTP/1.1" 200 -
+2025-07-25 10:55:17,998 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:55:49,888 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:56:27,411 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:56:31,034 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 10:56:31] "POST /api/chat HTTP/1.1" 200 -
+2025-07-25 10:56:31,835 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 10:56:50,338 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 11:10:21,047 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 11:10:21,048 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 11:10:21,049 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 11:10:21,049 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 11:10:21,049 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 11:10:21,073 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-25 11:10:21,077 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-25 11:10:21,079 - werkzeug - INFO -  * Restarting with stat
+2025-07-25 11:10:22,203 - KnowledgeGraphGenerator - INFO - 开始初始化数据库...
+2025-07-25 11:10:22,203 - KnowledgeGraphGenerator - INFO - 数据库文件路径: /Users/xiaogongjuonly/Desktop/Github/dfgxtest/Merge_final/knowledge_graph.db
+2025-07-25 11:10:22,203 - KnowledgeGraphGenerator - INFO - 数据库已存在，跳过初始化
+2025-07-25 11:10:22,204 - KnowledgeGraphGenerator - INFO - 数据库初始化完成
+2025-07-25 11:10:22,204 - KnowledgeGraphGenerator - INFO - 智能助教系统启动中...
+2025-07-25 11:10:22,208 - werkzeug - WARNING -  * Debugger is active!
+2025-07-25 11:10:22,234 - werkzeug - INFO -  * Debugger PIN: 141-741-129
+2025-07-25 11:10:24,986 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:10:24] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-25 11:10:25,055 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:10:25] "GET /login HTTP/1.1" 200 -
+2025-07-25 11:10:25,228 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:10:25] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-25 11:10:31,484 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:10:31] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-25 11:10:31,504 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:10:31] "GET / HTTP/1.1" 200 -
+2025-07-25 11:10:31,556 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:10:31] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-25 11:10:31,557 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:10:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 11:11:52,905 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:11:52] "GET / HTTP/1.1" 200 -
+2025-07-25 11:11:52,948 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:11:52] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-25 11:11:52,953 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:11:52] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 11:12:13,110 - KnowledgeGraphGenerator - INFO - 文件上传成功: uploads/6772a588-deaf-4463-9060-cace085c2ee4_数据与模型 测试(1).pdf, 大小: 6.78 MB, 最大节点数: 10
+2025-07-25 11:12:13,111 - KnowledgeGraphGenerator - INFO - 开始处理文档: uploads/6772a588-deaf-4463-9060-cace085c2ee4_数据与模型 测试(1).pdf, 拓扑ID: 6772a588-deaf-4463-9060-cace085c2ee4, 最大节点数: 10
+2025-07-25 11:12:13,113 - KnowledgeGraphGenerator - INFO - 拓扑ID: 6772a588-deaf-4463-9060-cace085c2ee4, 进度: 10%, 消息: 解析文档内容...
+2025-07-25 11:12:13,114 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/6772a588-deaf-4463-9060-cace085c2ee4_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-25 11:12:13,140 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:13] "POST /api/generate HTTP/1.1" 200 -
+2025-07-25 11:12:13,416 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-25 11:12:14,167 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:14] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:14,175 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-25 11:12:14,976 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-25 11:12:15,154 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:15] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:15,687 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-25 11:12:16,158 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:16] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:16,590 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-25 11:12:17,149 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:17] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:17,637 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-25 11:12:18,166 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:18] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:18,419 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-25 11:12:19,057 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-25 11:12:19,180 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:19] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:19,737 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-25 11:12:20,158 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:20] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:20,237 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/6772a588-deaf-4463-9060-cace085c2ee4_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-25 11:12:20,338 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-25 11:12:20,936 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-25 11:12:21,175 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:21] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:21,532 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-25 11:12:22,132 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-25 11:12:22,154 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:22] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:22,747 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-25 11:12:23,150 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:23] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:23,357 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-25 11:12:24,083 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-25 11:12:24,186 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:24] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:24,714 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-25 11:12:25,188 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:25] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:25,387 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-25 11:12:25,772 - KnowledgeGraphGenerator - INFO - 拓扑ID: 6772a588-deaf-4463-9060-cace085c2ee4, 进度: 20%, 消息: 准备提取知识层级...
+2025-07-25 11:12:25,773 - KnowledgeGraphGenerator - INFO - 拓扑ID: 6772a588-deaf-4463-9060-cace085c2ee4, 进度: 60%, 消息: 调用DeepSeek API提取知识层级...
+2025-07-25 11:12:25,851 - KnowledgeGraphGenerator - INFO - 第1次尝试调用DeepSeek API...
+2025-07-25 11:12:26,149 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:26] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:26,899 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 11:12:27,150 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:27] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:28,152 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:28] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:29,149 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:29] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:30,150 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:30] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:31,154 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:31] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:32,153 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:32] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:33,152 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:33] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:34,152 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:34] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:35,155 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:35] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:36,152 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:36] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:37,158 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:37] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:37,491 - KnowledgeGraphGenerator - INFO - API返回知识关系: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-25 11:12:37,491 - KnowledgeGraphGenerator - INFO - 原始JSON内容: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-25 11:12:37,492 - KnowledgeGraphGenerator - INFO - 成功解析知识关系，共10条
+2025-07-25 11:12:37,492 - KnowledgeGraphGenerator - INFO - 成功提取10条知识层级关系
+2025-07-25 11:12:37,492 - KnowledgeGraphGenerator - INFO - 拓扑ID: 6772a588-deaf-4463-9060-cace085c2ee4, 进度: 80%, 消息: 构建树形知识图并提取原文片段...
+2025-07-25 11:12:37,540 - KnowledgeGraphGenerator - INFO - 知识图谱 6772a588-deaf-4463-9060-cace085c2ee4 保存成功，用户: 12345
+2025-07-25 11:12:37,541 - KnowledgeGraphGenerator - INFO - 树形知识图生成完成，耗时: 24.43 秒
+2025-07-25 11:12:37,541 - KnowledgeGraphGenerator - INFO - 拓扑ID: 6772a588-deaf-4463-9060-cace085c2ee4, 进度: 100%, 消息: 处理完成
+2025-07-25 11:12:38,150 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:38] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:12:39,153 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:12:39] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:13:13,513 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:13:13] "GET /api/topology/6772a588-deaf-4463-9060-cace085c2ee4 HTTP/1.1" 200 -
+2025-07-25 11:20:01,976 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:01] "GET / HTTP/1.1" 200 -
+2025-07-25 11:20:02,029 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:02] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-25 11:20:02,031 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:02] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-25 11:20:38,282 - KnowledgeGraphGenerator - INFO - 文件上传成功: uploads/d1c34231-55f7-4908-b4f3-5c879adaf067_数据与模型 测试(1).pdf, 大小: 6.78 MB, 最大节点数: 10
+2025-07-25 11:20:38,283 - KnowledgeGraphGenerator - INFO - 开始处理文档: uploads/d1c34231-55f7-4908-b4f3-5c879adaf067_数据与模型 测试(1).pdf, 拓扑ID: d1c34231-55f7-4908-b4f3-5c879adaf067, 最大节点数: 10
+2025-07-25 11:20:38,284 - KnowledgeGraphGenerator - INFO - 拓扑ID: d1c34231-55f7-4908-b4f3-5c879adaf067, 进度: 10%, 消息: 解析文档内容...
+2025-07-25 11:20:38,285 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/d1c34231-55f7-4908-b4f3-5c879adaf067_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-25 11:20:38,512 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:38] "POST /api/generate HTTP/1.1" 200 -
+2025-07-25 11:20:38,908 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-25 11:20:39,532 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:39] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:40,537 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:40] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:40,821 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-25 11:20:41,530 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:41] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:41,858 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-25 11:20:42,543 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:42] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:42,718 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-25 11:20:43,525 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:43] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:43,573 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-25 11:20:44,529 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:44] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:44,623 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-25 11:20:45,286 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-25 11:20:45,523 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:45] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:45,857 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-25 11:20:46,484 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-25 11:20:46,541 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:46] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:46,783 - KnowledgeGraphGenerator - INFO - 开始解析文档: uploads/d1c34231-55f7-4908-b4f3-5c879adaf067_数据与模型 测试(1).pdf, 类型: .pdf
+2025-07-25 11:20:46,928 - KnowledgeGraphGenerator - INFO - 已解析PDF第 0 页
+2025-07-25 11:20:47,401 - KnowledgeGraphGenerator - INFO - 已解析PDF第 10 页
+2025-07-25 11:20:47,524 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:47] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:47,946 - KnowledgeGraphGenerator - INFO - 已解析PDF第 20 页
+2025-07-25 11:20:48,507 - KnowledgeGraphGenerator - INFO - 已解析PDF第 30 页
+2025-07-25 11:20:48,524 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:48] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:49,055 - KnowledgeGraphGenerator - INFO - 已解析PDF第 40 页
+2025-07-25 11:20:49,535 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:49] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:49,666 - KnowledgeGraphGenerator - INFO - 已解析PDF第 50 页
+2025-07-25 11:20:50,243 - KnowledgeGraphGenerator - INFO - 已解析PDF第 60 页
+2025-07-25 11:20:50,525 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:50] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:51,621 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:51] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:52,389 - KnowledgeGraphGenerator - INFO - 已解析PDF第 70 页
+2025-07-25 11:20:53,030 - KnowledgeGraphGenerator - INFO - 已解析PDF第 80 页
+2025-07-25 11:20:53,345 - KnowledgeGraphGenerator - INFO - 拓扑ID: d1c34231-55f7-4908-b4f3-5c879adaf067, 进度: 20%, 消息: 准备提取知识层级...
+2025-07-25 11:20:53,345 - KnowledgeGraphGenerator - INFO - 拓扑ID: d1c34231-55f7-4908-b4f3-5c879adaf067, 进度: 60%, 消息: 调用DeepSeek API提取知识层级...
+2025-07-25 11:20:53,420 - KnowledgeGraphGenerator - INFO - 第1次尝试调用DeepSeek API...
+2025-07-25 11:20:53,568 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:53] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:53,748 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-25 11:20:54,719 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:54] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:56,556 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:56] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:20:58,551 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:20:58] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:21:01,661 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:21:01] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:21:02,811 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:21:02] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:21:03,371 - KnowledgeGraphGenerator - INFO - API返回知识关系: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-25 11:21:03,371 - KnowledgeGraphGenerator - INFO - 原始JSON内容: [
+    ["数据与模型", "包含", "数据的重要性"],
+    ["数据与模型", "包含", "模型是什么"],
+    ["数据与模型", "包含", "模型如何训练评估"],
+    ["数据与模型", "包含", "数据与模型的应用场景"],
+    ["数据与模型", "包含", "数据预处理"],
+    ["数据的重要性", "包含", "数据在 AI中的核心地位"],
+ ...
+2025-07-25 11:21:03,371 - KnowledgeGraphGenerator - INFO - 成功解析知识关系，共10条
+2025-07-25 11:21:03,371 - KnowledgeGraphGenerator - INFO - 成功提取10条知识层级关系
+2025-07-25 11:21:03,371 - KnowledgeGraphGenerator - INFO - 拓扑ID: d1c34231-55f7-4908-b4f3-5c879adaf067, 进度: 80%, 消息: 构建树形知识图并提取原文片段...
+2025-07-25 11:21:03,404 - KnowledgeGraphGenerator - INFO - 知识图谱 d1c34231-55f7-4908-b4f3-5c879adaf067 保存成功，用户: 12345
+2025-07-25 11:21:03,404 - KnowledgeGraphGenerator - INFO - 树形知识图生成完成，耗时: 25.12 秒
+2025-07-25 11:21:03,405 - KnowledgeGraphGenerator - INFO - 拓扑ID: d1c34231-55f7-4908-b4f3-5c879adaf067, 进度: 100%, 消息: 处理完成
+2025-07-25 11:21:04,266 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:21:04] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:21:05,004 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:21:05] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:21:29,020 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:21:29] "GET /api/topology/d1c34231-55f7-4908-b4f3-5c879adaf067 HTTP/1.1" 200 -
+2025-07-25 11:23:19,310 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:23:19] "GET / HTTP/1.1" 200 -
+2025-07-25 11:23:19,365 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:23:19] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-25 11:23:19,366 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:23:19] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
