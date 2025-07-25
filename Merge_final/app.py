@@ -21,6 +21,9 @@ from contextlib import closing
 from collections import defaultdict
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
+from markdown import markdown
+from bs4 import BeautifulSoup
+import re
 
 logging.basicConfig(
     level=logging.INFO,
@@ -183,6 +186,27 @@ def init_db():
                     token TEXT,
                     created_at TEXT,
                     FOREIGN KEY (user_id) REFERENCES users (id)
+                );
+                    
+                -- 用户聊天问题表
+                CREATE TABLE IF NOT EXISTS chat_questions (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT,
+                    topology_id TEXT,
+                    question TEXT NOT NULL,
+                    created_at TEXT,
+                    FOREIGN KEY (user_id) REFERENCES users (id),
+                    FOREIGN KEY (topology_id) REFERENCES topologies (id)
+                );
+                    
+                -- 系统回答表
+                CREATE TABLE IF NOT EXISTS chat_answers (
+                    id TEXT PRIMARY KEY,
+                    question_id TEXT,
+                    answer TEXT NOT NULL,
+                    source TEXT,
+                    created_at TEXT,
+                    FOREIGN KEY (question_id) REFERENCES chat_questions (id)
                 );
                 """
                 db.executescript(schema)
@@ -443,7 +467,7 @@ def parse_document(file_path):
     """解析文档内容，返回文本（新增PPT支持）"""
     file_ext = os.path.splitext(file_path)[1].lower()
     logger.info(f"开始解析文档: {file_path}, 类型: {file_ext}")
-    
+
     try:
         if file_ext == '.txt':
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -679,7 +703,7 @@ def process_document(file_path, topology_id, max_nodes=0, user_id=None):
     """处理文档并生成树形知识图（支持节点数量限制）"""
     start_time = time.time()
     logger.info(f"开始处理文档: {file_path}, 拓扑ID: {topology_id}, 最大节点数: {max_nodes}")
-    
+
     # 更新状态为处理中
     topology_results[topology_id] = {
         "status": "processing",
@@ -687,7 +711,7 @@ def process_document(file_path, topology_id, max_nodes=0, user_id=None):
         "message": "开始处理文档...",
         "created_at": time.strftime('%Y-%m-%d %H:%M:%S')
     }
-    
+
     try:
         with app.app_context():
             update_progress(topology_id, 10, "解析文档内容...")
@@ -703,7 +727,7 @@ def process_document(file_path, topology_id, max_nodes=0, user_id=None):
                 return
             # ✅ 在这里添加缓存
             uploaded_documents[topology_id] = text
-            
+
             # 新增：将全文内容存入数据库，便于后续问答检索
             db = get_db()
             cursor = db.cursor()
@@ -712,7 +736,7 @@ def process_document(file_path, topology_id, max_nodes=0, user_id=None):
                 (topology_id, text, time.strftime('%Y-%m-%d %H:%M:%S'))
             )
             db.commit()
-            
+
             update_progress(topology_id, 20, "准备提取知识层级...")
             text_length = len(text)
             if text_length < 100:
@@ -726,16 +750,16 @@ def process_document(file_path, topology_id, max_nodes=0, user_id=None):
             update_progress(topology_id, 60, "调用DeepSeek API提取知识层级...")
             knowledge_edges = extract_knowledge_from_text(text, max_nodes)
             logger.info(f"成功提取{len(knowledge_edges)}条知识层级关系")
-            
+
             update_progress(topology_id, 80, "构建树形知识图并提取原文片段...")
             knowledge_graph = build_tree_structure(knowledge_edges, topology_id, text, max_nodes, user_id)
-            
+
             processing_time = time.time() - start_time
             logger.info(f"树形知识图生成完成，耗时: {processing_time:.2f} 秒")
-            
+
             update_progress(topology_id, 100, "处理完成")
             time.sleep(1)  # 确保前端有足够时间更新进度
-            
+
             topology_results[topology_id] = {
                 "status": "completed",
                 "data": knowledge_graph,
@@ -746,7 +770,7 @@ def process_document(file_path, topology_id, max_nodes=0, user_id=None):
                 "text_length": text_length,
                 "max_nodes": max_nodes  # 保存节点数量限制
             }
-            
+
     except Exception as e:
         import traceback
         error_msg = traceback.format_exc()
@@ -1524,6 +1548,7 @@ def recommend_resources_based_on_question(question):
         logger.error(f"学习资源推荐API错误: {str(e)}", exc_info=True)
         return []
 
+
 @app.route('/api/chat', methods=['POST'])
 def chat_with_knowledge():
     """
@@ -1535,10 +1560,26 @@ def chat_with_knowledge():
         data = request.json
         topology_id = data.get('topology_id', '')
         user_question = data.get('question', '').strip()
-        
+
         if not user_question:
             return jsonify({'status': 'error', 'message': '问题不能为空'}), 400
-        
+
+        # 获取当前用户ID
+        user_id = session.get('username', 'anonymous')
+
+        # 储存用户问题到chat_question表
+        with app.app_context():
+            db = get_db()
+            cursor = db.cursor()
+            question_id = str(uuid.uuid4())
+            created_at = time.strftime('%y-%m-%d %H:%M:%S')
+            cursor.execute(
+                "insert into chat_questions (id, user_id, topology_id, question, created_at) values (?, ?, ?, ?, ?)",
+                (question_id, user_id, topology_id or None, user_question, created_at)
+            )
+            db.commit()
+            logger.info(f"用户问题已储存： ID={question_id}, 用户={user_id}, 问题={user_question[:50]}...")
+
         # 获取上传文档全文内容
         with app.app_context():
             db = get_db()
@@ -1546,12 +1587,22 @@ def chat_with_knowledge():
             cursor.execute("SELECT content FROM topologies WHERE id = ?", (topology_id,))
             row = cursor.fetchone()
             document_text = row["content"] if row else ""
+<<<<<<< HEAD
+
+        # 直接用DeepSeek API在文档内容中查找相关内容
+        doc_search_prompt = (
+                "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
+                "并直接用文档原文文本回答。回答时用Markdown格式对原文文字进行重新排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
+                "**所有数学公式必须用纯文本，且不要用Markdown代码块（```）或中括号[]包裹公式**，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
+                "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
+=======
         
         doc_search_prompt = (
             "你是一个文档检索助手。请在下方给定的文档内容中查找与用户问题最相关的原文片段，"
             "并直接用文档原文文本回答。回答时分析原文语义，用Markdown格式对原文文字进行重新排版，不对文字进行更改，只优化排版，可以更改与文本意思无关的序数词和特殊符号，不要改变原文有效文字，"
             "**所有数学公式必须用LaTeX语法，并用$...$（行内）或$$...$$（块级）包裹，且不要用Markdown代码块（```）或中括号[]包裹公式**，不要改变原文有效文字。如果文档中没有相关内容，请只回复'未找到'。\n"
             "文档内容：" + document_text + "\n用户问题：" + user_question + "\n请用文档原文回答："
+>>>>>>> main
         )
         messages = [
             {"role": "system", "content": "你是一个文档检索助手。"},
@@ -1567,7 +1618,7 @@ def chat_with_knowledge():
         except Exception as e:
             logger.error(f"DeepSeek文档检索API错误: {str(e)}", exc_info=True)
             doc_answer = ""
-        
+
         deny_phrases = ["未找到", "没有相关内容", "查无相关", "未检索到", "未能找到", "未能检索到", "没有找到"]
         deny_matched = [deny for deny in deny_phrases if deny in doc_answer] if doc_answer else []
         logger.info(f"[问答调试] doc_answer: {doc_answer}")
@@ -1579,6 +1630,24 @@ def chat_with_knowledge():
             # 文档中查不到，调用智能网络问答接口
             answer = generate_answer_from_web(user_question)
             source = "web"
+
+        # 清理 answer，移除多余的 Markdown 标记（如 ```）
+        import re
+        answer = re.sub(r'^```(?:markdown|json)?\s*|\s*```$', '', answer, flags=re.MULTILINE).strip()
+        answer = re.sub(r'\n{3,}', '\n\n', answer)  # 规范化换行
+
+        # 储存系统回答到chat_answers表
+        with app.app_context():
+            db = get_db()
+            cursor = db.cursor()
+            answer_id = str(uuid.uuid4())
+            cursor.execute(
+                "insert into chat_answers (id, question_id, answer, source, created_at) values (?, ?, ?, ?, ?)",
+                (answer_id, question_id, answer, source, time.strftime('%Y-%m-%d %H:%M:%S'))
+            )
+            db.commit()
+            logger.info(f"系统回答已储存： ID={answer_id}, 问题ID={question_id}, 来源={source}")
+
         # 推荐学习资源
         resources = recommend_resources_based_on_question(user_question)
         return jsonify({
@@ -1587,10 +1656,11 @@ def chat_with_knowledge():
             'resources': resources,
             'source': source
         })
-        
+
     except Exception as e:
         logger.error(f"交互问答错误: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': f"交互问答出错: {str(e)}"}), 500
+
 
 def generate_answer_from_web(question):
     """
@@ -1599,8 +1669,8 @@ def generate_answer_from_web(question):
     messages = [
         {"role": "system", "content": (
             "你是一个智能助理，能够基于互联网资源回答各种问题。"
-            "回答时用Markdown格式排版，不要添加不合理的换行，去除空白段落，所有数学公式必须用LaTeX语法。"
-            "**行内公式请用$...$包裹，且必须与文字同行；独占一行或需要居中显示的公式必须与文字同行用$$...$$包裹。**"
+            "回答时用Markdown格式排版，不要添加不合理的换行，去除空白段落，所有数学公式必须用纯文本表示。"
+            "行内公式请用纯文本表示，且必须与文字同行；独占一行或需要居中显示的公式必须与文字同行用纯文本表示。"
             "禁止用markdown代码块（```）、中括号[]或其他符号包裹公式。"
             "只返回直接的答案内容，不要多余解释。"
         )},
@@ -1614,6 +1684,10 @@ def generate_answer_from_web(question):
         )
         answer = response.choices[0].message.content.strip()
         logger.info(f"[问答调试] 网络AI原始返回内容: {repr(answer)}")
+        # 清理 answer，移除多余的 Markdown 标记
+        import re
+        answer = re.sub(r'^```(?:markdown|json)?\s*|\s*```$', '', answer, flags=re.MULTILINE).strip()
+        answer = re.sub(r'\n{3,}', '\n\n', answer)  # 规范化换行
         return answer
     except Exception as e:
         logger.error(f"生成网络回答错误: {str(e)}", exc_info=True)
@@ -2201,6 +2275,50 @@ def change_password():
             return redirect(url_for('login'))
     
     return render_template('change_password.html')
+
+@app.route('/api/history', methods=['GET'])
+@login_required
+def get_question_history():
+    """渲染用户聊天历史记录页面"""
+    try:
+        user_id = session.get('username')
+        with app.app_context():
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT 
+                    cq.id AS question_id,
+                    cq.topology_id,
+                    t.content AS topology_content,
+                    cq.question,
+                    cq.created_at AS question_created_at,
+                    ca.id AS answer_id,
+                    ca.answer,
+                    ca.source,
+                    ca.created_at AS answer_created_at
+                FROM chat_questions cq
+                LEFT JOIN topologies t ON cq.topology_id = t.id
+                LEFT JOIN chat_answers ca ON cq.id = ca.question_id
+                WHERE cq.user_id = ?
+                ORDER BY cq.created_at DESC
+            """, (user_id,))
+            history = []
+            for row in cursor.fetchall():
+                history.append({
+                    'question_id': row['question_id'],
+                    'topology_id': row['topology_id'],
+                    'topology_content_preview': row['topology_content'][:100] + '...' if row['topology_content'] and len(row['topology_content']) > 100 else row['topology_content'],
+                    'question': row['question'],
+                    'created_at': row['question_created_at'],
+                    'answer_id': row['answer_id'],
+                    'answer': row['answer'],
+                    'source': row['source'],
+                    'answer_created_at': row['answer_created_at']
+                })
+            return render_template('chat_history.html', status='success', history=history)
+    except Exception as e:
+        logger.error(f"获取问答历史记录出错: {str(e)}", exc_info=True)
+        return render_template('chat_history.html', status='error', message=f"获取历史记录失败: {str(e)}")
 
 @app.route('/test_email')
 def test_email():

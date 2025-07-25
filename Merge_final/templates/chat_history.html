@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>历史记录</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat_history.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header-layout">
+            <h1>历史记录</h1>
+            <a href="{{ url_for('index') }}" class="btn">返回首页</a>
+        </div>
+        <div class="history-wrapper">
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <h2>历史记录列表</h2>
+                <div class="sidebar-list">
+                    {% if status == 'success' %}
+                        {% if history|length > 0 %}
+                            {% for item in history %}
+                                <div class="sidebar-item" data-question-id="{{ item.question_id }}">
+                                    <h3>{{ item.question|truncate(30, True) }}</h3>
+                                    <p>{{ item.created_at }}</p>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>暂无历史记录</p>
+                        {% endif %}
+                    {% else %}
+                        <p>加载失败: {{ message }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- 主内容区域 -->
+            <div class="main-content">
+                <div id="history-detail">
+                    {% if status == 'success' and history|length > 0 %}
+                        <div class="history-item">
+                            <h3>问题: {{ history[0].question }}</h3>
+                            <p><strong>回答:</strong> {{ history[0].answer|default('无回答') }}</p>
+                            <!-- <p><strong>来源:</strong> {{ history[0].source|default('未知') }}</p>
+                            <p><strong>提问时间:</strong> {{ history[0].created_at }}</p>
+                            <p><strong>回答时间:</strong> {{ history[0].answer_created_at|default('未回答') }}</p>
+                            <p><strong>相关文档:</strong> {{ history[0].topology_content_preview|default('无关联文档') }}</p> -->
+                        </div>
+                    {% else %}
+                        <p>请选择一条历史记录查看详情</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- 隐藏元素存储 history 数据 -->
+        <div id="history-data" style="display: none;">{{ history|tojson|safe }}</div>
+    </div>
+    <script src="{{ url_for('static', filename='js/chat_history.js') }}"></script>
+</body>
+</html>

@@ -342,6 +342,7 @@
           <div class="chat-input">
             <textarea id="qaInput" placeholder="请输入您的问题，如：图神经网络的核心思想是？"></textarea>
             <button id="qaSubmitBtn"><i class="fa fa-paper-plane"></i> 发送</button>
+            <a href="{{ url_for('get_question_history') }}">历史记录</a>
           </div>
           <div class="chat-feedback" id="resourceRecommend"></div>
 
