@@ -345,6 +345,22 @@
             <a href="{{ url_for('get_question_history') }}">历史记录</a>
           </div>
           <div class="chat-feedback" id="resourceRecommend"></div>
+
+          <div class="personalized-learning">
+            <div class="learning-actions">
+              <button id="theoryLearningBtn" class="learning-btn">
+                <i class="fa fa-book"></i> 系统理论学习
+              </button>
+              <button id="quizLearningBtn" class="learning-btn">
+                <i class="fa fa-lightbulb"></i> 测试强化学习
+              </button>
+            </div>
+            <div id="knowledgeCatalog" class="knowledge-catalog hidden">
+              <h4>知识点目录</h4>
+              <ul id="catalogList"></ul>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -456,6 +472,47 @@
         }
       });
     });
+  }
+    // 绑定按钮
+  const theoryLearningBtn = document.getElementById('theoryLearningBtn');
+  const quizLearningBtn = document.getElementById('quizLearningBtn');
+  const knowledgeCatalog = document.getElementById('knowledgeCatalog');
+  const catalogList = document.getElementById('catalogList');
+
+  // 系统理论学习：展示知识点目录
+  if (theoryLearningBtn) {
+    theoryLearningBtn.onclick = function() {
+      // 获取当前图谱ID
+      if (!currentTopologyId) {
+        alert('请先上传并生成知识图谱');
+        return;
+      }
+      fetch(`/api/topology/${currentTopologyId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success' && data.data && data.data.nodes) {
+            catalogList.innerHTML = '';
+            data.data.nodes.forEach(node => {
+              const li = document.createElement('li');
+              li.textContent = node.label;
+              catalogList.appendChild(li);
+            });
+            knowledgeCatalog.classList.remove('hidden');
+          } else {
+            catalogList.innerHTML = '<li>暂无知识点</li>';
+            knowledgeCatalog.classList.remove('hidden');
+          }
+        });
+    };
+  }
+
+  // 测试强化学习：跳转到知识测试区
+  if (quizLearningBtn) {
+    quizLearningBtn.onclick = function() {
+      // 直接滚动到quiz-section或显示quizContainer
+      document.getElementById('quizContainer').classList.remove('hidden');
+      window.scrollTo({ top: document.getElementById('quizContainer').offsetTop - 60, behavior: 'smooth' });
+    };
   }
 </script>
   
