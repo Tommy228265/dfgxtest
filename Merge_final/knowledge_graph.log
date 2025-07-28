@@ -18027,3 +18027,84 @@ openai.APIStatusError: Error code: 402 - {'error': {'message': 'Insufficient Bal
 2025-07-25 11:54:31,981 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:54:31] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
 2025-07-25 11:54:31,983 - werkzeug - INFO - 127.0.0.1 - - [25/Jul/2025 11:54:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
 >>>>>>> main
+2025-07-28 09:47:28,806 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-07-28 09:47:28,807 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\Users\Steven\Desktop\dfgxtest\Merge_final\knowledge_graph.db
+2025-07-28 09:47:28,807 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-07-28 09:47:28,807 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-07-28 09:47:28,808 - KnowledgeGraphGenerator - INFO - ÖÇÄÜÖú½ÌÏµÍ³Æô¶¯ÖÐ...
+2025-07-28 09:47:28,823 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-28 09:47:28,824 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-28 09:47:28,825 - werkzeug - INFO -  * Restarting with stat
+2025-07-28 09:47:29,712 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-07-28 09:47:29,713 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\Users\Steven\Desktop\dfgxtest\Merge_final\knowledge_graph.db
+2025-07-28 09:47:29,713 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-07-28 09:47:29,713 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-07-28 09:47:29,713 - KnowledgeGraphGenerator - INFO - ÖÇÄÜÖú½ÌÏµÍ³Æô¶¯ÖÐ...
+2025-07-28 09:47:29,719 - werkzeug - WARNING -  * Debugger is active!
+2025-07-28 09:47:29,724 - werkzeug - INFO -  * Debugger PIN: 861-967-402
+2025-07-28 09:47:31,247 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:31] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-28 09:47:31,286 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:31] "GET /login HTTP/1.1" 200 -
+2025-07-28 09:47:31,415 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:31] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-28 09:47:31,486 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:31] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-28 09:47:32,835 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:32] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-28 09:47:32,841 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:32] "GET / HTTP/1.1" 200 -
+2025-07-28 09:47:32,848 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:32] "GET /static/css/style.css?v=1.2 HTTP/1.1" 200 -
+2025-07-28 09:47:32,850 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:32] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-28 09:47:42,732 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:42] "GET /api/history HTTP/1.1" 200 -
+2025-07-28 09:47:42,737 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:42] "GET /static/css/chat_history.css HTTP/1.1" 200 -
+2025-07-28 09:47:42,738 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:42] "GET /static/js/chat_history.js HTTP/1.1" 200 -
+2025-07-28 09:47:51,951 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:51] "GET / HTTP/1.1" 200 -
+2025-07-28 09:47:51,958 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:51] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-28 09:47:51,958 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:47:51] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-28 09:51:25,759 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Steven\\Desktop\\dfgxtest\\Merge_final\\app.py', reloading
+2025-07-28 09:51:25,845 - werkzeug - INFO -  * Restarting with stat
+2025-07-28 09:51:26,753 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-07-28 09:51:26,753 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\Users\Steven\Desktop\dfgxtest\Merge_final\knowledge_graph.db
+2025-07-28 09:51:26,753 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-07-28 09:51:26,754 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-07-28 09:51:26,754 - KnowledgeGraphGenerator - INFO - ÖÇÄÜÖú½ÌÏµÍ³Æô¶¯ÖÐ...
+2025-07-28 09:51:26,760 - werkzeug - WARNING -  * Debugger is active!
+2025-07-28 09:51:26,764 - werkzeug - INFO -  * Debugger PIN: 861-967-402
+2025-07-28 09:51:41,899 - KnowledgeGraphGenerator - INFO - ÓÃ»§ÎÊÌâÒÑ´¢´æ£º ID=97dbb786-ec6b-43ec-994c-403931b3af59, ÓÃ»§=anonymous, ÎÊÌâ=¸ßË¹¹«Ê½...
+2025-07-28 09:51:42,862 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-28 09:51:45,902 - KnowledgeGraphGenerator - INFO - [ÎÊ´ðµ÷ÊÔ] doc_answer: Î´ÕÒµ½
+2025-07-28 09:51:45,902 - KnowledgeGraphGenerator - INFO - [ÎÊ´ðµ÷ÊÔ] deny_matched: ['Î´ÕÒµ½']
+2025-07-28 09:51:45,961 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-28 09:51:53,244 - KnowledgeGraphGenerator - INFO - ÏµÍ³»Ø´ðÒÑ´¢´æ£º ID=5ed9bd92-b359-47fd-885c-3431a3a32add, ÎÊÌâID=97dbb786-ec6b-43ec-994c-403931b3af59, À´Ô´=web
+2025-07-28 09:51:53,385 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-07-28 09:52:08,235 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:08] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-28 09:52:08,244 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:08] "GET /login HTTP/1.1" 200 -
+2025-07-28 09:52:08,287 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:08] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-28 09:52:09,587 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:09] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-28 09:52:09,593 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:09] "GET / HTTP/1.1" 200 -
+2025-07-28 09:52:09,599 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:09] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-28 09:52:09,600 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:09] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-28 09:52:11,002 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:11] "POST /api/chat HTTP/1.1" 200 -
+2025-07-28 09:52:11,289 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:11] "GET /api/history HTTP/1.1" 200 -
+2025-07-28 09:52:11,295 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:11] "[36mGET /static/css/chat_history.css HTTP/1.1[0m" 304 -
+2025-07-28 09:52:11,295 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 09:52:11] "[36mGET /static/js/chat_history.js HTTP/1.1[0m" 304 -
+2025-07-28 10:31:36,883 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-07-28 10:31:36,883 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\Users\Steven\Desktop\dfgxtest\Merge_final\knowledge_graph.db
+2025-07-28 10:31:36,883 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-07-28 10:31:36,883 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-07-28 10:31:36,883 - KnowledgeGraphGenerator - INFO - ÖÇÄÜÖú½ÌÏµÍ³Æô¶¯ÖÐ...
+2025-07-28 10:31:36,898 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-28 10:31:36,898 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-28 10:31:36,899 - werkzeug - INFO -  * Restarting with stat
+2025-07-28 10:31:38,907 - KnowledgeGraphGenerator - INFO - ¿ªÊ¼³õÊ¼»¯Êý¾Ý¿â...
+2025-07-28 10:31:38,907 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÎÄ¼þÂ·¾¶: C:\Users\Steven\Desktop\dfgxtest\Merge_final\knowledge_graph.db
+2025-07-28 10:31:38,908 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿âÒÑ´æÔÚ£¬Ìø¹ý³õÊ¼»¯
+2025-07-28 10:31:38,908 - KnowledgeGraphGenerator - INFO - Êý¾Ý¿â³õÊ¼»¯Íê³É
+2025-07-28 10:31:38,908 - KnowledgeGraphGenerator - INFO - ÖÇÄÜÖú½ÌÏµÍ³Æô¶¯ÖÐ...
+2025-07-28 10:31:38,916 - werkzeug - WARNING -  * Debugger is active!
+2025-07-28 10:31:38,920 - werkzeug - INFO -  * Debugger PIN: 861-967-402
+2025-07-28 10:31:43,938 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:43] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-28 10:31:43,976 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:43] "GET /login HTTP/1.1" 200 -
+2025-07-28 10:31:44,024 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:44] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-28 10:31:44,067 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:44] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-28 10:31:45,423 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:45] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-28 10:31:45,428 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:45] "GET / HTTP/1.1" 200 -
+2025-07-28 10:31:45,437 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:45] "[36mGET /static/css/style.css?v=1.2 HTTP/1.1[0m" 304 -
+2025-07-28 10:31:45,439 - werkzeug - INFO - 127.0.0.1 - - [28/Jul/2025 10:31:45] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
